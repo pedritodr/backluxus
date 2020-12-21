@@ -1,0 +1,46 @@
+/* liScroll styles */
+
+.tickercontainer {
+  height: 27px;
+  margin: 0;
+  padding: 0;
+}
+.tickercontainer .mask {
+  float: right;
+  overflow: hidden;
+  position: relative;
+  right: 0;
+  top: 4px;
+  width: 100%;
+}
+ul.newsticker { /* that's your list */
+position: relative;
+left: 750px;
+list-style-type: none;
+margin: 0;
+padding: 0;
+
+}
+ul.newsticker li {
+  float: left;
+  margin: 0 10px;
+  padding: 0;
+}
+ul.newsticker a {
+  color: #333333;
+  font-size: 14px;
+  margin-top:3px;
+}
+ul.newsticker span {
+margin: 0 10px 0 0;
+} 
+
+ul#ticker01 a > span {
+  color: #A70000;
+}
+
+
+
+
+
+

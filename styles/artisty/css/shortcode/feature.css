@@ -1,0 +1,189 @@
+/* -----------------------------------
+Template:  Theme Name
+
+NOTE: This is feature style file. All feature related style included in this file.
+
+--------------------------------------*/
+.feature-news-area {
+  margin-top: -119px;
+  position: relative;
+  width: 100%;
+  z-index: 184;
+}
+.feature-news {
+  background: #f6f6f6 none repeat scroll 0 0;
+  overflow: hidden;
+  padding: 20px;
+  padding-right: 10px;
+}
+.feature-info {
+  float: left;
+  width: 19%;
+  padding-right: 35px;
+}
+.single-feature{
+	width:27%;
+	float:left;
+	position:relative;
+	overflow:hidden;
+}
+.feature-info h3 {
+  font-weight: 600;
+}
+.feature-img-info > a > h4 {
+  color: #fff;
+}
+.feature-info p {
+  text-transform: lowercase;
+  margin-top: 20px;
+}
+
+
+.single-feature {
+  overflow: hidden;
+  position: relative;
+  padding:  0 10px;
+}
+.feature-img{
+	position:relative;
+	cursor:pointer;
+}
+.feature-img a{
+	display:inline-block;
+	position:relative;
+}
+.feature-img:before {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  content: "";
+  background: #000;
+  opacity: .5;
+  transition:all .4s;
+  z-index:1;  
+}
+.feature-img a img{}
+.feature-img-info {
+  position: absolute;
+  bottom: 0;
+  color: #fff;
+  padding: 10px;
+  z-index:3;
+  cursor:static;
+}
+.feature-img-info > p , .feature-img-info h4 {
+  margin-bottom: 2px;
+}
+span.fashion {
+  position: absolute;
+  top: 15px;
+  z-index: 111;
+  left: 0;
+  color: #fff;
+  padding: 8px 15px;
+  background: #102143;
+  text-transform: uppercase;
+  transition:all .4s;  
+}
+
+.feature-img > a::after {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  content: "";
+  left: 0;
+  top: 0;
+  background: #000;
+  opacity: 0;
+  transition:all .4s;
+}
+.single-feature:hover .feature-img > a::after{
+	opacity:.7;
+}
+.single-feature:hover .feature-img::before{opacity:0}
+.single-feature:hover span.fashion{
+	display:none;
+}
+.feature-text {
+  bottom: 38%;
+  position: absolute;
+  text-align: center;
+  width: 93%;
+  z-index: 111;
+}
+.feature-icon {
+  position: relative;
+  bottom: -35px;
+  transition:all .3s;
+  display:inline-block;  
+  opacity:0;
+}
+.feature-icon a {
+  color: #ffffff;
+  font-size: 15px;
+  padding:  0 7px;
+}
+.single-feature:hover .feature-icon{bottom:0px;opacity:1;}
+.feature-img > a::before {
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+  color: #102143;
+  content: "";
+  font-family: Material-Design-Iconic-Font;
+  font-size: 15px;
+  height: 30px;
+  left: 0;
+  line-height: 28px;
+  margin: auto;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 31%;
+  transform: scale(3);
+  transition: all 0.3s ease 0s;
+  width: 30px;
+  z-index: 1;
+  left: 0;
+}
+.single-feature:hover .feature-img > a::before{opacity:1;transform:scale(1)}
+
+/* today-feature-area */
+.single-today-feature{
+	overflow:hidden;
+	position:relative;
+}
+.today-feature-img{}
+.today-feature-img a{
+	position:relative;
+	display:inline-block;
+}
+.today-feature-img a img{}
+
+.today-feature-img > a:before {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  content: "";
+  left: 0;
+  top: 0;
+  background: #000;
+  opacity: 0;
+  transition:all .3s;
+}
+.single-today-feature:hover .today-feature-img > a:before{opacity:.4}
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,172 @@
+/* -----------------------------------
+Template:  Theme Name
+
+NOTE: This is news-details style file. All news-details related style included in this file.
+
+--------------------------------------*/
+.page_head ul li {
+  display: inline;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-family: raleway;
+  font-weight: 700;
+  margin:  0 25px;
+}
+.page_head ul li a{
+  color:#fff;
+  position:relative;	
+}
+.page_head ul li a::before {
+  content: "\f2fb";
+  font-family: Material-Design-Iconic-Font;
+  font-size: 24px;
+  left: 80px;
+  position: absolute;
+  top: -7px;
+}
+
+.news-details-page-info {
+  padding: 20px;
+  background: #F1F1F1;
+}
+.news-details-top-text > span {
+  text-transform: uppercase;
+  font-family: raleway;
+}
+.single-all-news-meta.mt-30{
+  display: inline-block;
+}
+.news-details-icon {
+  float: right;
+}
+.releted-post-blog {
+  border-bottom: 2px solid#fff;
+}
+.news-details-fashion > h4 {
+  text-transform: uppercase;
+  padding:  20px 0;
+  border-top: 2px solid#fff;
+  border-bottom: 2px solid#fff;
+}
+.releted-post-blog > h4 {
+  font-weight: 400;
+  font-family: raleway;
+}
+.single-releted-post-all-img {
+  width: 30%;
+  float: left;
+}
+.single-releted-post-all-text {
+  float: left;
+  padding-left: 20px;
+  width: 70%;
+}
+.border-2{border-bottom:2px solid#fff}
+.releted-post-all-icon > a {
+  font-size: 15px;
+  margin:  0 8px;
+}
+.related-massage textarea {
+  background: #fff;
+  height: 200px;
+}
+.related-massage input {
+  background: #fff;
+}
+.related-massage button {
+  background: #a70000 none repeat scroll 0 0;
+  border: medium none;
+  border-radius: 3px;
+  color: #ffffff;
+  float: right;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 44px 9px;
+  transition: all 0.4s ease 0s;
+}
+.related-massage button:hover{background:#fff;color:#a70000}
+.news-details-sidebar-about > h4 {
+  margin:  15px 15px;
+}
+.news-details-sidebar-about > p {
+  padding-left: 15px;
+  padding-right: 102px;
+  padding-top: 15px;
+}
+.sidebar-popular-post {
+  padding: 0 15px ;
+}
+.single-popular-post {
+  padding: 15px;
+  margin-bottom:5px;
+}
+.popular-post-img {
+  display: inline-block;
+  float: left;
+}
+.popular-post-text {
+  padding-left: 86px;
+}
+.popular-post-text > p {
+  margin-bottom: 0;
+}
+.popular-post-text > span {
+  font-family: raleway;
+}
+.sidebar-post-tag ul li {
+  display: inline-block;
+}
+.sidebar-post-tag a {
+  font-family: raleway;
+}
+.sidebar-post-tag > ul {
+  padding-left: 15px;
+  padding-right: 80px;
+}
+.tag-search {
+  border-top: 1px solid#fff;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+.tag-search form {
+  position: relative;
+  margin-top: 20px;
+}
+.tag-search form input {
+  background: #ffffff none repeat scroll 0 0;
+  border-radius: 3px;
+  width: 80%;
+  padding-left: 40px;
+  text-transform: capitalize;
+}
+.tag-search button {
+  position: absolute;
+  left: 10px;
+  height: 100%;
+  top: 0;
+  background: none;
+  border: none;
+  font-size: 25px;
+  line-height: 57px;
+}
+.sidebar-catetgories {
+  padding: 15px;
+}
+.sidebar-catetgories > h4 {
+  font-family: raleway;
+  text-transform: uppercase;
+}
+ul.catetgory-tag li a {
+  border-bottom: 1px solid #ffffff;
+  display: block;
+  font-family: raleway;
+  padding: 17px 0;
+  text-transform: capitalize;
+}
+ul.catetgory-tag li:first-child {
+  border-top: 1px solid#fff;
+}
+.single-portfolio-social > a {
+  color: #666;
+}

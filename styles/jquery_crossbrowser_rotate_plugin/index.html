@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>EtnasSoft Labs | jQuery Rotate Plugin</title>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.rotate.min.js"></script>
+<link type="text/css" media="screen" rel="stylesheet" href="css/jquery_rotate_plugin.css" />
+
+<script type="text/javascript">
+
+var rotate_angle = 0;
+
+$(document).ready(function(){
+  $('#rotate_button').click(function(){
+    rotate_angle = ( rotate_angle == 360 ) ? 0 : rotate_angle +10;
+    $('#logo, #textLayer').rotate({ angle : rotate_angle });
+  });
+});
+</script>
+</head>
+
+<body>
+<h1>EtnasSoft Labs</h1>
+<h2>Rotar elementos con CSS3 | jQuery Plugin </h2>
+<div id="content">
+	<img alt="EtnasSoft Logo" src="images/etnassoft_logo.jpg" id="logo" />
+	<div id="textLayer">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porta adipiscing odio sed consequat. Morbi varius mollis erat ut tempor. Sed blandit posuere ullamcorper.</div>
+	<button type="button" class="button" id="rotate_button"><span class="button-text">Rotar</span></button>
+</div>
+
+</body>
+</html>

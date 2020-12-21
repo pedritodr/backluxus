@@ -1,0 +1,78 @@
+/* -----------------------------------
+Template:  Theme Name
+
+NOTE: This is News View style file. All News View related style included in this file.
+
+--------------------------------------*/
+.news-view-area {
+  padding-bottom: 60px;
+}
+.single-portfolio-content{
+  padding: 20px;
+}
+.single-portfolio-content > span {
+  font-family: raleway;
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: block;
+}
+.single-portfolio-content > p {
+  padding-right: 30px;
+}
+.single-portfolio-social > a i {
+  margin:  0 8px;
+}
+.single-portfolio-social > a i:first-child {
+  margin-left: 0;
+}
+.single-portfolio-social > a:last-child {
+  margin-left: 15px;
+}
+.grid-item {
+  margin-bottom: 30px;
+  float: left;
+}
+
+.news_view_sidebar .news-details-sidebar-about > p{
+  padding-top: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.news_view_sidebar .popular-post-img {
+  float: right;
+  width: 25%;
+  margin-top: 5px;
+}
+.news_view_sidebar .popular-post-text {
+  float: left;
+  padding-left:0px;
+  width: 75%;
+}
+.news_view_sidebar .news-details-sidebar-about {
+  padding: 1px 0;
+}
+.news_view_sidebar .single-popular-post {
+  margin-bottom: 5px;
+  padding:15px 0px;
+}
+.news_view_sidebar .popular-post-text > span {
+  font-family: raleway;
+  font-size: 13px;
+}
+.news_view_sidebar .sidebar-post-tag > ul {
+  padding-left: 15px;
+  padding-right:0px;
+}
+.news_view_sidebar .tag-search form input {
+  width: 100%;
+}
+.news_view_sidebar .tag-search {
+  border-top: 1px solid #ffffff;
+  margin-left:0px;
+  margin-right:0px;
+  padding: 0px 15px;
+}
+.news_view_sidebar .sidebar-post-tag.gray-bg h4 {
+  margin: 0;
+  padding:  27px 15px;
+}

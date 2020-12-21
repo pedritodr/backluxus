@@ -1,0 +1,83 @@
+/* -----------------------------------
+Template:  Theme Name
+
+NOTE: This is Slider style file. All Slider related style included in this file.
+
+--------------------------------------*/
+/* .slider-area {
+    position: relative;
+} */
+.single-slider{
+	position:relative;
+}
+.slider-content {
+   position: absolute;
+   top: 39%;
+   transform: translateY(-50%);
+   width: 100%;
+   background-color: rgba(1, 7, 19, 0.4);
+ }
+.slider-content div {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.slider-content h1 {
+color: #fff;
+  font-size: 50px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}	
+.slider-content h1 span{
+	color:#A70000;
+}
+.slider-content h3 {
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.slider-content h3:last-child  {
+  margin-bottom: 0;
+}
+
+
+/* home-2 */
+.header-area-2 {
+  position: absolute;
+  width: 100%;
+  z-index: 2222;
+    padding: 30px 25px;
+}
+.slider-area-2{
+	position:relative;
+}
+.slider-content-2 {
+  position: absolute;
+  right:0%;
+  text-align: right;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+}
+.slider-content-2 h1, .slider-content-2 h3 {
+  color: #333333;
+}
+.slider-area-2 .owl-carousel .owl-controls .owl-dots {
+  bottom: 30px;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  text-align: center;
+}
+.slider-area-2 .owl-carousel .owl-controls .owl-dot {
+  background: #e5e5e5 none repeat scroll 0 0;
+  border: 5px solid #ff5555;
+  border-radius: 50%;
+  display: inline-block;
+  height: 20px;
+  margin: 0 3px;
+  width: 20px;
+}
+.slider-area-2 .owl-carousel .owl-controls .owl-dot.active{
+	background:#333;
+}

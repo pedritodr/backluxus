@@ -1,0 +1,72 @@
+/* -----------------------------------
+Template:  Theme Name
+
+NOTE: This is Portfolio style file. All Portfolio related style included in this file.
+
+--------------------------------------*/
+.projects-wrapper{
+  overflow: hidden;
+}
+.single-item{
+	overflow:hidden;
+	position:relative;
+}
+.portfolio-img > a {
+  display:inline-block;
+  position: relative;
+}
+.portfolio-img > a::before {
+  background: #a70000 none repeat scroll 0 0;
+  content: "";
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: all 0.4s ease 0s;
+  width: 100%;
+  z-index:1;
+}
+.single-item:hover .portfolio-img > a::before{opacity:.8}
+.portfolio-content {
+  left: 0;
+  margin: auto;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.4s ease 0s;
+  z-index: 999;
+}
+.portfolio-icon {
+  bottom: 60px;
+  position: relative;
+  transition: all 0.4s ease 0s;
+}
+.single-item:hover .portfolio-content{opacity:1;}
+.single-item:hover .portfolio-icon{  bottom:0px;}
+.portfolio-text {
+  position: relative;
+  top: 60px;
+  transition: all 0.4s ease 0s;
+}
+.single-item:hover .portfolio-text{  top:0px;}
+.portfolio-icon > a {
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  color: #ffffff;
+  display: inline-block;
+  font-size: 30px;
+  height: 45px;
+  line-height: 49px;
+  width: 45px;
+  margin: 0 10px;
+}
+.portfolio-icon > a:hover{
+	background:#fff;
+	color:#a70000;
+}
+
+

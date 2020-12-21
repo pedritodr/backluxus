@@ -1,0 +1,228 @@
+/* -----------------------------------
+Template:  Theme Name
+
+NOTE: This is Header style file. All Header related style included in this file.
+
+--------------------------------------*/
+.header-top-left {
+
+}
+.header-top-left a {
+  border: 1px solid #cccccc;
+  display: inline-block;
+  font-size: 15px;
+  height: 30px;
+  line-height: 30px;
+  margin-right: 4px;
+  text-align: center;
+  width: 30px;
+}
+.logo{
+	margin-top:4px;
+}
+.header-top-left a:hover {
+  background: #102143  none repeat scroll 0 0;
+  color: #ffffff;
+  border: 1px solid#102143 ;
+}
+.sign-up {
+  display: inline-block;
+  float: left;
+  margin-top: 6px;
+}
+.sign-up ul li {
+  display: inline-block;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.sign-up ul span {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.sign-up ul li a {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 5px;
+  text-transform: uppercase;
+}
+.search-box {
+  display: inline-block;
+  float: left;
+}
+.header-search form {
+  position: relative;
+}
+.header-search form input {
+  background: #ffffff none repeat scroll 0 0;
+  border: 1px solid #cccccc;
+  display: inline;
+  height: 40px;
+  position: relative;
+  top: 100%;
+  width: 300px;
+}
+.header-search form button {
+  background: #ffffff none repeat scroll 0 0;
+  border: 1px solid #cccccc;
+  font-size: 20px;
+  height: 100%;
+  line-height: 41px;
+  position: absolute;
+  right: 0;
+  width: 40px;
+}
+.header-search {
+  position: absolute;
+  right: 62px;
+  top: 32px;
+  display:none;
+  z-index:999;
+}
+.search-icon {
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+  border: medium none;
+  cursor: pointer;
+  line-height: 26px;
+  margin-left: 30px;
+  position: relative;
+  text-align: center;
+  width: 40px;
+  height: 25px;
+  margin-top: 3px;
+}
+.search-icon::before {
+  content: "";
+  font-family: Material-Design-Iconic-Font;
+  font-size: 20px;
+}
+.menu-icon {
+  display: inline-block;
+  float: right;
+  line-height: 21px;
+  margin-top: 4px;
+}
+.menu-icon > a {
+  font-size: 20px;
+}
+.mainmenu {
+  background: #f1f1f1 none repeat scroll 0 0;
+  padding: 30px;
+  position: fixed;
+  right: -400px;
+  width: 370px;
+  z-index: 9911111111;
+  height: 100%;
+  transition:all .4s;
+  top:0;
+  padding-top:60px;
+}
+.mainmenu > span {
+  position: absolute;
+  right: 30px;
+  top: 10px;
+  font-size: 20px;
+  cursor:pointer;
+  transition:all .4s;
+}
+.mainmenu > span:hover{
+	color:#102143 ;
+}
+.mainmenu ul {
+}
+.mainmenu ul li {
+    position: relative;
+}
+.mainmenu ul li a {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.menu-search form {
+    position: relative;
+}
+.menu-search > form input {
+    background: #ffffff none repeat scroll 0 0;
+    height: 40px;
+    text-transform: capitalize;
+    width: 100%;
+	border:none;
+}
+.menu-search form button {
+    background: #102143  none repeat scroll 0 0;
+    border: medium none;
+    color: #ffffff;
+    font-size: 23px;
+    height: 100%;
+    line-height: 44px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 41px;
+}
+.baderbar-menu-icon{
+  text-align: center;
+}
+.baderbar-menu-icon a {
+  border: 1px solid #cccccc;
+  display: inline-block;
+  font-size: 15px;
+  height: 30px;
+  line-height: 30px;
+  margin:  0 5px;
+  text-align: center;
+  width: 30px;
+}
+.baderbar-menu-icon a:hover {
+  background: #102143  none repeat scroll 0 0;
+  color: #ffffff;
+  border: 1px solid#102143 ;
+}
+.header-bottom-heading h4 {
+  margin-bottom: 0;
+  margin-top: 4px;
+}
+.header-bottom-area {
+    position: relative;
+}
+.header-bottom-area::before {
+    background: #444444 none repeat scroll 0 0;
+    content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 28%;
+}
+.header-bottom-heading {
+  color: #ffffff;
+}
+
+.header-bottom-heading h4 i {
+  font-size: 30px;
+  float: right;
+  position: absolute;
+  top: -3px;
+  right: 68px;
+}
+.news-running ul li {
+  display: inline-block;
+  margin-top: 4px;
+}
+.news-running ul li span {
+  margin-right: 10px;
+}
+.news-running {
+  float: left;
+  width: 100%;
+}
+
+
+
+.owl-carousel .owl-item img {
+  display: block;
+  width:static;
+}

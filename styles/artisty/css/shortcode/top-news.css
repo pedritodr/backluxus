@@ -1,0 +1,153 @@
+/* -----------------------------------
+Template:  Theme Name
+
+NOTE: This is top-news style file. All top-news related style included in this file.
+
+--------------------------------------*/
+.single-top-news {
+  background: #F6F6F6;
+}
+.single-top-news-info {
+  padding: 0 20px 33px;
+}
+.single-top-news-info > span {
+  display: block;
+  margin-bottom: 10px;
+  font-family:raleway;
+}
+.single-top-news-info > a i {
+  border: 1px solid #ff3333;
+  border-radius: 50%;
+  font-size: 15px;
+  height: 30px;
+  line-height: 28px;
+  text-align: center;
+  width: 30px;
+  transition:all .4s;
+}
+.single-top-news-info > a i:hover {
+  background: #000;
+  color: #fff;
+  border: 1px solid#000;
+}
+.single-top-news-info > p {
+  margin-bottom: 35px;
+}
+.single-all-news-list {
+  background: #f6f6f6 none repeat scroll 0 0;
+  overflow: hidden;
+  padding: 10px;
+}
+.single-all-news-text {
+  padding: 0px 25px;
+  margin-top: 12px;
+}
+.single-all-news-text > p {
+  margin-bottom: 0;
+}
+.single-all-news-meta > span {
+  font-family: raleway;
+  margin-right: 15px;
+}
+.single-top-new {
+  background: #f6f6f6 none repeat scroll 0 0;
+  overflow:hidden;
+  position:relative;
+}
+.single-top-news-right-img{}
+.single-top-news-right-img a{
+	position:relative;
+	display:inline-block;
+}
+
+.news-right-text {
+  color: #ffffff;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.news-right-text h2 {
+  font-size: 34px;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+.news-right-text > a {
+  display:inlne-block;
+  color: #fff;
+  font-size: 15px;
+  margin-top: 20px;
+}
+ul.top-news-menu li {
+  display: inline-block;
+}
+ul.top-news-menu li a {
+  font-weight: 700;
+  font-family: raleway;
+  text-transform: uppercase;
+  background: #F6F6F6;
+  display: block;
+  padding:  15px 30px;
+}
+ul.top-news-menu li.active a {
+  color: #A70000;
+}
+ul.top-news-menu li a:hover, ul.top-news-menu li.active a{
+	background:#A70000;
+	color:#fff;
+}
+
+/* update-news */
+.update-news {
+  text-align: center;
+}
+.update-news > a {
+  background: #ffffff none repeat scroll 0 0;
+  display: inline-block;
+  font-family: raleway;
+  font-size: 13px;
+  margin: 0 9px;
+  padding: 7px 20px 7px 80px;
+  position: relative;
+  text-align: left;
+  transition:all .3s;
+}
+.update-news > a:hover{
+	background:#A70000;
+	color:#fff;
+}
+.update-news a.apple:before {
+  position: absolute;
+  content: "\f33c";
+  font-family: Material-Design-Iconic-Font;
+  left: 30px;
+  font-size: 30px;
+  top: 3px;
+}
+.update-news a.android:before {
+  position: absolute;
+  content: "\f33b";
+  font-family: Material-Design-Iconic-Font;
+  left: 30px;
+  font-size: 30px;
+  top: 3px;
+}
+
+.today-feature-info {
+  background-color: #f5f5f5;
+}
+
+.section-title2.section-title2-color > h3 {
+  color: #313131;
+}
+
+
+
+
+
+
+
+

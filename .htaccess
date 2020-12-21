@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond $1 !^(index\.php|assets|robots\.txt)
+	RewriteRule ^(.*)$ index.php/$1 [L]
+	Options -Indexes
+	IndexIgnore * 
+	
+	##RewriteCond %{REQUEST_URI} /uploads/*
+	##RewriteRule ^(.*)$ http://%{SERVER_NAME} [R,L]
+	
+	##RewriteCond %{REQUEST_URI} /assets/*
+	##RewriteRule ^(.*)$ http://%{SERVER_NAME} [R,L]
+
+	## Enviroment for develop
+	SetEnvIf Host dev.osx.promostock$ CI_ENV=development.osx
+</IfModule>

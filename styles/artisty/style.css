@@ -1,0 +1,205 @@
+/*-----------------------------------------------------------------------------------
+
+    Template Name: Artisty
+    Template URI: https://devitems.com/html/artisty-preview/
+    Description: This is html5 template
+    Author: hastech-wp
+    Author URI: https://devitems.com
+    Version: 1.0
+
+-----------------------------------------------------------------------------------
+    
+    CSS INDEX
+    ===================
+	
+    1. Theme Default CSS (body, link color, section etc)
+
+-----------------------------------------------------------------------------------*/
+
+/*----------------------------------------*/
+/*  1.  Theme default CSS
+/*----------------------------------------*/
+/* google-fonts */
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700|Raleway:300,400,500,600,700');
+
+html, body {height: 100%;font-family: 'Poppins', sans-serif;}
+.floatleft {float:left}
+.floatright {float:right}
+.alignleft {float:left;margin-right:15px;margin-bottom: 15px}
+.alignright {float:right;margin-left:15px;margin-bottom: 15px}
+.aligncenter {display:block;margin:0 auto 15px}
+a:focus {outline:0px solid}
+img {max-width:100%;height:auto}
+.fix {overflow:hidden}
+p {margin:0 0 15px;font-family: 'Raleway', sans-serif;line-height:24px}
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 10px;
+  font-weight:600;
+  font-family: 'Poppins', sans-serif;
+}
+a {transition: all 0.3s ease 0s;text-decoration:none;}
+a:hover {
+  color: #102143;
+  text-decoration: none;
+}
+a:active, a:hover {
+  outline: 0 none;
+}
+ul{
+list-style: outside none none;
+margin: 0;
+padding: 0
+}
+.clear{clear:both}
+body {font-family: 'Poppins', sans-serif;}
+::-moz-selection {
+    background: #102143;
+    text-shadow: none;
+}
+::selection {
+    background: #102143;
+    text-shadow: none;
+}
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+.update-news-area {
+  background: url(img/bg/1.jpg)no-repeat scroll center center / cover;
+}
+.bg-img-2 {
+  background: url(img/bg/2.jpg) no-repeat scroll center center / cover;
+}
+.bg-video-img {
+  background: url(img/bg/1.jpg) no-repeat scroll center center / cover;
+}
+#scrollUp {
+  position: absolute;
+  right: 30px;
+  width: 40px;
+  height: 40px;
+  bottom: 30px;
+  color: #fff;
+  background: #102143;
+  text-align: center;
+  line-height: 40px;
+  font-size: 20px;
+  border-radius: 2px;
+}
+.page-head-area {
+  background: url(img/bg/3.jpg);
+}
+.widget-form input[placeholder] {
+  color: #ffffff;
+}
+.header-top-left {
+  text-align: left;
+}
+.video-popup {
+  border: 5px solid #ffffff;
+  border-radius: 50px;
+  color: #ffffff;
+  display: inline-block;
+  height: 60px;
+  line-height: 64px;
+  margin: 0 auto;
+  text-align: center;
+  width: 60px;
+    transition: all .3s ease 0s;
+}
+.video-popup:hover {
+  border: 5px solid #102143;
+  color: #102143;
+}
+.video-popup:hover i{
+  color: #102143;
+}
+.video-popup i {
+  color: #ffffff;
+  font-size: 30px;
+  padding-left: 3px;
+}
+.video-img {
+  position: relative;
+}
+.video-img::before {
+  background-color: #000;
+  bottom: 0;
+  content: "";
+  left: 0;
+  opacity: 0.5;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.single-brand {
+    text-align: center;
+    padding-top: 8px;
+}
+.single-brand > a {
+    display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.single-brand > a:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.brand-area .owl-carousel .owl-controls .owl-nav div {
+  background: #f1f1f1 none repeat scroll 0 0;
+  border: 1px solid #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+  height: 65px;
+  justify-content: center;
+  position: absolute;
+  right: -56px;
+  text-align: center;
+  top: 8px;
+  width: 62px;
+  transition:all .4s;
+}
+.brand-area .owl-carousel .owl-controls .owl-nav div:hover{
+	background:#102143;
+	color:#fff;
+}
+.brand-area .owl-carousel .owl-controls .owl-nav div.owl-next {
+  left: -56px;
+}
+.section-title > h3 {
+  color: #313131;
+  font-size: 34px;
+}
+
+.img-poppu > img {
+  width: 100%;
+}
