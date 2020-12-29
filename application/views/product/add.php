@@ -19,25 +19,40 @@
                         <div class="col-lg-6">
                             <label><?= translate("nombre_lang"); ?></label>
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
-                                <input type="text" class="form-control input-sm" name="name" required placeholder="<?= translate('nombre_lang'); ?>">
+                                <input type="text" class="form-control input-sm" name="name" id="producto" required placeholder="<?= translate('nombre_lang'); ?>">
+                                <div class="input-group-append">
+                                    <button onclick="searchProduct()" class="btn btn-outline-info" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                                        </svg></button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-3">
-                            <label><?= translate("stems_bunch_lang"); ?></label>
+                            <label><?= "Tipo" ?></label>
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-usd" aria-hidden="true"></i>
-                                </span>
-                                <input type="number" step="any" name="stems_bunch" min="0" class="form-control input-sm" required />
-
+                                <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
+                                <select id="type" name="type" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                    <option value="0">Selecciona una opción</option>
+                                    <?php
+                                    if (($all_types))
+                                        foreach ($all_types as $item) { ?>
+                                        <option value="<?= $item->type_id; ?>"><?= $item->name; ?></option>
+                                    <?php } ?>
+                                </select>
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <label><?= "Color" ?></label>
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-usd" aria-hidden="true"></i>
-                                </span>
-                                <input type="text" step="any" name="color" min="0" class="form-control input-sm" />
+                                <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
+                                <select id="color" name="color" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                    <option value="0">Selecciona una opción</option>
+                                    <?php
+                                    if (($all_colors))
+                                        foreach ($all_colors as $item) { ?>
+                                        <option value="<?= $item->color_id; ?>"><?= $item->name; ?></option>
+                                    <?php } ?>
+                                </select>
                             </div>
                         </div>
                         <div class="col-lg-3">
@@ -45,6 +60,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
                                 <select id="categoria" name="categoria" required class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                    <option value="0">Selecciona una opción</option>
                                     <?php
                                     if (($all_categorias))
                                         foreach ($all_categorias as $item) { ?>
@@ -91,6 +107,83 @@
 
 </div><!-- /.content-wrapper -->
 <script>
+    const searchProduct = () => {
+        let producto = $('#producto').val();
+        if (producto.trim().length > 0) {
+            swal({
+                title: '',
+                text: 'Buscando la variante',
+                timer: 3000,
+                padding: '2em',
+                onOpen: function() {
+                    swal.showLoading()
+                }
+            }).then(function(result) {
+                $.ajax({
+                    type: "POST",
+                    url: "<?php echo site_url('product/search') ?>",
+                    data: {
+                        producto: producto
+                    },
+                    cache: false,
+                    success: function(response) {
+                        response = JSON.parse(response);
+                        result.dismiss;
+                        if (response.status == 404) {
+                            swal({
+                                title: '¡Info!',
+                                text: "Esta opción esta diponible solo para administradores.",
+                                padding: '2em'
+                            });
+                        } else if (response.status == 500) {
+                            swal({
+                                title: '¡Info!',
+                                text: "No se encuentra en la base de datos.",
+                                padding: '2em'
+                            });
+                        } else {
+                            if (response.data.length > 0) {
+                                if (response.data.length > 1) {
+                                    var cadena = 'Se encontraron:'
+                                } else {
+                                    var cadena = 'Se encontró:'
+                                }
+                                response.data.forEach(item => {
+                                    cadena += '<br>' + item.name;
+
+                                });
+                                swal({
+                                    title: '¡Info!',
+                                    html: cadena,
+                                    padding: '2em'
+                                });
+                            } else {
+                                swal({
+                                    title: '¡Info!',
+                                    text: "No se encuentra en la base de datos.",
+                                    padding: '2em'
+                                });
+                            }
+
+                        }
+                        console.log(response);
+                        //result.dismiss
+                    }
+                });
+                /*     if (result.dismiss === swal.DismissReason.timer) {
+                        console.log('I was closed by the timer')
+                    } */
+            })
+        } else {
+            swal({
+                title: '¡Error!',
+                text: "El campo esta vacio y no se puede realizar la busqueda",
+                padding: '2em'
+            });
+        }
+
+    }
+
     $(() => {
         const quill = new Quill('#editor-container', {
             modules: {

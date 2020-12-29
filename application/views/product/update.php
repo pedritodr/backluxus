@@ -24,20 +24,47 @@
                             </div>
                         </div>
                         <div class="col-lg-3">
-                            <label><?= translate("stems_bunch_lang"); ?></label>
+                            <label><?= "Tipo" ?></label>
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-usd" aria-hidden="true"></i>
-                                </span>
-                                <input type="number" step="any" name="stems_bunch" min="0" class="form-control input-sm" required value="<?= $producto_object->stems_bunch; ?>" />
-
+                                <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
+                                <select id="type" name="type" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                    <option value="0">Selecciona una opción</option>
+                                    <?php if (isset($producto_object->type)) { ?>
+                                        <?php
+                                        if (($all_types))
+                                            foreach ($all_types as $item) { ?>
+                                            <option <?php if ($item->type_id == $producto_object->type->type_id) { ?> selected <?php } ?> value="<?= $item->type_id; ?>"><?= $item->name; ?></option>
+                                        <?php } ?>
+                                    <?php } else { ?>
+                                        <?php
+                                        if (($all_types))
+                                            foreach ($all_types as $item) { ?>
+                                            <option value="<?= $item->type_id; ?>"><?= $item->name; ?></option>
+                                        <?php } ?>
+                                    <?php } ?>
+                                </select>
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <label><?= "Color" ?></label>
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-usd" aria-hidden="true"></i>
-                                </span>
-                                <input type="text" step="any" name="color" min="0" class="form-control input-sm" value="<?= $producto_object->color; ?>" />
+                                <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
+                                <select id="color" name="color" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                    <option value="0">Selecciona una opción</option>
+                                    <?php if (isset($producto_object->color)) { ?>
+                                        <?php
+                                        if (($all_colors))
+                                            foreach ($all_colors as $item) { ?>
+                                            <option <?php if ($item->color_id == $producto_object->color->color_id) { ?> selected <?php } ?> value="<?= $item->color_id; ?>"><?= $item->name; ?></option>
+                                        <?php } ?>
+                                    <?php } else { ?>
+                                        <?php
+                                        if (($all_colors))
+                                            foreach ($all_colors as $item) { ?>
+                                            <option value="<?= $item->color_id; ?>"><?= $item->name; ?></option>
+                                        <?php } ?>
+                                    <?php } ?>
+                                </select>
                             </div>
                         </div>
                         <div class="col-lg-3">
@@ -45,11 +72,21 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
                                 <select id="categoria" name="categoria" required class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                    <?php
-                                    if (($all_categorias))
-                                        foreach ($all_categorias as $item) { ?>
-                                        <option <?php if ($item->category_id == $producto_object->categorie_id) { ?> selected <?php } ?> value="<?= $item->category_id; ?>"><?= $item->name; ?></option>
+                                    <option value="0">Selecciona una opción</option>
+                                    <?php if (isset($producto_object->categoria)) { ?>
+                                        <?php
+                                        if (($all_categorias))
+                                            foreach ($all_categorias as $item) { ?>
+                                            <option <?php if ($item->category_id == $producto_object->categoria->category_id) { ?> selected <?php } ?> value="<?= $item->category_id; ?>"><?= $item->name; ?></option>
+                                        <?php } ?>
+                                    <?php } else { ?>
+                                        <?php
+                                        if (($all_categorias))
+                                            foreach ($all_categorias as $item) { ?>
+                                            <option value="<?= $item->category_id; ?>"><?= $item->name; ?></option>
+                                        <?php } ?>
                                     <?php } ?>
+
                                 </select>
                             </div>
                         </div>

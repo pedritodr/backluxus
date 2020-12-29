@@ -23,6 +23,21 @@ $config['listar_measures_lang'] = "Listar medidas y pesos";
 $config['add_measure_lang'] = "Adicionar medida|peso";
 $config['update_measure_lang'] = "Actualizar medida|peso";
 
+$config['manage_colors_lang'] = "Gestionar colores";
+$config['listar_colors_lang'] = "Listar colores";
+$config['add_color_lang'] = "Adicionar color";
+$config['update_color_lang'] = "Actualizar color";
+
+$config['manage_types_lang'] = "Gestionar tipos";
+$config['listar_types_lang'] = "Listar tipos";
+$config['add_type_lang'] = "Adicionar tipo";
+$config['update_type_lang'] = "Actualizar tipo";
+
+$config['manage_bouquets_lang'] = "Gestionar bouquets";
+$config['listar_bouquests_lang'] = "Listar bouquets";
+$config['add_bouquest_lang'] = "Adicionar bouquets";
+$config['update_bouquest_lang'] = "Actualizar bouquets";
+
 $config['manage_countrys_lang'] = "Gestionar paises de entrega";
 $config['listar_countrys_lang'] = "Listar paises de entrega";
 $config['add_country_lang'] = "Adicionar país de entrega";

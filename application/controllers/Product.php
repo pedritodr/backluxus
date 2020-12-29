@@ -8,6 +8,9 @@ class Product extends CI_Controller
         parent::__construct();
 
         $this->load->model('Product_model', 'product');
+        $this->load->model('Categoria_model', 'categoria');
+        $this->load->model('Color_model', 'color');
+        $this->load->model('Type_model', 'type');
         $this->load->library(array('session'));
         $this->load->helper("mabuya");
 
@@ -36,9 +39,13 @@ class Product extends CI_Controller
             redirect('login/index');
         }
 
-        $this->load->model('Categoria_model', 'categoria');
+
         $all_categorias = $this->categoria->get_all(['is_active' => 1]);
         $data['all_categorias'] = $all_categorias;
+        $all_types = $this->type->get_all(['is_active' => 1]);
+        $data['all_types'] = $all_types;
+        $all_colors = $this->color->get_all(['is_active' => 1]);
+        $data['all_colors'] = $all_colors;
         $this->load_view_admin_g('product/add', $data);
     }
 
@@ -48,17 +55,17 @@ class Product extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-        $this->load->model('Categoria_model', 'categoria');
         $name = $this->input->post('name');
         $desc = $this->input->post('desc');
         $categoria = $this->input->post('categoria');
         $color = $this->input->post('color');
-        $stems_bunch = (int)$this->input->post('stems_bunch');
+        $type = $this->input->post('type');
         $obj_categoria = $this->categoria->get_by_id($categoria);
+        $obj_type = $this->type->get_by_id($type);
+        $obj_color = $this->color->get_by_id($color);
         //establecer reglas de validacion
         $this->form_validation->set_rules('name', translate('nombre_lang'), 'required');
         $this->form_validation->set_rules('categoria', translate('categorie_lang'), 'required');
-        $this->form_validation->set_rules('stems_bunch', translate('stems_bunch_lang'), 'required|numeric');
 
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
@@ -73,7 +80,7 @@ class Product extends CI_Controller
                 if ($allow_extension) {
                     $result = save_image_from_post('archivo', './uploads/product', time(), 600, 600);
                     if ($result[0]) {
-                        $data = ['product_id' => 'product_' . uniqid(), 'name' => $name, 'description' => $desc, 'photo' => $result[1], 'stems_bunch' => $stems_bunch, 'categorie_id' => $categoria, 'is_active' => 1, 'color' => $color, 'categoria' => $obj_categoria];
+                        $data = ['product_id' => 'product_' . uniqid(), 'name' => $name, 'description' => $desc, 'photo' => $result[1], 'type' => $obj_type, 'is_active' => 1, 'color' => $obj_color, 'categoria' => $obj_categoria];
                         $this->product->create($data);
                         $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                         redirect("product/index");
@@ -86,7 +93,7 @@ class Product extends CI_Controller
                     redirect("product/add_index", "location", 301);
                 }
             } else {
-                $data = ['product_id' => 'product_' . uniqid(), 'name' => $name, 'description' => $desc, 'photo' => null, 'stems_bunch' => $stems_bunch, 'categorie_id' => $categoria, 'is_active' => 1, 'color' => $color, 'categoria' => $obj_categoria];
+                $data = ['product_id' => 'product_' . uniqid(), 'name' => $name, 'description' => $desc, 'photo' => null, 'type' => $obj_type, 'is_active' => 1, 'color' => $obj_color, 'categoria' => $obj_categoria];
                 $this->product->create($data);
                 $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                 redirect("product/index");
@@ -107,9 +114,12 @@ class Product extends CI_Controller
         $producto_object = $this->product->get_by_id($producto_id);
 
         if ($producto_object) {
-            $producto_object->categoria = $this->categoria->get_by_id($producto_object->categorie_id);
             $all_categorias = $this->categoria->get_all(['is_active' => 1]);
             $data['all_categorias'] = $all_categorias;
+            $all_types = $this->type->get_all(['is_active' => 1]);
+            $data['all_types'] = $all_types;
+            $all_colors = $this->color->get_all(['is_active' => 1]);
+            $data['all_colors'] = $all_colors;
             $data['producto_object'] = $producto_object;
             $this->load_view_admin_g('product/update', $data);
         } else {
@@ -203,7 +213,9 @@ class Product extends CI_Controller
         $desc = $this->input->post('desc');
         $categoria = $this->input->post('categoria');
         $color = $this->input->post('color');
-        $stems_bunch = (int)$this->input->post('stems_bunch');
+        $type = $this->input->post('type');
+        $obj_type = $this->type->get_by_id($type);
+        $obj_color = $this->color->get_by_id($color);
         $producto_id = $this->input->post('producto_id');
         $producto_object = $this->product->get_by_id($producto_id);
         $obj_categoria = $this->categoria->get_by_id($categoria);
@@ -226,7 +238,7 @@ class Product extends CI_Controller
             if ($allow_extension || $_FILES['archivo']['error'] == 4) {
 
                 if ($_FILES['archivo']['error'] == 4) {
-                    $data = ['name' => $name, 'description' => $desc, 'stems_bunch' => $stems_bunch, 'color' => $color, 'categorie_id' => $categoria, 'categoria' => $obj_categoria];
+                    $data = ['name' => $name, 'description' => $desc, 'type' => $obj_type, 'color' => $obj_color, 'categoria' => $obj_categoria];
                     $this->product->update($producto_id, $data);
                     $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                     redirect("product/index");
@@ -239,7 +251,7 @@ class Product extends CI_Controller
                             if (file_exists($producto_object->main_photo))
                                 unlink($producto_object->main_photo);
 
-                            $data = ['name' => $name, 'main_photo' => $result[1], 'description' => $desc, 'stems_bunch' => $stems_bunch, 'color' => $color, 'categorie_id' => $categoria, 'categoria' => $obj_categoria];
+                            $data = ['name' => $name, 'main_photo' => $result[1], 'description' => $desc, 'type' => $obj_type, 'color' => $obj_color, 'categoria' => $obj_categoria];
                             $this->product->update($producto_id, $data);
                             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                             redirect("product/index");
@@ -372,5 +384,28 @@ class Product extends CI_Controller
         } else {
             show_404();
         }
+    }
+    public function search()
+    {
+        //ini_set('max_execution_time', '0');
+        $user_id = $this->session->userdata('user_id');
+        if (!$user_id) {
+            echo json_encode(['status' => 404]);
+            exit();
+        }
+        if ($this->session->userdata('role_id')) {
+            if ($this->session->userdata('role_id') != 1) {
+                echo json_encode(['status' => 404]);
+                exit();
+            }
+        }
+        $producto = $this->input->post('producto');
+        $result = $this->product->search($producto);
+        if (count($result) > 0) {
+            echo json_encode(['status' => 200, 'data' => $result]);
+        } else {
+            echo json_encode(['status' => 500]);
+        }
+        exit();
     }
 }

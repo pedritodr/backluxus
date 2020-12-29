@@ -36,9 +36,15 @@
                                         <tr>
                                             <td>
                                                 <p><?= $item->name; ?></p>
-                                                <p><strong><?= translate("category_lang"); ?> : </strong><?= $item->categoria->name; ?></p>
-                                                <p><strong><?= translate("stems_bunch_lang"); ?> : </strong><?= $item->stems_bunch ?></p>
-                                                <p><strong><?= "Color" ?> : </strong><?= $item->color ?></p>
+                                                <?php if (isset($item->categoria)) { ?>
+                                                    <p><strong><?= translate("category_lang"); ?> : </strong><?= $item->categoria->name; ?></p>
+                                                <?php } ?>
+                                                <?php if (isset($item->type)) { ?>
+                                                    <p><strong><?= "Tipo" ?> : </strong><?= $item->type->name ?></p>
+                                                <?php } ?>
+                                                <?php if (isset($item->color)) { ?>
+                                                    <p><strong><?= "Color" ?> : </strong><?= $item->color->name ?></p>
+                                                <?php } ?>
                                             </td>
                                             <td style="width:20%">
                                                 <?php if (file_exists($item->photo)) { ?>

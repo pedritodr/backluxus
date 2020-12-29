@@ -143,4 +143,8 @@ class Product_model extends CI_Model
         $result = $this->mongo_db->get('products');
         return $result;
     }
+    function search($producto)
+    {
+        return $this->mongo_db->like('name', $producto)->get('product');
+    }
 }
