@@ -221,9 +221,7 @@ class Product extends CI_Controller
         $obj_categoria = $this->categoria->get_by_id($categoria);
         //establecer reglas de validacion
         $this->form_validation->set_rules('name', translate('nombre_lang'), 'required');
-        $this->form_validation->set_rules('desc', translate('descripcion_lang'), 'required');
         $this->form_validation->set_rules('categoria', translate('categorie_lang'), 'required');
-        $this->form_validation->set_rules('stems_bunch', translate('stems_bunch_lang'), 'required|numeric');
 
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
