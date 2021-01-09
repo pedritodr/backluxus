@@ -32,7 +32,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
                                 <select id="type" name="type" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                   <!--  <option value="0">Selecciona una opción</option> -->
+                                    <option value="0">Selecciona una opción</option>
                                     <?php
                                     if (($all_types))
                                         foreach ($all_types as $item) { ?>
@@ -46,7 +46,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
                                 <select id="color" name="color" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                    <!-- <option value="0">Selecciona una opción</option> -->
+                                    <option value="0">Selecciona una opción</option>
                                     <?php
                                     if (($all_colors))
                                         foreach ($all_colors as $item) { ?>
@@ -60,7 +60,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
                                 <select id="categoria" name="categoria" required class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <!--     <option value="0">Selecciona una opción</option> -->
+                                    <option value="0">Selecciona una opción</option>
                                     <?php
                                     if (($all_categorias))
                                         foreach ($all_categorias as $item) { ?>

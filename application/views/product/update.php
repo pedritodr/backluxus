@@ -28,7 +28,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
                                 <select id="type" name="type" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                    <!--      <option value="0">Selecciona una opción</option> -->
+                                    <option value="0">Selecciona una opción</option>
                                     <?php if (isset($producto_object->type)) { ?>
                                         <?php
                                         if (($all_types))
@@ -50,7 +50,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
                                 <select id="color" name="color" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                    <!--     <option value="0">Selecciona una opción</option> -->
+                                    <option value="0">Selecciona una opción</option>
                                     <?php if (isset($producto_object->color)) { ?>
                                         <?php
                                         if (($all_colors))
@@ -72,7 +72,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
                                 <select id="categoria" name="categoria" required class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                    <!--     <option value="0">Selecciona una opción</option> -->
+                                    <option value="0">Selecciona una opción</option>
                                     <?php if (isset($producto_object->categoria)) { ?>
                                         <?php
                                         if (($all_categorias))
