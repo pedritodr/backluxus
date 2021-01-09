@@ -30,10 +30,18 @@
                                 <select id="type" name="type" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                     <option value="0">Selecciona una opción</option>
                                     <?php if (isset($producto_object->type)) { ?>
-                                        <?php
-                                        if (($all_types))
-                                            foreach ($all_types as $item) { ?>
-                                            <option <?php if ($item->type_id == $producto_object->type->type_id) { ?> selected <?php } ?> value="<?= $item->type_id; ?>"><?= $item->name; ?></option>
+                                        <?php if (($producto_object->type)) { ?>
+                                            <?php
+                                            if (($all_types))
+                                                foreach ($all_types as $item) { ?>
+                                                <option <?php if ($item->type_id == $producto_object->type->type_id) { ?> selected <?php } ?> value="<?= $item->type_id; ?>"><?= $item->name; ?></option>
+                                            <?php } ?>
+                                        <?php } else { ?>
+                                            <?php
+                                            if (($all_types))
+                                                foreach ($all_types as $item) { ?>
+                                                <option value="<?= $item->type_id; ?>"><?= $item->name; ?></option>
+                                            <?php } ?>
                                         <?php } ?>
                                     <?php } else { ?>
                                         <?php
@@ -52,11 +60,20 @@
                                 <select id="color" name="color" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                     <option value="0">Selecciona una opción</option>
                                     <?php if (isset($producto_object->color)) { ?>
-                                        <?php
-                                        if (($all_colors))
-                                            foreach ($all_colors as $item) { ?>
-                                            <option <?php if ($item->color_id == $producto_object->color->color_id) { ?> selected <?php } ?> value="<?= $item->color_id; ?>"><?= $item->name; ?></option>
+                                        <?php if (($producto_object->color)) { ?>
+                                            <?php
+                                            if (($all_colors))
+                                                foreach ($all_colors as $item) { ?>
+                                                <option <?php if ($item->color_id == $producto_object->color->color_id) { ?> selected <?php } ?> value="<?= $item->color_id; ?>"><?= $item->name; ?></option>
+                                            <?php } ?>
+                                        <?php } else { ?>
+                                            <?php
+                                            if (($all_colors))
+                                                foreach ($all_colors as $item) { ?>
+                                                <option value="<?= $item->color_id; ?>"><?= $item->name; ?></option>
+                                            <?php } ?>
                                         <?php } ?>
+
                                     <?php } else { ?>
                                         <?php
                                         if (($all_colors))
@@ -74,11 +91,20 @@
                                 <select id="categoria" name="categoria" required class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                     <option value="0">Selecciona una opción</option>
                                     <?php if (isset($producto_object->categoria)) { ?>
-                                        <?php
-                                        if (($all_categorias))
-                                            foreach ($all_categorias as $item) { ?>
-                                            <option <?php if ($item->category_id == $producto_object->categoria->category_id) { ?> selected <?php } ?> value="<?= $item->category_id; ?>"><?= $item->name; ?></option>
+                                        <?php if (($producto_object->categoria)) { ?>
+                                            <?php
+                                            if (($all_categorias))
+                                                foreach ($all_categorias as $item) { ?>
+                                                <option <?php if ($item->category_id == $producto_object->categoria->category_id) { ?> selected <?php } ?> value="<?= $item->category_id; ?>"><?= $item->name; ?></option>
+                                            <?php } ?>
+                                        <?php } else { ?>
+                                            <?php
+                                            if (($all_categorias))
+                                                foreach ($all_categorias as $item) { ?>
+                                                <option value="<?= $item->category_id; ?>"><?= $item->name; ?></option>
+                                            <?php } ?>
                                         <?php } ?>
+
                                     <?php } else { ?>
                                         <?php
                                         if (($all_categorias))
