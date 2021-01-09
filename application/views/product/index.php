@@ -37,7 +37,9 @@
                                             <td>
                                                 <p><?= $item->name; ?></p>
                                                 <?php if (isset($item->categoria)) { ?>
-                                                    <p><strong><?= translate("category_lang"); ?> : </strong><?= $item->categoria->name; ?></p>
+                                                    <?php if (($item->categoria)) { ?>
+                                                        <p><strong><?= translate("category_lang"); ?> : </strong><?= $item->categoria->name; ?></p>
+                                                    <?php } ?>
                                                 <?php } ?>
                                                 <?php if (isset($item->type)) { ?>
                                                     <p><strong><?= "Tipo" ?> : </strong><?= $item->type->name ?></p>
