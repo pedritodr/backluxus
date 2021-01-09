@@ -1,6 +1,6 @@
 <?php
 
-class Provider_model extends CI_Model
+class Farm_model extends CI_Model
 {
 
     function __construct()
@@ -12,62 +12,45 @@ class Provider_model extends CI_Model
 
     function create($data)
     {
-
-        $this->db->insert('provider', $data);
-        $id = $this->db->insert_id();
-        // $this->activelog($id,$data['name'],1);
-        return $id;
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->insert('fams', $data);
+        return $newId;
     }
-
-
     function get_by_id($id)
     {
-        $this->db->where('provider_id', $id);
-        $query = $this->db->get('provider');
-
-        return $query->row();
+        $result = $this->mongo_db->where(['farm_id' => $id])->get('fams');
+        return (count($result) > 0) ? (object) $result[0] : false;
     }
-
-    function delete($id)
-    {
-        $this->db->where('provider_id', $id);
-        $this->db->delete('provider');
-        $afec = $this->db->affected_rows();
-
-
-        return $afec;
-    }
-
     function get_all($conditions = [], $get_as_row = FALSE)
     {
-
-        foreach ($conditions as $key => $value) {
-            $this->db->where($key, $value);
+        if (count($conditions) > 0) {
+            $result = $this->mongo_db->where($conditions)->get('fams');
+        } else {
+            $result = $this->mongo_db->get('fams');
         }
-        $query = $this->db->get('provider');
 
-        return ($get_as_row) ? $query->row() : $query->result();
+        if ($get_as_row) {
+            if (count($result) > 0) {
+                return (object) $result[0];
+            } else {
+                return false;
+            }
+        } else {
+            return ($result) ? array_to_object($result) : FALSE;
+        }
     }
-
-
-
     function update($id, $data)
     {
-        $old = $this->get_by_id($id);
-        $this->db->where('provider_id', $id);
-        foreach ($data as $key => $value) {
-            $this->db->set($key, $value);
-        }
-        $this->db->update('provider');
-        $afec = $this->db->affected_rows();
-
-        if ($afec > 0) {
-            $new = $this->get_by_id($id);
-            // $this->activelog($id, null, 2, $new, $old);
-        }
-
-        return $afec;
+        $result = $this->mongo_db->where('farm_id', $id)->set($data)->update('fams');
+        return $result;
     }
+    function delete($id)
+    {
+        $objecId = $this->mongo_db->create_document_id($id);
+        $result = $this->mongo_db->where(['_id' => $objecId])->delete('fams');
+        return $result;
+    }
+
 
     function create_provider_products_array($id, $array)
     {

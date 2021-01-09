@@ -6,7 +6,6 @@ class Color extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
         $this->load->model('Color_model', 'color');
         $this->load->library(array('session'));
         $this->load->helper("mabuya");
@@ -94,11 +93,12 @@ class Color extends CI_Controller
             $data = ['name' => $name];
             $row =  $this->color->update($color_id, $data);
             if ($row) {
-                $products =  $this->product->gel_all(['color.color_id' => $color_id]);
-                $color_object = $this->type->get_by_id($color_id);
+                $this->load->model('Product_model', 'product');
+                $products =  $this->product->get_all(['color.color_id' => $color_id]);
+                $color_object = $this->color->get_by_id($color_id);
                 if ($products) {
                     foreach ($products as $item) {
-                        $data_product = ['type' => $color_object];
+                        $data_product = ['color' => $color_object];
                         $this->product->update($item->product_id, $data_product);
                     }
                 }

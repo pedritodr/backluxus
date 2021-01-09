@@ -1,13 +1,13 @@
 <?php
 
-class Provider extends CI_Controller
+class Farm extends CI_Controller
 {
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->load->model('Provider_model', 'provider');
+        $this->load->model('Farm_model', 'farm');
         $this->load->library(array('session'));
         $this->load->helper("mabuya");
 
@@ -24,19 +24,11 @@ class Provider extends CI_Controller
             redirect('login/index');
         }
         $this->load->model('Product_model', 'product');
-        $all_providers = $this->provider->get_all();
+        $all_farms = $this->farm->get_all();
 
-        foreach ($all_providers as $provider) {
-            $provider->products = $this->provider->get_all_products_by_provider($provider->provider_id);
-            foreach ($provider->products as $item) {
-                $item->measure = $this->product->get_by_measure_id($item->product_id);
-            }
-        }
+        $data['all_farms'] = $all_farms;
 
-
-        $data['all_providers'] = $all_providers;
-
-        $this->load_view_admin_g("provider/index", $data);
+        $this->load_view_admin_g("farm/index", $data);
     }
 
     public function add_index()
@@ -49,7 +41,7 @@ class Provider extends CI_Controller
         $all_products = $this->product->get_all();
         $data['all_products'] = $all_products;
 
-        $this->load_view_admin_g('provider/add', $data);
+        $this->load_view_admin_g('farm/add', $data);
     }
 
     public function add()
@@ -80,34 +72,34 @@ class Provider extends CI_Controller
 
 
         $data = ['name' => $name, 'tax_id' => $identificacion, 'email' => $email, 'phone' => $phone, 'address' => $address, 'seller' => $seller, 'phone_seller' => $phone_seller, 'skype_seller' => $skype_seller, 'email_seller' => $email_seller, 'person_payment' => $person_payment, 'email_payment ' => $email_payment, 'phone_payment   ' => $phone_payment, 'skype_payment   ' => $skype_payment, 'data_banking' => $banking, 'data_additional' => $additional, 'name_commercial' => $name_commercial];
-        $id = $this->provider->create($data);
+        $id = $this->farm->create($data);
         if (isset($id)) {
-            $this->provider->create_provider_products_array($id, $varieties);
+            $this->farm->create_farm_products_array($id, $varieties);
         }
 
         $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
-        redirect("provider/index", "location", 301);
+        redirect("farm/index", "location", 301);
     }
 
-    function update_index($provider_id = 0)
+    function update_index($farm_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
             redirect('login/index');
         }
 
-        $provider_object = $this->provider->get_by_id($provider_id);
+        $farm_object = $this->farm->get_by_id($farm_id);
         $this->load->model('Product_model', 'product');
         $all_products = $this->product->get_all();
         $data['all_products'] = $all_products;
 
 
-        if ($provider_object) {
-            $data['provider_object'] = $provider_object;
-            $data['products'] = $this->provider->get_all_products_by_provider_simple($provider_id);
+        if ($farm_object) {
+            $data['farm_object'] = $farm_object;
+            $data['products'] = $this->farm->get_all_products_by_farm_simple($farm_id);
 
 
-            $this->load_view_admin_g('provider/update', $data);
+            $this->load_view_admin_g('farm/update', $data);
         } else {
             show_404();
         }
@@ -138,33 +130,33 @@ class Provider extends CI_Controller
         $skype_payment = $this->input->post('skype_payment');
         $name_commercial = $this->input->post('nombre_comercial');
 
-        $provider_id = $this->input->post('provider_id');
+        $farm_id = $this->input->post('farm_id');
 
-        $provider_object = $this->provider->get_by_id($provider_id);
+        $farm_object = $this->farm->get_by_id($farm_id);
 
-        if ($provider_object) {
+        if ($farm_object) {
 
             $data = ['name' => $name, 'tax_id' => $identificacion, 'email' => $email, 'phone' => $phone, 'address' => $address, 'seller' => $seller, 'phone_seller' => $phone_seller, 'skype_seller' => $skype_seller, 'email_seller' => $email_seller, 'person_payment' => $person_payment, 'email_payment ' => $email_payment, 'phone_payment   ' => $phone_payment, 'skype_payment   ' => $skype_payment, 'data_banking' => $banking, 'data_additional' => $additional, 'name_commercial' => $name_commercial];
 
-            $this->provider->update($provider_id, $data);
-            $this->provider->create_provider_products_array($provider_id, $varieties);
+            $this->farm->update($farm_id, $data);
+            $this->farm->create_farm_products_array($farm_id, $varieties);
 
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
-            redirect("provider/index", "location", 301);
+            redirect("farm/index", "location", 301);
         }
     }
-    public function delete($provider_id = 0)
+    public function delete($farm_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
             redirect('login/index');
         }
 
-        $provider_object = $this->provider->get_by_id($provider_id);
-        if ($provider_object) {
-            $this->provider->delete($provider_id);
+        $farm_object = $this->farm->get_by_id($farm_id);
+        if ($farm_object) {
+            $this->farm->delete($farm_id);
             $this->response->set_message(translate('data_deleted_ok'), ResponseMessage::SUCCESS);
-            redirect("provider/index");
+            redirect("farm/index");
         } else {
             show_404();
         }
