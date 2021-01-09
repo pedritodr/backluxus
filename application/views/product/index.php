@@ -42,10 +42,14 @@
                                                     <?php } ?>
                                                 <?php } ?>
                                                 <?php if (isset($item->type)) { ?>
-                                                    <p><strong><?= "Tipo" ?> : </strong><?= $item->type->name ?></p>
+                                                    <?php if (($item->type)) { ?>
+                                                        <p><strong><?= "Tipo" ?> : </strong><?= $item->type->name ?></p>
+                                                    <?php } ?>
                                                 <?php } ?>
                                                 <?php if (isset($item->color)) { ?>
-                                                    <p><strong><?= "Color" ?> : </strong><?= $item->color->name ?></p>
+                                                    <?php if (($item->color)) { ?>
+                                                        <p><strong><?= "Color" ?> : </strong><?= $item->color->name ?></p>
+                                                    <?php } ?>
                                                 <?php } ?>
                                             </td>
                                             <td style="width:20%">
