@@ -1,219 +1,49 @@
-<!-- Select2 -->
-<link rel="stylesheet" href="<?= base_url(); ?>admin_lte/plugins/select2/select2.min.css">
-<!-- Theme style -->
-<link rel="stylesheet" href="<?= base_url(); ?>admin_lte/dist/css/AdminLTE.min.css">
-<!-- daterange picker -->
-<link rel="stylesheet" href="<?= base_url(); ?>admin_lte/plugins/daterangepicker/daterangepicker.css">
+<div class="main-container" id="container">
 
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-        <h1>
-            <?= translate('manage_providers_lang'); ?>
-            <small><?= translate('update_provider_lang'); ?></small>
-            | <a href="<?= site_url('provider/index'); ?>" class="btn btn-default"><i class="fa fa-arrow-circle-left"></i> <?= translate('back_lang'); ?>
+    <div class="layout-px-spacing" style="width:100%">
+        <h3>
+            <?= translate('manage_farms_lang') ?> | <a href="<?= site_url('farm/index_provider'); ?>" class="btn btn-default"><i class="fa fa-arrow-circle-left"></i> <?= translate('back_lang'); ?>
             </a>
-        </h1>
-        <ol class="breadcrumb">
-            <li><a href="<?= site_url('dashboard/index'); ?>"><i class="fa fa-dashboard"></i> <?= translate('pizarra_resumen_lang'); ?></a></li>
-            <li class="active"><?= translate('update_provider_lang'); ?></li>
+        </h3>
 
+        <div class="col-xs-12">
+            <div class="statbox widget box box-shadow">
+                <div class="widget-header">
+                    <h6 class="text-simple"> <?= translate('update_provider_lang') ?></h6>
+                </div>
+                <div class="widget-content widget-content-area">
+                    <?= get_message_from_operation(); ?>
+                    <?= form_open_multipart("farm/update_provider"); ?>
+                    <div class="row">
+                        <input type="hidden" name="provider_id" value="<?= $provider_obj->provider_id ?>">
+                        <div class="col-lg-6">
+                            <label><?= translate("owner_lang"); ?></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" name="owner" value="<?= $provider_obj->owner ?>" required placeholder="<?= translate('owner_lang'); ?>">
+                            </div>
+                        </div>
 
-        </ol>
-    </section>
+                        <div class="col-lg-6">
+                            <label><?= translate("days_credit_lang"); ?></label>
+                            <div class="input-group">
+                                <input type="number" min="0" class="form-control input-sm" name="days" value="<?= $provider_obj->days_credit ?>" required placeholder="<?= translate('days_credit_lang'); ?>">
+                            </div>
+                        </div>
 
-    <!-- Main content -->
-    <section class="content">
-        <div class="row">
-            <div class="col-xs-12">
+                        <div class="col-lg-12" style="text-align: right;">
+                            <br>
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-check-square"></i> <?= translate('guardar_info_lang'); ?></button>
+                        </div>
 
-                <div class="box box-default">
-                    <div class="box-header with-border">
-                        <h3 class="box-title"><?= translate('update_provider_lang'); ?></h3>
                     </div>
-                    <div class="box-body">
-
-                        <?= get_message_from_operation(); ?>
-
-                        <?= form_open_multipart("provider/update"); ?>
-                        <input type="hidden" name="provider_id" value="<?= $provider_object->provider_id; ?>" />
-
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="col-lg-3">
-                                    <label><?= translate("nombre_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-cogs"></i></span> <input type="text" class="form-control input-sm" name="name" placeholder="<?= translate('nombre_lang'); ?>" value="<?= $provider_object->name; ?>">
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <label><?= translate("tax_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-cogs"></i></span> <input type="text" class="form-control input-sm" name="identificacion" placeholder="<?= translate('tax_lang'); ?>" value="<?= $provider_object->tax_id; ?>">
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <label><?= translate("email_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon">@</span>
-                                        <input type="text" class="form-control input-sm" name="email" placeholder="<?= translate('email_lang'); ?>" value="<?= $provider_object->email; ?>">
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3">
-                                    <label><?= translate("phone_provider_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-mobile" aria-hidden="true"></i></span>
-                                        <input type="text" class="form-control input-sm" name="phone" placeholder="<?= translate('phone_provider_lang'); ?>" value="<?= $provider_object->phone; ?>">
-                                    </div>
-
-                                </div>
-
-                                <div class="col-lg-3">
-                                    <label><?= translate("person_payment_lang"); ?></label>
-                                    <div class="input-group">
-
-                                        <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i>
-                                        </span>
-                                        <input type="text" class="form-control input-sm" name="person_payment" placeholder="<?= translate('person_payment_lang'); ?>" value="<?= $provider_object->person_payment; ?>">
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-3">
-                                    <label><?= translate("email_payment_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon">@</span>
-                                        <input type="email" class="form-control input-sm" name="email_payment" placeholder="<?= translate('email_payment_lang') ?>" value="<?= $provider_object->email_payment; ?>">
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-3">
-                                    <label><?= translate("phone_payment_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-mobile" aria-hidden="true"></i></span>
-                                        <input type="text" class="form-control input-sm" name="phone_payment" placeholder="<?= translate('phone_payment_lang'); ?>" value="<?= $provider_object->phone_payment; ?>">
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-3">
-                                    <label><?= translate("skype_payment_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-skype"></i></span> <input type="text" class="form-control input-sm" name="skype_payment" placeholder="<?= translate('skype_payment_lang'); ?>" value="<?= $provider_object->skype_payment; ?>">
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3">
-                                    <label><?= translate("seller_lang"); ?></label>
-                                    <div class="input-group">
-
-                                        <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i>
-                                        </span>
-                                        <input type="text" class="form-control input-sm" name="seller" placeholder="<?= translate('seller_lang'); ?>" value="<?= $provider_object->seller; ?>">
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-3">
-                                    <label><?= translate("email_seller_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon">@</span>
-                                        <input type="email" class="form-control input-sm" name="email_seller" placeholder="<?= translate('email_seller_lang') ?>" value="<?= $provider_object->email_seller; ?>">
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-3">
-                                    <label><?= translate("phone_seller_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-mobile" aria-hidden="true"></i></span>
-                                        <input type="text" class="form-control input-sm" name="phone_seller" placeholder="<?= translate('phone_seller_lang'); ?>" value="<?= $provider_object->phone_seller; ?>">
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-3">
-                                    <label><?= translate("skype_seller_lang"); ?></label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-skype"></i></span> <input type="text" class="form-control input-sm" name="skype_seller" placeholder="<?= translate('skype_seller_lang'); ?>" value="<?= $provider_object->skype_seller; ?>">
-                                    </div>
-                                </div>
-                                <div class="col-lg-7">
-                                    <label><?= translate("address_lang"); ?></label>
-                                    <div class="input-group">
-
-                                        <span class="input-group-addon"><i class="fa fa-location-arrow" aria-hidden="true"></i>
-                                        </span>
-                                        <input type="text" class="form-control input-sm" name="address" placeholder="<?= translate('address_lang'); ?>" value="<?= $provider_object->address; ?>">
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-5">
-                                    <label>Nombre comercial</label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-cogs"></i></span> <input type="text" class="form-control input-sm" name="nombre_comercial" placeholder="Nombre comercial" value="<?= $provider_object->name_commercial; ?>">
-                                    </div>
-                                </div>
+                    <?= form_close(); ?>
 
 
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
 
 
-                            </div>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
 
-
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="control-label"><?= translate("data_banking_lang"); ?></label>
-                                    <textarea name="banking" class="form-control textarea" placeholder="<?= translate("data_banking_lang"); ?>">
-                                    <?= $provider_object->data_banking; ?>
-                                    </textarea>
-
-                                    <br>
-
-
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="control-label"><?= translate("data_additional_lang"); ?></label>
-                                    <textarea name="additional" class="form-control textarea" placeholder="<?= translate("data_additional_lang"); ?>">
-                                    <?= $provider_object->data_additional; ?>
-                                    </textarea>
-
-                                    <br>
-
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <br>
-
-                        <div class="row">
-                            <div class="col-xs-12" style="text-align: right;">
-
-                                <button type="submit" class="btn btn-primary"><i class="fa fa-check-square"></i> <?= translate('guardar_info_lang'); ?></button>
-                            </div>
-                        </div>
-
-                    </div><!-- /.box-body -->
-                </div><!-- /.box -->
-
-
-            </div><!-- /.col -->
-        </div><!-- /.row -->
-    </section><!-- /.content -->
 </div><!-- /.content-wrapper -->
-
-<script>
-    $(function() {
-        $("#example1").DataTable();
-        $(".select2").select2();
-        $(".textarea").wysihtml5();
-
-    });
-</script>
-<!-- Select2 -->
-<script src="<?= base_url(); ?>admin_lte/plugins/select2/select2.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-<script src="<?= base_url(); ?>admin_lte/plugins/daterangepicker/daterangepicker.js"></script>

@@ -33,6 +33,27 @@ $config['listar_types_lang'] = "Listar tipos";
 $config['add_type_lang'] = "Adicionar tipo";
 $config['update_type_lang'] = "Actualizar tipo";
 
+$config['manage_farms_lang'] = "Gestionar fincas";
+$config['listar_farms_lang'] = "Listar fincas";
+$config['add_farm_lang'] = "Adicionar finca";
+$config['update_farm_lang'] = "Actualizar finca";
+$config['farms_lang'] = "Fincas";
+$config['owner_lang'] = "Dueño";
+$config['hectare_lang'] = "Hectareaje";
+$config['days_credit_lang'] = "Días de crédito con nuestra empresa";
+$config['name_legal_lang'] = "Nombre jurídico";
+$config['name_commercial_lang'] = "Nombre comercial";
+$config['address_farm_lang'] = "Dirección finca";
+$config['address_oficce_lang'] = "Dirección oficina";
+$config['listar_providers_lang'] = "Listar de proveedores";
+$config['add_provider_lang'] = "Adicionar proveedor";
+$config['update_provider_lang'] = "Actualizar proveedor";
+$config['data_farm_lang'] = "Datos de la finca";
+$config['person_luxus_commercial_lang'] = "Persona encargada luxus";
+
+
+
+
 $config['manage_bouquets_lang'] = "Gestionar bouquets";
 $config['listar_bouquests_lang'] = "Listar bouquets";
 $config['add_bouquest_lang'] = "Adicionar bouquets";

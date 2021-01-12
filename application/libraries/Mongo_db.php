@@ -1,18 +1,18 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *  ------------------------------------------------------------------------
- *  
+ *
  *  Open Source CodeIgniter MongoDB Library (ALL-IN-ONE).
  *
- *  This library is based on a brand new PHP 7 to work with CodeIgniter 
- *  since version 3 and MongoDB since version 3.2. I have implemented the 
- *  following main functions MongoDB:  select, insert, update, delete and 
+ *  This library is based on a brand new PHP 7 to work with CodeIgniter
+ *  since version 3 and MongoDB since version 3.2. I have implemented the
+ *  following main functions MongoDB:  select, insert, update, delete and
  *  aggregate documents; execute commands.
- *  
+ *
  *  @author   Dmitriy Verkhoumov <verkhoumov@yandex.ru> <https://github.com/verkhoumov>
  *  @since    14.10.2016
  *  @license  MIT License
- *  
+ *
  *  @version  1.1.3
  *  @link     https://github.com/verkhoumov/codeigniter-mongodb-library
  *
@@ -50,7 +50,7 @@ class Mongo_db
 	 *
 	 *  During library initialization and reconnection arguments
 	 *  recursively replaced with passed to method accordingly to priority type:
-	 *  
+	 *
 	 *  1) High priority - data passed during [__construct()], to methods [connect()] and [reconnect()].
 	 *  2) Medium priority - data from config file [/config/mongo_db.php].
 	 *  3) Low priority - values specified as default for class parameters
@@ -64,7 +64,7 @@ class Mongo_db
 
 	/**
 	 *  Group name in config file [/config/mongo_db.php], used by default.
-	 *  
+	 *
 	 *  @var string
 	 */
 	private $config_group = 'default';
@@ -79,22 +79,22 @@ class Mongo_db
 
 	/**
 	 *  Protocol for creating a database connection.
-	 *  
+	 *
 	 *  @var string
 	 */
 	private $protocol = 'mongodb://';
 
 	/**
 	 *  Database connection.
-	 *  
+	 *
 	 *  @var MongoDB\Driver\Manager
 	 */
 	private $db, $connection;
 
 	/**
-	 *  Is authentication needed to be used? When connection 
+	 *  Is authentication needed to be used? When connection
 	 *  through UNIX Domain Socket must be FALSE.
-	 *  
+	 *
 	 *  @var boolean
 	 */
 	private $auth = TRUE;
@@ -102,14 +102,14 @@ class Mongo_db
 	/**
 	 *  Show debug info when working with data base?
 	 *  I recommend to use TRUE during development.
-	 *  
+	 *
 	 *  @var boolean
 	 */
 	private $debug = TRUE;
 
 	/**
 	 *  Format in which query results should be presented.
-	 *  
+	 *
 	 *  @var 'array' or 'object'
 	 */
 	private $return_as = 'array';
@@ -117,9 +117,9 @@ class Mongo_db
 	/**
 	 *  Automatic reset of constructed query after it's initialization,
 	 *  e.g after following method calls:
-	 *  insert(), insertAll(), update(), updateAll(), delete(), deleteAll(), 
+	 *  insert(), insertAll(), update(), updateAll(), delete(), deleteAll(),
 	 *  get(), getWhere(), getOne(), getOneWhere(), count().
-	 *  
+	 *
 	 *  @var boolean
 	 */
 	private $auto_reset_query = TRUE;
@@ -136,7 +136,7 @@ class Mongo_db
 
 	/**
 	 *  Driver options.
-	 *  
+	 *
 	 *  @var array
 	 */
 	private $driver_options = [];
@@ -189,13 +189,13 @@ class Mongo_db
 
 	/**
 	 *  Library constructor. Accepts array with two arguments: config_group and config.
-	 *  
+	 *
 	 *  1) Argument config_group contains name of used group in config file.
 	 *  2) Argument config may contain data like in group from config file:
 	 *     settings, connection_string, connection, driver and etc.
 	 *
 	 *  @param  array  $config  [Group name and config parameters]
-	 *  
+	 *
 	 *  @uses   $this->load->library('mongo_db', ['config' => ['connection_string' => 'localhost:27015']]);
 	 */
 	function __construct(array $config = ['config_group' => '', 'config' => []])
@@ -217,10 +217,10 @@ class Mongo_db
 	 *
 	 *  @uses    $this->mongo_db->reconnect();
 	 *  @uses    $this->mongo_db->reconnect(['config_group' => 'default_group']);
-	 *  
+	 *
 	 *  @param   array   $config  [Group name and config parameters]
 	 *  @see __construct @param description.
-	 *  
+	 *
 	 *  @return  MongoDB\Driver\Manager
 	 */
 	public function reconnect(array $config = ['config_group' => '', 'config' => []]): Manager
@@ -233,25 +233,23 @@ class Mongo_db
 	 *
 	 *  @uses    $this->mongo_db->connect();
 	 *  @uses    $this->mongo_db->connect(['config_group' => 'default_group']);
-	 *  
+	 *
 	 *  @param   array   $config  [Group name and config parameters]
 	 *  @see __construct @param description.
-	 *  
+	 *
 	 *  @return  MongoDB\Driver\Manager
 	 */
-	public function connect(array $config = ['config_group' => '', 'config' => []]): Manager
+	function connect(array $config = ['config_group' => '', 'config' => []]): Manager
 	{
 		$this->config($config)->prepare();
 
 		$connection_string = $this->create_connection_string();
-
 		try {
 			$this->connection = new Manager($connection_string, $this->db_options, $this->driver_options);
 			$this->db = $this->connection;
 		} catch (ConnectionException $e) {
 			$this->error("Failed to connect to MongoDB: {$e->getMessage()}", __METHOD__);
 		}
-
 		return $this->db;
 	}
 
@@ -271,7 +269,7 @@ class Mongo_db
 	 *  @uses     $this->mongo_db->select(['_id', 'title', 'cost'])->get('payment');
 	 *  @uses     $this->mongo_db->select([], ['description'])->get('payment');
 	 *  @uses     $this->mongo_db->select(['_id', 'title', 'cost'], ['description'])->get('payment');
-	 *  
+	 *
 	 *  @param     array   $includes  [<field1>, <field2>, ...]
 	 *  @param     array   $excludes  [<field1>, <field2>, ...]
 	 *  @return    $this
@@ -305,6 +303,36 @@ class Mongo_db
 		return $this;
 	}
 
+	public function filter($coleccion, $tuberia, $indexes)
+	{
+		foreach ($indexes as $item) {
+			$command = new MongoDB\Driver\Command(
+				[
+					'createIndexes' => $coleccion,
+					'indexes' => [
+						[
+							'name' => $item,
+							'key'  => [$item => "text"]
+						]
+					]
+				]
+			);
+			$this->db->executeCommand($this->db_name, $command);
+		}
+
+
+		$command1 = new MongoDB\Driver\Command([
+			'aggregate' => $coleccion,
+			'pipeline' => $tuberia,
+			'cursor' => new stdClass,
+		]);
+
+
+
+		$cursor  = $this->db->executeCommand($this->db_name, $command1);
+
+		return (isset($cursor)) ? $cursor->toArray() : false;
+	}
 
 
 
@@ -321,17 +349,17 @@ class Mongo_db
 
 	/**
 	 *  $fields equal $value ($fields = $number).
-	 *  
-	 *  Analogous of $eq in MongoDB. For construction of complex multidimensional 
+	 *
+	 *  Analogous of $eq in MongoDB. For construction of complex multidimensional
 	 *  queries use this method as a base in cooperation with other operators.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/eq/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where('cost', 4.50)->get('payment');
 	 *  @uses     $this->mongo_db->where(['cost' => 4.50, 'user.firstname' => 'Alex'])->get('payment');
 	 *  @uses     $this->mongo_db->where('status', ['http' => $this->mongo_db->in([200, 201, 404, 500, 503])])->get('payment');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => <value|condition>, <field2> => <value|condition>, ...]
 	 *  @param    mixed         $value   <value|condition>
 	 *  @return   $this
@@ -359,7 +387,7 @@ class Mongo_db
 	 *  Returns construction for operator $gt.
 	 *
 	 *  @uses     ['result' => $this->mongo_db->gt(5.5)]
-	 *  
+	 *
 	 *  @param    float  $number  Number to compare
 	 *  @return   array
 	 */
@@ -378,13 +406,13 @@ class Mongo_db
 
 	/**
 	 *  $fields greater than $number ($fields > $number).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/gt/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_gt('year', 2014)->get('purchase_history');
 	 *  @uses     $this->mongo_db->where_gt(['year' => 2010, 'cost' => 4.99])->get('purchase_history');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => <number>, <field2> => <number>, ...]
 	 *  @param    float         $number  <number>
 	 *  @return   $this
@@ -407,12 +435,30 @@ class Mongo_db
 
 		return $this;
 	}
+	public function where_gt_field($fields, string $value): self
+	{
+		if (isset($fields, $value) && is_string($fields) && $fields != '') {
+			$this->push_where_field($fields, $this->gt($value));
+		} elseif (isset($fields) && is_array($fields) && !empty($fields)) {
+			foreach ($fields as $field => $value) {
+				if (is_string($field) && $field != '' && is_float($value)) {
+					$this->push_where_field($field, $this->gt($value));
+				} else {
+					$this->error('Each field name in list must not be an empty string, value must be numeric', __METHOD__);
+				}
+			}
+		} else {
+			$this->error('No specified or valid arguments were given', __METHOD__);
+		}
+
+		return $this;
+	}
 
 	/**
 	 *  Returns construction for operator $gte.
 	 *
 	 *  @uses     ['money.summary' => $this->mongo_db->gte(79)]
-	 *  
+	 *
 	 *  @param     float  $number  Number to compare
 	 *  @return    array
 	 */
@@ -431,13 +477,13 @@ class Mongo_db
 
 	/**
 	 *  $fields greater than or equal $number ($fields >= $number).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/gte/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_gte('cost', 99.9)->get('purchase_history');
 	 *  @uses     $this->mongo_db->where_gte(['cost' => 99.9, 'time' => 147282174234])->get('purchase_history');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => <number>, <field2> => <number>, ...]
 	 *  @param    float         $number  <number>
 	 *  @return   $this
@@ -465,7 +511,7 @@ class Mongo_db
 	 *  Returns construction for operator $lt.
 	 *
 	 *  @uses     ['k' => $this->mongo_db->lt(0.567)]
-	 *  
+	 *
 	 *  @param    float  $number  Number to compare
 	 *  @return   array
 	 */
@@ -484,13 +530,13 @@ class Mongo_db
 
 	/**
 	 *  $fields lower than $number ($fields < $number).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/lt/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_lt('day', 20)->updateAll('datepicker');
 	 *  @uses     $this->mongo_db->where_lt(['day' => 20, 'minute' => 51])->get('datepicker');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => <number>, <field2> => <number>, ...]
 	 *  @param    float         $number  <number>
 	 *  @return   $this
@@ -518,7 +564,7 @@ class Mongo_db
 	 *  Returns construction for operator $lte.
 	 *
 	 *  @uses     ['years' => $this->mongo_db->lte(35)]
-	 *  
+	 *
 	 *  @param    float  $number  Number to compare
 	 *  @return   array
 	 */
@@ -537,13 +583,13 @@ class Mongo_db
 
 	/**
 	 *  $fields lower than or equal $number ($fields <= $number).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/lte/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_lte('version', 3)->get('phones');
 	 *  @uses     $this->mongo_db->where_lte(['version' => 3, 'count' => 50])->get('phones');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => <number>, <field2> => <number>, ...]
 	 *  @param    float         $number  <number>
 	 *  @return   $this
@@ -571,7 +617,7 @@ class Mongo_db
 	 *  Returns construction based on usage of two operators: $gt and $lt.
 	 *
 	 *  @uses     ['years' => $this->mongo_db->beth(0, 11)]
-	 *  
+	 *
 	 *  @param    float  $number_start  Minimum value
 	 *  @param    float  $number_end    Maximum value
 	 *  @return   array
@@ -594,11 +640,11 @@ class Mongo_db
 
 	/**
 	 *  $field value between $number_start and $number_end ($number_start < $field < $number_end).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_beth('phone.version', 0, 11)->get('phones');
-	 *  
+	 *
 	 *  @param    string  $field         <field>
 	 *  @param    float   $number_start  <number1>
 	 *  @param    float   $number_end    <number2>
@@ -619,7 +665,7 @@ class Mongo_db
 	 *  Returns construction based on usage of two operators: $gte and $lte.
 	 *
 	 *  @uses     ['years' => $this->mongo_db->beth_equal(1, 10)]
-	 *  
+	 *
 	 *  @param    float  $number_start  Minimum value
 	 *  @param    float  $number_end    Maximum value
 	 *  @return   array
@@ -642,11 +688,11 @@ class Mongo_db
 
 	/**
 	 *  $field value between or equal $number_start and/or $number_end ($number_start <= $field <= $number_end).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_beth_equal('phone.version', 1, 10)->get('phones');
-	 *  
+	 *
 	 *  @param    string  $field         <field>
 	 *  @param    float   $number_start  <number1>
 	 *  @param    float   $number_end    <number2>
@@ -667,7 +713,7 @@ class Mongo_db
 	 *  Returns construction based on usage of two operators: $lt and $gt.
 	 *
 	 *  @uses     ['years' => $this->mongo_db->nbeth(19, 34)]
-	 *  
+	 *
 	 *  @param    float  $number_start  Minimum value
 	 *  @param    float  $number_end    Maximum value
 	 *  @return   array
@@ -690,11 +736,11 @@ class Mongo_db
 
 	/**
 	 *  $field value NO between $number_start and $number_end ($field < $number_start AND $field > $number_end).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_nbeth('years', 19, 34)->get('users');
-	 *  
+	 *
 	 *  @param    string  $field         <field>
 	 *  @param    float   $number_start  <number1>
 	 *  @param    float   $number_end    <number2>
@@ -715,7 +761,7 @@ class Mongo_db
 	 *  Returns construction based on usage of two operators: $lte and $gte.
 	 *
 	 *  @uses     ['years' => $this->mongo_db->nbeth_equal(18, 35)]
-	 *  
+	 *
 	 *  @param    float  $number_start  Minimum value
 	 *  @param    float  $number_end    Maximum value
 	 *  @return   array
@@ -738,11 +784,11 @@ class Mongo_db
 
 	/**
 	 *  $field value NO between or equal $number_start and/or $number_end ($field <= $number_start AND $field >= $number_end).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_nbeth_equal('years', 18, 35)->get('users');
-	 *  
+	 *
 	 *  @param    string  $field         <field>
 	 *  @param    float   $number_start  <number1>
 	 *  @param    float   $number_end    <number2>
@@ -763,7 +809,7 @@ class Mongo_db
 	 *  Returns construction based on usage $ne operators.
 	 *
 	 *  @uses     ['phone.os' => $this->mongo_db->ne('ios')]
-	 *  
+	 *
 	 *  @param    mixed  $value  Any value
 	 *  @return   array
 	 */
@@ -782,13 +828,13 @@ class Mongo_db
 
 	/**
 	 *  $fields value NOT equal $value ($fields != $value).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/ne/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_ne('phone.os', 'ios')->get('phones');
 	 *  @uses     $this->mongo_db->where_ne(['phone.os' => 'ios', 'phone.type' => 'touch'])->get('phones');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => <value>, <field2> => <value>, ...]
 	 *  @param    mixed         $value   <value>
 	 *  @return   $this
@@ -816,7 +862,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $in operator.
 	 *
 	 *  @uses     ['number' => $this->mongo_db->in(['one', 'two', 'three', 'four'])]
-	 *  
+	 *
 	 *  @param    array  $list  List of possible values
 	 *  @return   array
 	 */
@@ -835,13 +881,13 @@ class Mongo_db
 
 	/**
 	 *  $fields value exists in $list (as PHP function in_array()).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/in/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_in('number', ['one', 'two', 'three', 'four'])->get('numbers');
 	 *  @uses     $this->mongo_db->where_in(['number' => ['one', 'two', 'four'], 'type' => ['error', 'warning']])->get('numbers');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => [<value1>, ..., <valueN>], <field2> => [<value1>, ..., <valueN>]]
 	 *  @param    array         $list    [<value1>, ..., <valueN>]
 	 *  @return   $this
@@ -869,7 +915,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $nin operator.
 	 *
 	 *  @uses     ['version' => $this->mongo_db->nin(['ios', 'android'])]
-	 *  
+	 *
 	 *  @param    array  $list  Any value
 	 *  @return   array
 	 */
@@ -888,13 +934,13 @@ class Mongo_db
 
 	/**
 	 *  $fields value NO exists in $list (as PHP function in_array() === FALSE).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/nin/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_nin('version', ['ios', 'android'])->get('phones');
 	 *  @uses     $this->mongo_db->where_nin(['version' => ['ios', 'android'], 'type' => ['touch']])->get('phones');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => [<value1>, ..., <valueN>], <field2> => [<value1>, ..., <valueN>]]
 	 *  @param    array         $list    [<value1>, ..., <valueN>]
 	 *  @return   $this
@@ -930,7 +976,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $or operator.
 	 *
 	 *  @uses     $this->mongo_db->or(['user.name' => 'Alex', 'city' => 'Moscow', 'years' => $this->mongo_db->gte(18)]);
-	 *  
+	 *
 	 *  @param    array  $conditions  List of conditions
 	 *  @return   array
 	 */
@@ -956,11 +1002,11 @@ class Mongo_db
 	/**
 	 *  List of conditions, where at least one of listed should be fulfilled.
 	 *  $fieldA = $valueA OR $fieldB = $valueB OR ... etc.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/or/
 	 *
 	 *  @uses     $this->mongo_db->or_where(['years' => $this->mongo_db->gte(18), 'name' => 'Dima'])->get('users');
-	 *  
+	 *
 	 *  @param    array   $conditions  [<expression1>, <expression2>, ... , <expressionN>]
 	 *  @return   $this
 	 */
@@ -987,7 +1033,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $and operator.
 	 *
 	 *  @uses     $this->mongo_db->and(['price' => 100, 'type' => 'keyboard']);
-	 *  
+	 *
 	 *  @param    array  $conditions  List of conditions
 	 *  @return   array
 	 */
@@ -1013,11 +1059,11 @@ class Mongo_db
 	/**
 	 *  List of all conditions, which should be fulfilled.
 	 *  $fieldA = $valueA AND $fieldB = $valueB AND ... etc.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/and/
 	 *
 	 *  @uses     $this->mongo_db->and_where(['type' => 'keyboard', 'cost' => $this->mongo_db->gt(1980.50)])->get('purchase');
-	 *  
+	 *
 	 *  @param    array   $conditions  [<expression1>, <expression2>, ... , <expressionN>]
 	 *  @return   $this
 	 */
@@ -1044,7 +1090,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $not operator.
 	 *
 	 *  @uses     ['price' => $this->mongo_db->not($this->mongo_db->lte(600))];
-	 *  
+	 *
 	 *  @param    mixed  $condition  Condition/List of conditions/Value
 	 *  @return   array
 	 */
@@ -1063,13 +1109,13 @@ class Mongo_db
 
 	/**
 	 *  Field or list of fields which does not satisfy specified conditions.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/not/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->not_where('price', $this->mongo_db->lte(600))->get('collection');
 	 *  @uses     $this->mongo_db->not_where(['item.type' => $this->mongo_db->nin(['phone', 'keyboard']), 'cost' => $this->mongo_db->lt(99.90)])->get('collection');
-	 *  
+	 *
 	 *  @param    string|array  $fields      <field> OR [<field1> => <operator-expression>, <field2> => <operator-expression>, ...]
 	 *  @param    mixed         $condition   <operator-expression>
 	 *  @return   $this
@@ -1097,7 +1143,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $nor operator.
 	 *
 	 *  @uses     $this->mongo_db->nor(['price' => 1.99, 'sale' => TRUE]);
-	 *  
+	 *
 	 *  @param    array  $conditions  List of conditions
 	 *  @return   array
 	 */
@@ -1122,11 +1168,11 @@ class Mongo_db
 
 	/**
 	 *  Detailed information presented in MongoDB documentation.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/nor/
 	 *
 	 *  @uses     $this->mongo_db->nor_where(['price' => 1.99, 'sale' => TRUE])->get('cart');
-	 *  
+	 *
 	 *  @param    array   $conditions  [<expression1>, <expression2>, ... , <expressionN>]
 	 *  @return   $this
 	 */
@@ -1161,7 +1207,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $exists operator.
 	 *
 	 *  @uses     ['user.country' => $this->mongo_db->exists(TRUE)];
-	 *  
+	 *
 	 *  @param    boolean  $exists  List of conditions
 	 *  @return   array
 	 */
@@ -1180,13 +1226,13 @@ class Mongo_db
 
 	/**
 	 *  Field or list of fields which must be presented (or not presented) in document.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/exists/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_exists('user.country', TRUE)->get('users');
 	 *  @uses     $this->mongo_db->where_exists(['user.city' => TRUE, 'user.banned_reason' => FALSE])->get('users');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => <boolean>, <field2> => <boolean>, ...]
 	 *  @param    bool          $exists  <boolean>
 	 *  @return   $this
@@ -1214,7 +1260,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $type operator.
 	 *
 	 *  @uses     ['js_code' => $this->mongo_db->type('javascript')];
-	 *  
+	 *
 	 *  @param    integer|string  $type  <BSON type number|String alias>
 	 *  @return   array
 	 */
@@ -1234,13 +1280,13 @@ class Mongo_db
 	/**
 	 *  Field or list of fields and data type of values of all fields Double, String, ObjectID, etc).
 	 *  List of available data types presented in MongoDB documentation.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/type/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_type('js_code', 'javascript')->get('collection');
 	 *  @uses     $this->mongo_db->where_type(['js_code' => 'javascript', 'create_at' => 'date'])->get('collection');
-	 *  
+	 *
 	 *  @param    string|array    $fields  <field> OR [<field1> => <BSON type number|String alias>, <field2> => <BSON type number|String alias>, ...]
 	 *  @param    integer|string  $type    <BSON type number|String alias>
 	 *  @return   $this
@@ -1276,7 +1322,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $mod operator.
 	 *
 	 *  @uses     ['cost' => $this->mongo_db->mod(4, 2)];
-	 *  
+	 *
 	 *  @param    float   $divisor    [Divisor value]
 	 *  @param    float   $remainder  [Remainder value]
 	 *  @return   array
@@ -1297,12 +1343,12 @@ class Mongo_db
 	/**
 	 *  Division of $field on $divisor as such that modulo $remainder.
 	 *  Note that with irrational division problems with result occurs (problem occurs on MongoDB level).
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/mod/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_mod('cost', 4, 2)->get('collection');
-	 *  
+	 *
 	 *  @param    string  $field      [Field name]
 	 *  @param    float   $divisor    [Divisor value]
 	 *  @param    float   $remainder  [Remainder value]
@@ -1323,7 +1369,7 @@ class Mongo_db
 	 *  Returns regular expression constructed with help of MongoDB\BSON\Regex.
 	 *
 	 *  @uses     ['user.name' => $this->mongo_db->regex('Dmitr(i|y)i', iU, FALSE)];
-	 *  
+	 *
 	 *  @param    string        $regex                  [Regex line: [0-9A-Z], .*, ...]
 	 *  @param    string        $flags                  [Regex flags: i, U, ...]
 	 *  @param    bool|boolean  $enable_start_wildcard  [Should be used opening symbol ^]
@@ -1348,12 +1394,12 @@ class Mongo_db
 
 	/**
 	 *  Search by $field, that satisfies specified regular expression.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/regex/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->like('user.name', 'alex')->get('users');
-	 *  
+	 *
 	 *  @param    string   $field                  [Field name]
 	 *  @param    string   $regex                  [Regex line: [0-9A-Z], .*, ...]
 	 *  @param    string   $flags                  [Regex flags: i, U, ...]
@@ -1374,7 +1420,7 @@ class Mongo_db
 
 	/**
 	 *  Options parsing when full text search.
-	 *  
+	 *
 	 *  @param   array   $options  [Options list]
 	 *  @return  array
 	 */
@@ -1401,11 +1447,11 @@ class Mongo_db
 
 	/**
 	 *  Full text search.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/text/
 	 *
 	 *  @uses     $this->mongo_db->where_text('cake', ['caseSensitive' => TRUE])->get('collection');
-	 *  
+	 *
 	 *  @param    string  $text     [Search string]
 	 *  @param    array   $options  [Search options]
 	 *
@@ -1413,7 +1459,7 @@ class Mongo_db
 	 *  1) language - search language @see https://docs.mongodb.com/manual/reference/text-search-languages/#text-search-languages
 	 *  2) case - case sensitive (default is FALSE)
 	 *  3) diacritic - diacritic symbols sensitive (default is FALSE)
-	 *  
+	 *
 	 *  @return    $this
 	 */
 	public function where_text(string $text, array $options = []): self
@@ -1429,11 +1475,11 @@ class Mongo_db
 
 	/**
 	 *  Used when full text search for sorting results.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/text/#sort-by-text-search-score
 	 *
 	 *  @uses     $this->mongo_db->where_text('tea cup')->textScore('score')->textScore_sort('score')->get('book');
-	 *  
+	 *
 	 *  @param    string  $result_field  [Field name with relevant value of search result]
 	 *  @return   $this
 	 */
@@ -1449,13 +1495,13 @@ class Mongo_db
 	}
 
 	/**
-	 *  Used when full text search for recording text relevant 
+	 *  Used when full text search for recording text relevant
 	 *  value of each found document to specified field.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/text/#return-the-text-search-score
 	 *
 	 *  @uses     $this->mongo_db->where_text('tea cup')->textScore('score', TRUE)->get('book');
-	 *  
+	 *
 	 *  @param    string   $result_field  [Field name, place where text relevant value will be recorded]
 	 *  @param    boolean  $sort          [Should sort search results by relevant value?]
 	 *  @return   $this
@@ -1479,7 +1525,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $where operator.
 	 *
 	 *  @uses     $this->mongo_db->js('function() { return (this.credits == this.debits) }');
-	 *  
+	 *
 	 *  @param    string   $js   [JavaScript function as string]
 	 *  @return   array
 	 */
@@ -1498,11 +1544,11 @@ class Mongo_db
 
 	/**
 	 *  Use JavaScript to search documents.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/where/
 	 *
 	 *  @uses     $this->mongo_db->where_js('function() { return (this.credits == this.debits) }')->get('economics');
-	 *  
+	 *
 	 *  @param    string  $js  [JavaScript function as string]
 	 *  @return   $this
 	 */
@@ -1542,7 +1588,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $all operator.
 	 *
 	 *  @uses     ['article.tags' => $this->mongo_db->all(['news', 'yellow', 'trades'])];
-	 *  
+	 *
 	 *  @param    array   $list    [<value1>, <value2>, ... , <valueN>]
 	 *  @return   array
 	 */
@@ -1561,13 +1607,13 @@ class Mongo_db
 
 	/**
 	 *  Field contains each value.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/all/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_all('tags', ['news', 'war', 'people'])->get('articles');
 	 *  @uses     $this->mongo_db->where_all(['tags' => ['news', 'war', 'people'], 'authors' => ['Dima', 'Alex']])->get('articles');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => [<value1>, ... , <valueN>], <field2> => [<value1>, ... , <valueN>], ...]
 	 *  @param    array         $list    [<value1>, <value2>, ... , <valueN>]
 	 *  @return   $this
@@ -1595,7 +1641,7 @@ class Mongo_db
 	 *  Returns construction based on usage of $elemMatch operator.
 	 *
 	 *  @uses     ['results' => $this->mongo_db->elemMatch([$this->mongo_db->gt(10), $this->mongo_db->lt(50)])];
-	 *  
+	 *
 	 *  @param    array   $list    [<query1>, <query2>, ... , <queryN>]
 	 *  @return   array
 	 */
@@ -1614,13 +1660,13 @@ class Mongo_db
 
 	/**
 	 *  Checks each array element with given condition.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/elemMatch/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_elemMatch('results', [$this->mongo_db->gt(10), $this->mongo_db->lt(50)])->get('news');
 	 *  @uses     $this->mongo_db->where_elemMatch(['res' => [$this->mongo_db->gt(10), $this->mongo_db->lt(50)], 'tags' => ['$in' => ['tag1', 'tag2']]])->get('news');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => [<query1>, ... , <queryN>], <field2> => [<query1>, ... , <queryN>], ...]
 	 *  @param    array         $list    [<query1>, <query2>, ... , <queryN>]
 	 *  @return   $this
@@ -1648,7 +1694,7 @@ class Mongo_db
 	 *  Returns construction based on useage of $size operator.
 	 *
 	 *  @uses     ['some.array' => $this->mongo_db->size(5)];
-	 *  
+	 *
 	 *  @param    int   $size    <number>
 	 *  @return   array
 	 */
@@ -1667,13 +1713,13 @@ class Mongo_db
 
 	/**
 	 *  Sets array size in initial document.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/size/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->where_size('some.array', 5)->get('users');
 	 *  @uses     $this->mongo_db->where_size(['user.news' => 10, 'user.tags' => 8])->get('users');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1> => <number>, <field2> => <number>, ...]
 	 *  @param    integer       $list    <number>
 	 *  @return   $this
@@ -1707,7 +1753,7 @@ class Mongo_db
 
 	/**
 	 *  Bitwise operation constructor.
-	 *  
+	 *
 	 *  @param   string  $type  [Bitwise operation mode]
 	 *  @param   string  $data  <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return  array
@@ -1727,7 +1773,7 @@ class Mongo_db
 
 	/**
 	 *  Construction for where bitwise operation.
-	 *  
+	 *
 	 *  @param   string  $type   [Bitwise operation mode]
 	 *  @param   string  $field  <field>
 	 *  @param   string  $data   <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
@@ -1749,7 +1795,7 @@ class Mongo_db
 	 *
 	 *  @uses     ['bit' => $this->mongo_db->bitsAllSet(35)];
 	 *  @uses     ['bit' => $this->mongo_db->bitsAllSet([1, 5])];
-	 *  
+	 *
 	 *  @param    mixed   $data    <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return   array
 	 */
@@ -1760,13 +1806,13 @@ class Mongo_db
 
 	/**
 	 *  Bitwise operation $bitsAllSet.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/bitsAllSet/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_bitsAllSet('bit', 35)->get('collection');
 	 *  @uses     $this->mongo_db->where_bitsAllSet('bit', [1, 5])->get('collection');
-	 *  
+	 *
 	 *  @param    string  $field  <field>
 	 *  @param    mixed   $data   <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return   $this
@@ -1781,7 +1827,7 @@ class Mongo_db
 	 *
 	 *  @uses     ['bit' => $this->mongo_db->bitsAnySet('22')];
 	 *  @uses     ['bit' => $this->mongo_db->bitsAnySet([1, 5])];
-	 *  
+	 *
 	 *  @param    mixed   $data    <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return   array
 	 */
@@ -1792,13 +1838,13 @@ class Mongo_db
 
 	/**
 	 *  Bitwise operation $bitsAnySet.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/bitsAnySet/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_bitsAnySet('bit', 35)->get('collection');
 	 *  @uses     $this->mongo_db->where_bitsAnySet('bit', [1, 5])->get('collection');
-	 *  
+	 *
 	 *  @param    string  $field  <field>
 	 *  @param    mixed   $data   <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return   $this
@@ -1813,7 +1859,7 @@ class Mongo_db
 	 *
 	 *  @uses     ['bit' => $this->mongo_db->bitsAllClear(35)];
 	 *  @uses     ['bit' => $this->mongo_db->bitsAllClear([1, 5])];
-	 *  
+	 *
 	 *  @param    mixed   $data    <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return   array
 	 */
@@ -1824,13 +1870,13 @@ class Mongo_db
 
 	/**
 	 *  Bitwise operation $bitsAllClear.
-	 *  
+	 *
 	 *  @see       https://docs.mongodb.com/manual/reference/operator/query/bitsAllClear/
 	 *  @see       https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_bitsAllClear('bit', 35)->get('collection');
 	 *  @uses     $this->mongo_db->where_bitsAllClear('bit', [1, 5])->get('collection');
-	 *  
+	 *
 	 *  @param     string  $field  <field>
 	 *  @param     mixed   $data   <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return    $this
@@ -1845,7 +1891,7 @@ class Mongo_db
 	 *
 	 *  @uses     ['bit' => $this->mongo_db->bitsAnyClear(35)];
 	 *  @uses     ['bit' => $this->mongo_db->bitsAnyClear([1, 5])];
-	 *  
+	 *
 	 *  @param    mixed   $data    <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return   array
 	 */
@@ -1856,13 +1902,13 @@ class Mongo_db
 
 	/**
 	 *  Bitwise operation $bitsAnyClear.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/query/bitsAnyClear/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->where_bitsAnyClear('bit', 35)->get('collection');
 	 *  @uses     $this->mongo_db->where_bitsAnyClear('bit', [1, 5])->get('collection');
-	 *  
+	 *
 	 *  @param    string  $field  <field>
 	 *  @param    mixed   $data   <numeric bitmask|BinData bitmask|[<position1>, <position2>, ... ]>
 	 *  @return   $this
@@ -1882,13 +1928,13 @@ class Mongo_db
 
 	/**
 	 *  Returns only first element of array satisfying given conditions.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/projection/positional/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->findOne('prices')->get('cart');
 	 *  @uses     $this->mongo_db->findOne(['prices', 'tags'])->get('cart');
-	 *  
+	 *
 	 *  @param    string|array  $fields  <field> OR [<field1>, <field2>, ..., <fieldN>]
 	 *  @return   $this
 	 */
@@ -1914,13 +1960,13 @@ class Mongo_db
 	/**
 	 *  Returns only first element of array satisfying given conditions.
 	 *  For better understanding see MongoDB documentation.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/projection/elemMatch/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->findOne_elemMatch('students', ['school' => 102])->get('school');
 	 *  @uses     $this->mongo_db->findOne_elemMatch(['students' => ['school' => 102, 'age' => $this->mongo_db->gte(18)], 'teachers' => ['age' => $this->mongo_db->gte(30)]])->get('school');
-	 *  
+	 *
 	 *  @param    string|array  $fields      <field> OR [<field1> => <conditions>, <field2> => <conditions>, ...]
 	 *  @param    array         $conditions  <conditions>
 	 *  @return   $this
@@ -1950,7 +1996,7 @@ class Mongo_db
 
 	/**
 	 *  $slice constructor by array [x, y] or integer x.
-	 *  
+	 *
 	 *  @param   array|integer  $slice  [Slice value]
 	 *  @return  array|integer
 	 */
@@ -1973,14 +2019,14 @@ class Mongo_db
 
 	/**
 	 *  Slice array.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/projection/slice/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->slice('comments', -5)->get('news');
 	 *  @uses     $this->mongo_db->slice('comments', [20, 10])->get('news');
 	 *  @uses     $this->mongo_db->slice(['comments' => 3, likes => [-15, 10]])->get('news');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <slice>, <field2> => <slice>, ...]
 	 *  @param    integer|array  $slice   <slice>
 	 *
@@ -1990,7 +2036,7 @@ class Mongo_db
 	 *  3) [3, 10] - skips first 3 elements and returns after next 10;
 	 *  4) [-23, -10] - skips last 23 elements and returns previous 10;
 	 *  5) same with [-x, y], [x, -y].
-	 *  
+	 *
 	 *  @return  $this
 	 */
 	public function slice($fields, $slice = 0): self
@@ -2023,7 +2069,7 @@ class Mongo_db
 
 	/**
 	 *  Checks sorting type and adapts it to MongoDB.
-	 *  
+	 *
 	 *  @param   mixed   $sort  [Sort type: ASC|DESC]
 	 *  @return  integer|array
 	 */
@@ -2052,19 +2098,19 @@ class Mongo_db
 
 	/**
 	 *  Sorts list of documents by field.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->sort('_id', 'desc')->get('users');
 	 *  @uses     $this->mongo_db->sort(['likes' => 'desc', '_id' => FALSE])->get('users');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <sort>, <field2> => <sort>, ...]
 	 *  @param    mixed          $sort    <sort>
 	 *
 	 *  $sort types:
 	 *  1) DESC, -1 or FALSE - for descending sorting.
 	 *  2) ASC, 1 or TRUE - for ascending sort.
-	 *  
+	 *
 	 *  @return    $this
 	 */
 	public function sort($fields, $sort = 1): self
@@ -2099,7 +2145,7 @@ class Mongo_db
 	 *  Limits query results.
 	 *
 	 *  @uses    $this->mongo_db->limit(15)->get('gamers');
-	 *  
+	 *
 	 *  @param   integer  $limit  <number>
 	 *  @return  $this
 	 */
@@ -2120,11 +2166,13 @@ class Mongo_db
 		return $this;
 	}
 
+
+
 	/**
 	 *  Skips specified amount of query results.
 	 *
 	 *  @uses    $this->mongo_db->offset(5)->get('collection');
-	 *  
+	 *
 	 *  @param   integer  $offset  <number>
 	 *  @return  $this
 	 */
@@ -2154,7 +2202,7 @@ class Mongo_db
 
 	/**
 	 *  Converts document from format gotten from database to classical array.
-	 *  
+	 *
 	 *  @param   stdClass  $document  [Document]
 	 *  @return  array
 	 */
@@ -2174,7 +2222,7 @@ class Mongo_db
 
 	/**
 	 *  Converts document from format gotten from database to classical object.
-	 *  
+	 *
 	 *  @param   stdClass  $document  [Document]
 	 *  @return  stdClass
 	 */
@@ -2200,7 +2248,7 @@ class Mongo_db
 
 	/**
 	 *  Converts document ID and returns document back.
-	 *  
+	 *
 	 *  @param   stdClass  $document  [Document]
 	 *  @return  stdClass
 	 */
@@ -2217,7 +2265,7 @@ class Mongo_db
 	 *  Generates new ID for document in format MongoDB\BSON\ObjectID.
 	 *
 	 *  @uses     $this->mongo_db->create_document_id();
-	 *  
+	 *
 	 *  @param    mixed   $id  [Document ID]
 	 *  @return   MongoDB\BSON\ObjectID
 	 */
@@ -2232,7 +2280,7 @@ class Mongo_db
 
 	/**
 	 *  Returns document ID of $document.
-	 *  
+	 *
 	 *  @param   array   $document  [Document]
 	 *  @return  string
 	 */
@@ -2264,7 +2312,7 @@ class Mongo_db
 
 	/**
 	 *  Gets documents from database.
-	 *  
+	 *
 	 *  @param   string   $collection  [Collection name]
 	 *  @param   array    $options     [Query options]
 	 *  @param   bool     $get_count   [Do return number of found documents?]
@@ -2305,11 +2353,17 @@ class Mongo_db
 			}
 
 			if ($cursor instanceof Cursor) {
+
+				$cursor->setTypeMap(['document' => 'stdClass']);
+
 				$array = $cursor->toArray();
 
 				if ($get_count === TRUE) {
 					$result = count($array);
-				} elseif ($this->return_as == 'object') {
+				}
+				/* 	foreach ($array as $document) {
+					$result[] = $this->document_to_object($document);
+				} */ elseif ($this->return_as == 'object') {
 					foreach ($array as $document) {
 						$result[] = $this->document_to_object($document);
 					}
@@ -2319,7 +2373,6 @@ class Mongo_db
 					}
 				}
 			}
-
 			return $result;
 		} catch (Exception $e) {
 			$this->error("Failed to complete query to get data: {$e->getMessage()}", $method);
@@ -2334,7 +2387,7 @@ class Mongo_db
 	 *  @uses     $this->mongo_db->where('user.name', 'Dmitriy')->get('users');
 	 *  @uses     $this->mongo_db->where('user.name', 'Dmitriy')->where_beth('user.years', 18, 35)->get('users', ['awaitData' => TRUE]);
 	 *  @uses     $this->mongo_db->where(['user.name' => 'Dmitriy', 'user.years' => $this->mongo_db->beth(18, 35)])->sort('_id', 'desc')->limit(10)->get('users', ['awaitData' => TRUE]);
-	 *  
+	 *
 	 *  @param    string  $collection  [Collection name]
 	 *  @param    array   $options     [Query options]
 	 *  @return   array
@@ -2351,7 +2404,7 @@ class Mongo_db
 	 *  @see      where() method for $where
 	 *
 	 *  @uses     $this->mongo_db->getWhere('users', ['user.name' => 'Alexter']);
-	 *  
+	 *
 	 *  @param    string  $collection  [Collection name]
 	 *  @param    array   $where       [Search conditions]
 	 *  @param    array   $options     [Query options]
@@ -2368,7 +2421,7 @@ class Mongo_db
 	 *  @see      http://php.net/manual/ru/mongodb-driver-query.construct.php (queryOptions) for $options
 	 *
 	 *  @uses     $this->mongo_db->where('phone.os', 'iOS')->sort('likes', -1)->getOne('phones');
-	 *  
+	 *
 	 *  @param    string  $collection  [Collection name]
 	 *  @param    array   $options     [Query options]
 	 *  @return   array
@@ -2385,7 +2438,7 @@ class Mongo_db
 	 *  @see      where() method for $where
 	 *
 	 *  @uses     $this->mongo_db->getOneWhere('news', ['stars' => ['$gt' => 10]]);
-	 *  
+	 *
 	 *  @param    string  $collection  [Collection name]
 	 *  @param    array   $options     [Query options]
 	 *  @return   array
@@ -2402,7 +2455,7 @@ class Mongo_db
 	 *
 	 *  @uses     $this->mongo_db->count('news');
 	 *  @uses     $this->mongo_db->count('news', ['noCursorTimeout' => TRUE, 'offset' => 50]);
-	 *  
+	 *
 	 *  @param    string  $collection  [Collection name]
 	 *  @param    array   $options     [Query options]
 	 *  @return   integer
@@ -2428,18 +2481,18 @@ class Mongo_db
 
 	/**
 	 *  $fields value + $number.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/inc/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->inc('phone.cost', -75.50)->where('phone-cost', 500)->update('cart');
 	 *  @uses     $this->mongo_db->inc(['phone.cost' => 25, 'phone.priority' => -1])->update('cart');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <number1>, <field2> => <number2>, ...]
 	 *  @param    integer|float  $number  <number>
 	 *
 	 *  $number can be positive (for increment) or negative (for decrement).
-	 *  
+	 *
 	 *  @return   $this
 	 */
 	public function inc($fields, float $number = 0): self
@@ -2463,13 +2516,13 @@ class Mongo_db
 
 	/**
 	 *  $fields value * $number.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/mul/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->mul('money', 2)->update('course');
 	 *  @uses     $this->mongo_db->mul(['money' => 2, 'rubbles' => 0.9])->update('course');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <number1>, <field2> => <number2>, ...]
 	 *  @param    integer|float  $number  <number>
 	 *  @return   $this
@@ -2495,13 +2548,13 @@ class Mongo_db
 
 	/**
 	 *  Changes initial field name to new.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/rename/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $olds
 	 *
 	 *  @uses     $this->mongo_db->rename('tags', 'tag_list')->update('news');
 	 *  @uses     $this->mongo_db->rename(['tag_list' => 'tags', 'news.title' => 'news.head', 'popularity' => 'stars'])->update('news');
-	 *  
+	 *
 	 *  @param    string|array  $olds  <field> OR [<field1> => <newName1>, <field2> => <newName2>, ...]
 	 *  @param    string        $new   <newName>
 	 *  @return   $this
@@ -2528,13 +2581,13 @@ class Mongo_db
 	/**
 	 *  Inserts data only while insert operation.
 	 *  Method works only when [upsert => true], this option applied automatically.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/setOnInsert/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->setOnInsert('status.variants', ['stable', 'relase', 'alpha'])->update('statuses');
 	 *  @uses     $this->mongo_db->setOnInsert(['status.code' => 'stable', 'status.priority' => 100])->update('statuses');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <value1>, <field2> => <value2>, ...]
 	 *  @param    mixed          $value   <value>
 	 *  @return   $this
@@ -2562,16 +2615,16 @@ class Mongo_db
 
 	/**
 	 *  Adds data in document.
-	 *  
+	 *
 	 *  Use this method to implement query through positional $ update operator:
 	 *  @see https://docs.mongodb.com/manual/reference/operator/update/positional/
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/set/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->set('title', 'Super news')->where('_id' => 999)->update('news');
 	 *  @uses     $this->mongo_db->set(['tags' => ['tagA', 'tagB', 'tagC'], 'title' => 'Super news', 'rank' => 0])->updateAll('news');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <value1>, <field2> => <value2>, ...]
 	 *  @param    mixed          $value   <value>
 	 *  @return   $this
@@ -2597,13 +2650,13 @@ class Mongo_db
 
 	/**
 	 *  Deletes one or more fields from document.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/unset/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->unset('phone.cost')->update('phones');
 	 *  @uses     $this->mongo_db->unset(['city.code', 'city.attitude'])->update('cities');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1>, <field2>, ..., <fieldN>]
 	 *  @return   $this
 	 */
@@ -2628,13 +2681,13 @@ class Mongo_db
 
 	/**
 	 *  Decreases value to specified if initial is higher.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/min/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->min('count', 10)->update('cart');
 	 *  @uses     $this->mongo_db->min(['count' => 50, 'price' => 999])->update('cart');
-	 *  
+	 *
 	 *  @param    string|array    $fields  <field> OR [<field1> => <value1>, <field2> => <value2>, ...]
 	 *  @param    integer|float   $number  <value>
 	 *  @return   $this
@@ -2660,13 +2713,13 @@ class Mongo_db
 
 	/**
 	 *  Increases value to specified if initial value is less.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/max/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->max('cost', 2000)->update('cart');
 	 *  @uses     $this->mongo_db->max(['cost' => 2000, 'stars' => 15])->update('cart');
-	 *  
+	 *
 	 *  @param    string|array    $fields  <field> OR [<field1> => <value1>, <field2> => <value2>, ...]
 	 *  @param    integer|float   $number  <value>
 	 *  @return   $this
@@ -2692,20 +2745,20 @@ class Mongo_db
 
 	/**
 	 *  Specify current date in given format.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/currentDate/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->setCurrentDate('article.date', 'date')->updateAll('news');
 	 *  @uses     $this->mongo_db->setCurrentDate(['article.date' => 'date', 'last_change' => 'timestamp'])->where('_id', 19)->update('news');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <typeSpecification1>, <field2> => <typeSpecification2>, ...]
 	 *  @param    string         $type    <typeSpecification>
 	 *
 	 *  typeSpecification:
 	 *  1) 'timestamp' for Timestamp(1410996356, 1)
 	 *  2) 'date' for ISODate("2013-10-02T01:11:18.965Z")
-	 *  
+	 *
 	 *  @return    $this
 	 */
 	public function setCurrentDate($fields, string $type = ''): self
@@ -2739,19 +2792,19 @@ class Mongo_db
 
 	/**
 	 *  $ operation.
-	 *  
+	 *
 	 *  @see set() method.
 	 */
 
 	/**
 	 *  Adds all elements of array $data to the end of source array.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/addToSet/#each-modifier
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->addToSetAll('tags', ['iphone', 'samsung', 'nokia'])->updateAll('phones');
 	 *  @uses     $this->mongo_db->addToSetAll(['tags' => ['iphone', 'nokia'], 'authors' => ['Dima', 'Sasha']])->update('phones');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => [<value1>, ... , <valueN>], <field2> => [<value1>, ... , <valueN>], ...]
 	 *  @param    array          $data    [<value1>, <value2>, ... , <valueN>]
 	 *  @return   $this
@@ -2777,13 +2830,13 @@ class Mongo_db
 
 	/**
 	 *  Adds $data to the end of source array.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/addToSet/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->addToSet('days', 'friday')->update('dates');
 	 *  @uses     $this->mongo_db->addToSet(['days' => 'friday', 'months' => ['december', 'november']])->update('dates');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <value1>, <field2> => <value2>, ...]
 	 *  @param    mixed          $data    <value>
 	 *  @return   $this
@@ -2809,7 +2862,7 @@ class Mongo_db
 
 	/**
 	 *  Constructor for pop() and shift() methods.
-	 *  
+	 *
 	 *  @param   string|array  $fields  <field>
 	 *  @param   integer       $side    [1 - pop() - from end, -1 - shift() - from start]
 	 *  @return  $this
@@ -2835,13 +2888,13 @@ class Mongo_db
 
 	/**
 	 *  Deletes last element from array.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/pop/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->pop('tags')->update('news');
 	 *  @uses     $this->mongo_db->pop(['tags', 'comments'])->update('news');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1>, <field2>, ...]
 	 *  @return   $this
 	 */
@@ -2852,12 +2905,12 @@ class Mongo_db
 
 	/**
 	 *  Deletes first element from array.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->shift('tags')->update('news');
 	 *  @uses     $this->mongo_db->shift(['tags', 'comments'])->updateAll('news');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1>, <field2>, ...]
 	 *  @return   $this
 	 */
@@ -2868,13 +2921,13 @@ class Mongo_db
 
 	/**
 	 *  Deletes all listed elements from array.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/pullAll/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->pullAll('fact', ['Jack', 'Ma', 'likes', 'girls', ':)'])->update('facts');
 	 *  @uses     $this->mongo_db->pullAll(['fact' => ['I', 'love', 'my', 'mom'], 'array' => ['one', two]])->update('facts');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => [<value1>, ... , <valueN>], <field2> => [<value1>, ... , <valueN>], ...]
 	 *  @param    array          $data    [<value1>, <value2>, ... , <valueN>]
 	 *  @return   $this
@@ -2900,13 +2953,13 @@ class Mongo_db
 
 	/**
 	 *  Deletes all listed elements satisfying given conditions from array.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/pull/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->pull('vegetables', 'carrots')->update('fruitsCollection');
 	 *  @uses     $this->mongo_db->pull(['fruits' => ['$in' => ['apples', 'oranges']], 'vegetables' => 'carrots'])->update('fruitsCollection');
-	 *  
+	 *
 	 *  @param    string|array   $fields  <field> OR [<field1> => <value1|condition1>, <field2> => <value2|condition2>, ...]
 	 *  @param    mixed          $value   <value|condition>
 	 *  @return   $this
@@ -2932,7 +2985,7 @@ class Mongo_db
 
 	/**
 	 *  Prepare options for pushAll() method.
-	 *  
+	 *
 	 *  @param   array   $options  [Options list: slice, sort, position]
 	 *  @return  array
 	 */
@@ -2961,12 +3014,12 @@ class Mongo_db
 
 	/**
 	 *  Adds all listed data into document.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/push/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->pushAll('players', ['Dmitriy', 'Alex', 'John'], ['sort' => 'DESC'])->where('_id', 962134)->update('games');
-	 *  
+	 *
 	 *  @param    string  $field    <field>
 	 *  @param    array   $data     [<document1>, <document2>, ... , <documentN>]
 	 *  @param    array   $options  <options>
@@ -2975,7 +3028,7 @@ class Mongo_db
 	 *  1) slice - limits array with given values, positive (from start), negative (from end).
 	 *  2) sort - sorts array by chosen field. Look available values in sort() method description.
 	 *  3) position - specifies place for data insertion in source array.
-	 *  
+	 *
 	 *  @return    $this
 	 */
 	public function pushAll(string $field = '', array $data = [], array $options = []): self
@@ -2991,13 +3044,13 @@ class Mongo_db
 
 	/**
 	 *  Adds new value to source array.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/push/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $fields
 	 *
 	 *  @uses     $this->mongo_db->push('scores', 89)->update('games');
 	 *  @uses     $this->mongo_db->push(['scores' => 89, 'players' => 6, 'type' => 'basketball'])->update('games');
-	 *  
+	 *
 	 *  @param    string|array  $fields   <field> OR [<field1> => <value1>, <field2> => <value2>, ...]
 	 *  @param    mixed         $value    <value>
 	 *  @return   $this
@@ -3023,25 +3076,25 @@ class Mongo_db
 
 	/**
 	 *  $each operation.
-	 *  
+	 *
 	 *  @see addToSetAll() & pushAll() methods.
 	 */
 
 	/**
 	 *  $slice operation.
-	 *  
+	 *
 	 *  @see pushAll() method.
 	 */
 
 	/**
 	 *  $sort operation.
-	 *  
+	 *
 	 *  @see pushAll() method.
 	 */
 
 	/**
 	 *  $position operation.
-	 *  
+	 *
 	 *  @see pushAll() method.
 	 */
 
@@ -3055,12 +3108,12 @@ class Mongo_db
 
 	/**
 	 *  Bitwise operation $bit.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/bit/
 	 *  @see      https://docs.mongodb.com/manual/core/document/#document-dot-notation for $field
 	 *
 	 *  @uses     $this->mongo_db->bit('score', 'and', 50)->update('scores');
-	 *  
+	 *
 	 *  @param    string  $field   <field>
 	 *  @param    string  $type    <and|or|xor>
 	 *  @param    int     $number  <number>
@@ -3088,15 +3141,15 @@ class Mongo_db
 	 */
 
 	/**
-	 *  Prevents a write operation that affects multiple documents from yielding 
-	 *  to other reads or writes once the first document is written. By using 
-	 *  the $isolated option, you can ensure that no client sees the changes 
+	 *  Prevents a write operation that affects multiple documents from yielding
+	 *  to other reads or writes once the first document is written. By using
+	 *  the $isolated option, you can ensure that no client sees the changes
 	 *  until the operation completes or errors out.
-	 *  
+	 *
 	 *  @see      https://docs.mongodb.com/manual/reference/operator/update/isolated/
 	 *
 	 *  @uses     $this->mongo_db->isolated()->max('scrore', 100)->updateAll('scores');
-	 *  
+	 *
 	 *  @return   $this
 	 */
 	public function isolated(): self
@@ -3117,7 +3170,7 @@ class Mongo_db
 	 *  Adds new document into database.
 	 *
 	 *  @uses    $this->mongo_db->insert('players', ['player' => ['name' => 'Alex', 'years' => 18]]);
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $document    <document>
 	 *  @return  string  <insertId>
@@ -3156,12 +3209,22 @@ class Mongo_db
 			$this->error("Failed insert query for document: {$e->getMessage()}", __METHOD__);
 		}
 	}
+	public function insert_batch($coleccion, $array = [])
+	{
+		$database = $this->db_name;
+		$collection = (new MongoDB\Client)->$database->$coleccion;
 
+		$insertManyResult = $collection->insertMany($array);
+
+		printf("Inserted %d document(s)\n", $insertManyResult->getInsertedCount());
+
+		var_dump($insertManyResult->getInsertedIds());
+	}
 	/**
 	 *  Adds multiple documents into database.
 	 *
 	 *  @uses    $this->mongo_db->insertAll('news', [['title' => 'Hi', 'stars' => 0, 'comments' => 0], ['title' => 'Hello', 'stars' => 3, 'comments' => 5]]);
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $documents   [<document1>, <document2>, ... , <documentN>]
 	 *  @return  array   [<insertId1> by <document1>, <insertId2> by <document2>, ..., <insertIdN> by <documentN>]
@@ -3171,7 +3234,6 @@ class Mongo_db
 		if ($collection == '' && !empty($documents)) {
 			$this->error('Specify collection name to which query will be applied and documents list', __METHOD__);
 		}
-
 		try {
 			$bulk_write = new BulkWrite(self::BULK_WRITE_OPTIONS);
 			$write_concern = new WriteConcern(self::WRITE_CONCERN_MODE, self::WRITE_CONCERN_TIMEOUT, self::WRITE_CONCERN_JOURNAL);
@@ -3217,7 +3279,7 @@ class Mongo_db
 
 	/**
 	 *  Updates existing document.
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $options     <options>
 	 *  @return  boolean
@@ -3259,14 +3321,14 @@ class Mongo_db
 	 *  Updates existing document.
 	 *
 	 *  @uses    $this->mongo_db->set('type', 'juice')->update('fruits', ['upsert' => TRUE]);
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $options     <options>
 	 *
 	 *  $options can take following values:
 	 *  1) 'multi' - default FALSE;
 	 *  2) 'upsert' - default FALSE.
-	 *  
+	 *
 	 *  @return  boolean
 	 */
 	public function update(string $collection = '', array $options = []): bool
@@ -3279,14 +3341,14 @@ class Mongo_db
 	 *  for documents update.
 	 *
 	 *  @uses    $this->mongo_db->set('type', 'juice')->updateAll('fruits');
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $options     <options>
 	 *
 	 *  $options can take following values:
 	 *  1) 'multi' - default TRUE;
 	 *  2) 'upsert' - default FALSE.
-	 *  
+	 *
 	 *  @return  boolean
 	 */
 	public function updateAll(string $collection = '', array $options = []): bool
@@ -3304,13 +3366,13 @@ class Mongo_db
 
 	/**
 	 *  Deletes documents from collection.
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $options     <options>
 	 *
 	 *  $options can take following values:
 	 *  1) 'limit' - default TRUE;
-	 *  
+	 *
 	 *  @return  boolean
 	 */
 	private function _delete(string $collection = '', array $options = [], string $method = ''): bool
@@ -3349,13 +3411,13 @@ class Mongo_db
 	 *  Deletes first found document from collection.
 	 *
 	 *  @uses    $this->mongo_db->where('_id', 2953)->delete('news');
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $options     <options>
 	 *
 	 *  $options can take following values:
 	 *  1) 'limit' - default TRUE;
-	 *  
+	 *
 	 *  @return  boolean
 	 */
 	public function delete(string $collection = '', array $options = []): bool
@@ -3367,13 +3429,13 @@ class Mongo_db
 	 *  Deletes all found documents from collection.
 	 *
 	 *  @uses    $this->mongo_db->where('deleted', TRUE)->deleteAll('news');
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $options     <options>
 	 *
 	 *  $options can take following values:
 	 *  1) 'limit' - default FALSE;
-	 *  
+	 *
 	 *  @return  boolean
 	 */
 	public function deleteAll(string $collection = '', array $options = []): bool
@@ -3392,7 +3454,7 @@ class Mongo_db
 
 	/**
 	 *  Executes commands and aggregations MongoDB.
-	 *  
+	 *
 	 *  @param   array   $command  <command>
 	 *  @param   string  $method   Initiator method name
 	 *  @return  array
@@ -3437,7 +3499,7 @@ class Mongo_db
 	 *  @see     https://docs.mongodb.com/manual/reference/command/
 	 *
 	 *  @uses    $this->mongo_db->command(['serverStatus' => TRUE, 'rangeDeleter' => TRUE]);
-	 *  
+	 *
 	 *  @param   array   $command  <command>
 	 *  @return  array
 	 */
@@ -3457,9 +3519,9 @@ class Mongo_db
 	 *           	]
 	 *           ], ['allowDiskUse' => TRUE]);
 	 *
-	 *  NOTE: if you are using MongoDB version 3.6 or later, be sure to specify 
+	 *  NOTE: if you are using MongoDB version 3.6 or later, be sure to specify
 	 *  the `cursors` option in the `$options`.
-	 *  
+	 *
 	 *  @param   string  $collection  <collectionName>
 	 *  @param   array   $pipeline    Aggregation query
 	 *  @param   array   $options     Aggregation options
@@ -3477,7 +3539,8 @@ class Mongo_db
 
 		$command = [
 			'aggregate' => $collection,
-			'pipeline'  => $pipeline
+			'pipeline'  => $pipeline,
+			'cursor' 	=> new stdClass
 		] + $options;
 
 		return $this->_command($command, __METHOD__);
@@ -3497,7 +3560,7 @@ class Mongo_db
 	 *
 	 *  @uses    ['date' => $this->mongo_db->date()];
 	 *  @uses    ['datetime' => $this->mongo_db->date(time() * 1000)];
-	 *  
+	 *
 	 *  @param   int     $time  [Timestamp in milliseconds]
 	 *  @return  UTCDatetime
 	 */
@@ -3515,7 +3578,7 @@ class Mongo_db
 	 *
 	 *  @uses    ['time' => $this->mongo_db->timestamp()];
 	 *  @uses    ['timestamp' => $this->mongo_db->timestamp(time())];
-	 *  
+	 *
 	 *  @param   int     $time  [Timestamp in seconds]
 	 *  @param   int     $inc   [Integer denoting the incrementing ordinal for operations within a given second]
 	 *  @return  Timestamp
@@ -3542,7 +3605,7 @@ class Mongo_db
 	 *  Changes database. Works if parameter 'connection_string' in config is not presented.
 	 *
 	 *  @uses    $this->mongo_db->switch_db('MySuperProject');
-	 *  
+	 *
 	 *  @param   string  $database  [New name for database]
 	 *  @return  MongoDB\Driver\Manager
 	 */
@@ -3557,10 +3620,10 @@ class Mongo_db
 
 	/**
 	 *  Resets last completed query.
-	 *  
-	 *  If 'auto_reset_query' is FALSE, you can change or add 
+	 *
+	 *  If 'auto_reset_query' is FALSE, you can change or add
 	 *  previous queries to database for better flexibility.
-	 *  
+	 *
 	 *  @return  $this
 	 */
 	public function reset_query(): self
@@ -3589,7 +3652,7 @@ class Mongo_db
 	 *  1) Manual config data (has high priority).
 	 *  2) Config data from file (has middle priority).
 	 *  3) Default config data, that have been installed as default value for parameters in this class (lowest priority).
-	 *  
+	 *
 	 *  @param   array   $manual_config  [Manual config data]
 	 *  @return  $this
 	 */
@@ -3632,9 +3695,9 @@ class Mongo_db
 	}
 
 	/**
-	 *  Parse parameter 'connection_string' and config 
+	 *  Parse parameter 'connection_string' and config
 	 *  file with settings for database connection.
-	 *  
+	 *
 	 *  @return  $this
 	 */
 	private function prepare(): self
@@ -3685,7 +3748,7 @@ class Mongo_db
 		if (isset($connection['port']) && is_array($connection['port']) && !empty($connection['port'])) {
 			$this->ports = $connection['port'];
 		} else {
-			// This parameter can not be empty, because config constructor 
+			// This parameter can not be empty, because config constructor
 			// creates an association between each host and port.
 		}
 
@@ -3729,7 +3792,7 @@ class Mongo_db
 	 *  Parse parameter 'connection_string'.
 	 *
 	 *  @see  https://docs.mongodb.com/manual/reference/connection-string/
-	 *  
+	 *
 	 *  @param   string  $connection  [Connection string to DB]
 	 *  @return  array
 	 */
@@ -3869,7 +3932,7 @@ class Mongo_db
 
 	/**
 	 *  Creates connection string for connection to database.
-	 *  
+	 *
 	 *  @return  string
 	 */
 	private function create_connection_string(): string
@@ -3937,7 +4000,7 @@ class Mongo_db
 
 	/**
 	 *  It pull the first element of the array.
-	 *  
+	 *
 	 *  @param   array    $array  Get query result.
 	 *  @param   integer  $n      Array row number.
 	 *  @return  array
@@ -3954,11 +4017,150 @@ class Mongo_db
 
 		return $result;
 	}
+	public function get_customize_fields_search($collection, $fields, $conditions, $limit = [], $offset = [], $sort = [])
+	{
 
+		$projects = [
+			'$project' => $fields
+		];
+		$arreglo = [$projects];
+
+		if (count($limit) > 0) {
+			array_unshift($arreglo, $limit);
+		}
+		if (count($offset) > 0) {
+			array_unshift($arreglo, $offset);
+		}
+		if (count($sort) > 0) {
+			array_unshift($arreglo, $sort);
+		}
+		if (count($conditions) > 0) {
+
+			array_unshift($arreglo, ['$match' => $conditions]);
+		}
+
+		$query = $this->aggregate($collection, $arreglo);
+
+		return $query;
+	}
+	public function get_customize_fields_array($collection, $fields, $conditions, $is_sample = false, $sample = [])
+	{
+		$projects = [
+			'$project' => $fields
+		];
+		$arreglo = [$projects];
+
+		if (count($conditions) > 0) {
+			if ($is_sample) {
+				array_unshift($arreglo, ['$match' => $conditions], $sample);
+			} else {
+				array_unshift($arreglo, ['$match' => $conditions]);
+			}
+		}
+
+		$query = $this->aggregate($collection, $arreglo);
+		return $query;
+	}
+	public function removeArrayIntoArray($arr1, $arr2)
+	{
+		$query = $this->_update($arr1, $arr2);
+		return $query;
+	}
+	public function get_customize_fields($collection, $fields, $conditions, $is_sample = false, $sample = [], $fields2 = [])
+	{
+
+		if (count($fields2) > 0) {
+			$projects = [
+				'$project' => $fields,
+				'$project' => $fields2
+			];
+		} else {
+			$projects = [
+				'$project' => $fields
+			];
+		}
+
+		$arreglo = [$projects];
+
+
+		if (count($conditions) > 0) {
+			if ($is_sample) {
+				array_unshift($arreglo, ['$match' => $conditions], $sample);
+			} else {
+				array_unshift($arreglo, ['$match' => $conditions]);
+			}
+		}
+		$query = $this->aggregate($collection, $arreglo);
+		return $query;
+	}
+	public function get_customize_fields_sort_sub_array($collection, $fields, $conditions, $unwind, $group, $sort)
+	{
+		if (count($fields) > 0) {
+			$projects = [
+				'$project' => $fields
+			];
+		}
+		$arreglo = [$projects];
+		if (count($unwind) > 0) {
+			$arreglo[] = $unwind;
+		}
+		if (count($group) > 0) {
+			$arreglo[] = $group;
+		}
+		if (count($sort) > 0) {
+			$arreglo[] = $sort;
+		}
+		if (count($conditions) > 0) {
+			array_unshift($arreglo, ['$match' => $conditions]);
+		}
+		$query = $this->aggregate($collection, $arreglo);
+		return $query;
+	}
+	public function get_customize_field_sort_and_limit($collection, $fields, $conditions, $limit, $sort)
+	{
+		$arreglo = [];
+		if (count($fields) > 0) {
+			$projects = [
+				'$project' => $fields
+			];
+			$arreglo = [$projects];
+		}
+		if (count($sort) > 0) {
+			$arreglo[] = $sort;
+		}
+		if (count($limit) > 0) {
+			$arreglo[] = $limit;
+		}
+		if (count($conditions) > 0) {
+			array_unshift($arreglo, ['$match' => $conditions]);
+		}
+
+		$query = $this->aggregate($collection, $arreglo);
+		return $query;
+	}
 	/**
 	 *  @param   string  $field  <field>
 	 *  @return  $this
 	 */
+	public function get_customize_fields_and_group($collection, $fields, $conditions, $group)
+	{
+		$arreglo = [];
+		if (count($fields) > 0) {
+			$projects = [
+				'$project' => $fields
+			];
+			$arreglo = [$projects];
+		}
+		if (count($conditions) > 0) {
+			array_unshift($arreglo, ['$match' => $conditions]);
+		}
+		if (count($group) > 0) {
+			$arreglo[] = $group;
+		}
+
+		$query = $this->aggregate($collection, $arreglo);
+		return $query;
+	}
 	private function create_where_field(string $field = ''): self
 	{
 		if ($field != '' && !array_key_exists($field, $this->wheres)) {
@@ -3970,7 +4172,7 @@ class Mongo_db
 
 	/**
 	 *  Add parameters to filter when selecting data.
-	 *  
+	 *
 	 *  @param   string  $field  <field|operator>
 	 *  @param   mixed   $data   [Data]
 	 *  @return  $this
@@ -3996,7 +4198,7 @@ class Mongo_db
 
 	/**
 	 *  Add new parameters to update data.
-	 *  
+	 *
 	 *  @param   string  $operator  <operator>
 	 *  @param   mixed   $data      [Data]
 	 *  @return  $this
@@ -4022,7 +4224,7 @@ class Mongo_db
 
 	/**
 	 *  Add new parameters to select data.
-	 *  
+	 *
 	 *  @param   string  $field  <field|column>
 	 *  @param   mixed   $data   [Data]
 	 *  @return  $this
@@ -4048,7 +4250,7 @@ class Mongo_db
 
 	/**
 	 *  Add new parameters to sort data.
-	 *  
+	 *
 	 *  @param   string  $field  <field>
 	 *  @param   mixed   $data   [Data]
 	 *  @return  $this
@@ -4081,7 +4283,7 @@ class Mongo_db
 
 	/**
 	 *  Error handler.
-	 *  
+	 *
 	 *  @param   string   $text  [Error message]
 	 *  @param   integer  $code  [Error code]
 	 *  @return  $this
