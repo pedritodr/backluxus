@@ -230,4 +230,114 @@ class Farm extends CI_Controller
             show_404();
         }
     }
+    public function index_personal($provider_id=0,$farm_id = 0)
+    {
+        //  var_dump($provider_id);
+        //  die();
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $all_personal = $this->farm->get_all_personal($farm_id);
+
+        $data['all_personal'] = $all_personal;
+        $data['farm_id'] = $farm_id;
+        $data['provider_id'] = $provider_id;
+        $this->load_view_admin_g("farm/index_personal", $data);
+    }
+
+    public function add_persona_index($farm_id = 0)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $this->load_view_admin_g('farm/add_person', ['farm_id' => $farm_id]);
+    }
+
+    public function add_persona()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $name = $this->input->post('name');
+        $phone = $this->input->post('phone');
+        $skype = $this->input->post('skype');
+        $whatsapp = $this->input->post('whatsapp');
+        $farm_id = $this->input->post('farm_id');
+        $rol = $this->input->post('rol');
+        $this->form_validation->set_rules('name', translate('nombre_lang'), 'required');
+        $this->form_validation->set_rules('phone', translate('phone_lang'), 'required');
+        if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
+            $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
+            redirect("farm/add_persona_index/") . $farm_id;
+        } else {
+            $person_id = 'person_' . uniqid();
+            $data = ['person_id' => $person_id, 'name' => $name, 'skype' => $skype, 'phone' => $phone, 'whatsapp' => $whatsapp, 'rol' => $rol, 'is_active' => 1,"farm_id"=>$farm_id];
+            $this->farm->create_person($farm_id, $data);
+            $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
+            redirect("farm/index_personal/" . $farm_id, "location", 301);
+        }
+    }
+    function update_persona_index($provider_id=0,$farm_id=0,$person_id = 0)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $person_object = $this->farm->get_persona_by_id($provider_id,$farm_id,$person_id);
+        if ($person_object) {
+            $data['person_object'] = $person_object;
+            $data['provider_id'] = $provider_id;
+            $this->load_view_admin_g('farm/update_person', $data);
+        } else {
+            show_404();
+        }
+    }
+    public function update_persona()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $name = $this->input->post('name');
+        $phone = $this->input->post('phone');
+        $skype = $this->input->post('skype');
+        $whatsapp = $this->input->post('whatsapp');
+        $person_id = $this->input->post('person_id');
+        $farm_id = $this->input->post('farm_id');
+        $provider_id = $this->input->post('provider_id');
+        $this->form_validation->set_rules('name', translate('nombre_lang'), 'required');
+        $this->form_validation->set_rules('phone', translate('phone_lang'), 'required');
+        if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
+            $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
+            redirect("farm/update_persona_index/") .$provider_id.'/'. $farm_id.'/'.$person_id;
+        } else {
+            $data = ['name' => $name, 'skype' => $skype, 'phone' => $phone, 'whatsapp' => $whatsapp];
+            $params = ['provider_id' => $provider_id, 'farm_id' => $farm_id, 'person_id' => $person_id];
+            $this->farm->update_person((object)$params, (object)$data);
+            $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
+            redirect("farm/index_personal/" .$provider_id.'/'. $farm_id, "location", 301);
+        }
+    }
+    public function delete_persona($provider_id=0,$farm_id=0,$person_id = 0)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $person_object = $this->farm->get_persona_by_id($provider_id,$farm_id,$person_id);
+        if ($person_object) {
+            $params = ['provider_id' => $provider_id, 'farm_id' => $farm_id, 'person_id' => $person_id];
+            $this->farm->delete_person((object)$params);
+            $this->response->set_message(translate('data_deleted_ok'), ResponseMessage::SUCCESS);
+            redirect("farm/index_personal/" .$provider_id.'/'. $farm_id, "location", 301);
+        } else {
+            show_404();
+        }
+    }
 }

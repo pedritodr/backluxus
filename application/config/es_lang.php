@@ -50,9 +50,12 @@ $config['add_provider_lang'] = "Adicionar proveedor";
 $config['update_provider_lang'] = "Actualizar proveedor";
 $config['data_farm_lang'] = "Datos de la finca";
 $config['person_luxus_commercial_lang'] = "Persona encargada luxus";
-
-
-
+$config['personal_lang'] = "Personal";
+$config['manage_personal_lang'] = "Gestionar personal";
+$config['data_personal_lang'] = "Datos del personal";
+$config['listar_personal_lang'] = "Listar del personal";
+$config['add_person_lang'] = "Adicionar persona";
+$config['update_person_lang'] = "Actualizar persona";
 
 $config['manage_bouquets_lang'] = "Gestionar bouquets";
 $config['listar_bouquests_lang'] = "Listar bouquets";
@@ -65,6 +68,26 @@ $config['add_country_lang'] = "Adicionar país de entrega";
 $config['update_country_lang'] = "Actualizar país de entrega";
 
 $config['stems_bunch_lang'] = "Stems bunch";
+$config['skype_lang'] = "Skype";
+$config['whatsapp_lang'] = "Whatsapp";
+
+$config['manage_invoice_farms_lang'] = "Gestionar factura de fincas";
+$config['listar_invoice_farms_lang'] = "Listar facturas de fincas";
+$config['add_invoice_farm_lang'] = "Adicionar factura finca";
+$config['update_invoice_farm_lang'] = "Actualizar factura finca";
+$config['date2_lang'] = "Date";
+$config['to_lang'] = "To";
+$config['country_lang'] = "Country";
+$config['address2_lang'] = "Address";
+$config['customer_lang'] = "Customer";
+$config['airline_lang'] = "Airline";
+$config['shippement_date_lang'] = "Shippement date";
+$config['due_date_lang'] = "Due date";
+$config['awb_lang'] = "AWB";
+$config['hawb_lang'] = "HAWB";
+$config['freigh_forward_lang'] = "Freigh forward";
+$config['dae_lang'] = "Dae";
+$config['packing_list_lang'] = "Packing list N";
 
 $config['me_dicen_lang'] = "Me dicen";
 $config['reception_pedido_lang'] = "Recepción";

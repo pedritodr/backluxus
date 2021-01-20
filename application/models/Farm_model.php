@@ -1,11 +1,13 @@
 <?php
-
+require 'vendor/autoload.php';
 class Farm_model extends CI_Model
 {
 
+    private $mongodb;
     function __construct()
     {
         parent::__construct();
+        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
         // $this->load->database();
     }
 
@@ -36,8 +38,8 @@ class Farm_model extends CI_Model
         $query      = $this->mongo_db->get_customize_fields('providers', $fields, $conditions, false, []);
         $query[0]->farms[0]->provider_id = $query[0]->provider_id;
         return (count($query) > 0) ? (object) $query[0]->farms[0] : false;
-        return $query;
     }
+
     function get_all_providers($conditions = [], $get_as_row = FALSE)
     {
         if (count($conditions) > 0) {
@@ -74,6 +76,14 @@ class Farm_model extends CI_Model
         $newId = $this->mongo_db->where('provider_id', $provider_id)->push('farms', $data)->update('providers');
         return $newId;
     }
+    function create_person($id = 0, $data = [])
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $result = $this->get_all_personal($id);
+        $result[] = (object)$data;
+        $result = $this->mongo_db->where('farms.farm_id', $id)->set(['farms.$.personal' => $result])->update('providers');
+        return $result;
+    }
     function update_farm($id, $data)
     {
         $result = $this->mongo_db->where('farms.farm_id', $id)->set(['farms.$' => $data])->update('providers');
@@ -84,5 +94,70 @@ class Farm_model extends CI_Model
         $result = $this->mongo_db->where('farms.farm_id', $id)->set(['farms.$.is_active' => 0])->update('providers');
         return $result;
     }
+    function get_all_personal($id)
+    {
+        $tuberia = [
+            ['$project' => ['farms.personal' => 1, 'farms.farm_id' => 1]],
+            ['$unwind' => '$farms'],
+            ['$unwind' => '$farms.personal'],
+            ['$match' => ['farms.personal.is_active' => 1, 'farms.farm_id' => $id]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('providers', $tuberia);
+        return (count($query) > 0) ? $query : false;
+    }
+
+    function get_persona_by_id($provider_id, $farm_id, $person_id)
+    {
+        $tuberia = [
+            ['$project' => ['farms.personal' => 1, 'farms.farm_id' => 1,'provider_id'=>1]],
+            ['$unwind' => '$farms'],
+            ['$unwind' => '$farms.personal'],
+            ['$match' => ['farms.personal.is_active' => 1, 'farms.personal.person_id' => $person_id,'farms.farm_id'=>$farm_id,'provider_id'=>$provider_id]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('providers', $tuberia);
+        if (isset($query[0]->farms->personal)) {
+            if (is_object($query[0]->farms->personal)) {
+                return $query[0]->farms->personal;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    function update_person($params, $data)
+    {
+        $query = $this->mongodb->luxus->providers->updateOne(
+            ['provider_id' => ['$eq' => $params->provider_id]],
+            ['$set' => [
+                'farms.$[far].personal.$[per].name' => $data->name,
+                'farms.$[far].personal.$[per].skype' => $data->skype,
+                'farms.$[far].personal.$[per].phone' => $data->phone,
+                'farms.$[far].personal.$[per].whatsapp' => $data->whatsapp,
+            ]],
+            ['arrayFilters' => [
+                ['far.farm_id' => ['$eq' => $params->farm_id]],
+                ['per.person_id' => ['$eq' => $params->person_id]]
+            ]]
+        );
+        return $query;
+    }
+    function delete_person($params)
+    {
+        $query = $this->mongodb->luxus->providers->updateOne(
+            ['provider_id' => ['$eq' => $params->provider_id]],
+            ['$set' => [
+                'farms.$[far].personal.$[per].is_active' => 0
+            ]],
+            ['arrayFilters' => [
+                ['far.farm_id' => ['$eq' => $params->farm_id]],
+                ['per.person_id' => ['$eq' => $params->person_id]]
+            ]]
+        );
+        return $query;
+    }
+
     //------------------------------------------------------------------------------------------------------------------------------------------
 }

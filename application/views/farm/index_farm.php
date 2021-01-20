@@ -47,7 +47,7 @@
                                                             </svg></button>
                                                         <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                             <a class="dropdown-item" href="<?= site_url('farm/update_index/' . $item->farm_id); ?>"><i class="fa fa-edit"></i> <?= translate("edit_lang"); ?></a>
-                                                            <a class="dropdown-item" href="<?= site_url('farm/farm_index/' . $item->farm_id); ?>"> <?= translate("farms_lang"); ?></a>
+                                                            <a class="dropdown-item" href="<?= site_url('farm/index_personal/' . $provider_object->provider_id.'/'. $item->farm_id); ?>"> <?= translate("personal_lang"); ?></a>
                                                             <a class="dropdown-item btn btn-danger" href="javascript:void(0)" onclick="deleteFarm('<?= $item->farm_id ?>')"><i class="fa fa-edit"></i> <?= translate("delete_lang"); ?></a>
                                                         </div>
                                                     </div>
