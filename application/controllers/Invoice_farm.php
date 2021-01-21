@@ -34,7 +34,17 @@ class Invoice_farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-        $this->load_view_admin_g('invoice_farm/add');
+        $this->load->model('Farm_model', 'farm');
+        $this->load->model('Product_model', 'product');
+        $this->load->model('Box_model', 'box');
+        $this->load->model('measure_model', 'measure');
+        $this->load->model('Country_model', 'country');
+        $data['products'] = $this->product->get_all(['is_active'=>1]);
+        $data['farms'] = $this->farm->get_all_farms();
+        $data['boxs_type'] = $this->box->get_all(['is_active'=>1]);
+        $data['measures'] = $this->measure->get_all(['is_active'=>1]);
+        $data['countrys'] = $this->country->get_all(['is_active'=>1]);
+        $this->load_view_admin_g('invoice_farm/add',$data);
     }
 
     public function add()

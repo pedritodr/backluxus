@@ -17,11 +17,14 @@ $config['manage_boxs_lang'] = "Gestionar tipo de cajas";
 $config['listar_boxs_lang'] = "Listar cajas";
 $config['add_box_lang'] = "Adicionar tipo de caja";
 $config['update_box_lang'] = "Actualizar Tipo de caja";
+$config['type_box_lang'] = "Type box";
+$config['bnc_box_lang'] = "BNC/BOX";
 
 $config['manage_measures_lang'] = "Gestionar medidas y pesos";
 $config['listar_measures_lang'] = "Listar medidas y pesos";
 $config['add_measure_lang'] = "Adicionar medida|peso";
 $config['update_measure_lang'] = "Actualizar medida|peso";
+$config['measure_lang'] = "Medidas | pesos";
 
 $config['manage_colors_lang'] = "Gestionar colores";
 $config['listar_colors_lang'] = "Listar colores";
@@ -68,6 +71,8 @@ $config['add_country_lang'] = "Adicionar país de entrega";
 $config['update_country_lang'] = "Actualizar país de entrega";
 
 $config['stems_bunch_lang'] = "Stems bunch";
+$config['total_stm_lang'] = "Total STM";
+$config['total_lang'] = "Total";
 $config['skype_lang'] = "Skype";
 $config['whatsapp_lang'] = "Whatsapp";
 
@@ -88,6 +93,12 @@ $config['hawb_lang'] = "HAWB";
 $config['freigh_forward_lang'] = "Freigh forward";
 $config['dae_lang'] = "Dae";
 $config['packing_list_lang'] = "Packing list N";
+$config['previous_lang'] = "Anterior";
+$config['next_lang'] = "Siguiente";
+$config['details_lang'] = "Detalle";
+$config['data_lang'] = "Datos";
+$config['confirmation_lang'] = "Confirmación";
+$config['finalize_lang'] = "Finalizar";
 
 $config['me_dicen_lang'] = "Me dicen";
 $config['reception_pedido_lang'] = "Recepción";
@@ -163,7 +174,6 @@ $config['manejo_ingresos_lang'] = "Manejo de ingresos";
 $config['lista_ingresos_lang'] = "Lista de ingresos";
 $config['codigo_pedido_lang'] = "Código del pedido";
 $config['total_venta_lang'] = "Total de la venta";
-$config['total_lang'] = "Total por Cantidad ";
 $config['monto_oferta_lang'] = "Monto de la venta";
 $config['monto_pagar_chef_lang'] = "Pagar al Chef";
 $config['monto_ganancia_chef_lang'] = "Monto de la ganancia del Chef";
@@ -180,6 +190,7 @@ $config['sorprendeme_lang'] = "Sorpréndeme";
 $config['experiencia_lang'] = "Experiencia";
 $config['addres_lang'] = "Dirección";
 $config['credenciales_lang'] = "Credenciales";
+$config['select_opction_lang'] = "Selecciona una opción";
 
 $config['manage_photos_lang'] = "Gestionar fotos";
 $config['listar_photos_lang'] = "Listar fotos";
@@ -553,6 +564,7 @@ $config['add_banner_lang'] = "Adicionar banner";
 $config['update_banner_lang'] = "Editar banner";
 $config['text_lang'] = "Texto";
 $config['url_lang'] = "Url";
+$config['bx_lang'] = "Bx";
 
 $config['manage_services_lang'] = "Gestionar servicios";
 $config['listar_services_lang'] = "Listar servicios";
@@ -660,6 +672,7 @@ $config['tabla_precios_lang'] = "Tabla de precios";
 $config['manage_tabla_precios'] = "Gestionar tabla de precios";
 $config['localidad_lang'] = "Localidad";
 $config['price_lang'] = "Precio";
+$config['price2_lang'] = "Price";
 $config['caracteristica_lang'] = "Característica";
 $config['capacidad_lang'] = "Capacidad";
 $config['add_item_tabla_lang'] = "Adicionar elemento tabla de precio";

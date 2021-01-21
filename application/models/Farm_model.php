@@ -110,10 +110,10 @@ class Farm_model extends CI_Model
     function get_persona_by_id($provider_id, $farm_id, $person_id)
     {
         $tuberia = [
-            ['$project' => ['farms.personal' => 1, 'farms.farm_id' => 1,'provider_id'=>1]],
+            ['$project' => ['farms.personal' => 1, 'farms.farm_id' => 1, 'provider_id' => 1]],
             ['$unwind' => '$farms'],
             ['$unwind' => '$farms.personal'],
-            ['$match' => ['farms.personal.is_active' => 1, 'farms.personal.person_id' => $person_id,'farms.farm_id'=>$farm_id,'provider_id'=>$provider_id]]
+            ['$match' => ['farms.personal.is_active' => 1, 'farms.personal.person_id' => $person_id, 'farms.farm_id' => $farm_id, 'provider_id' => $provider_id]]
         ];
 
         $query      = $this->mongo_db->aggregate('providers', $tuberia);
@@ -157,6 +157,25 @@ class Farm_model extends CI_Model
             ]]
         );
         return $query;
+    }
+    function get_all_farms()
+    {
+        $fields = [
+            'farms' => ['$filter'  => ['input' => '$farms', 'as' => 'farm', 'cond' => ['$eq' => ['$$farm.is_active', 1]]]],
+            '_id' => 1,
+        ];
+        $conditions = [];
+        $query      = $this->mongo_db->get_customize_fields('providers', $fields, $conditions, false, []);
+        $farms =[];
+        foreach ($query as $item) {
+            if(count($item->farms)>0){
+                foreach ($item->farms as $farm) {
+                        $farms[]=$farm;
+                }
+            }
+        }
+
+        return (count($farms) > 0) ? $farms : false;
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------
