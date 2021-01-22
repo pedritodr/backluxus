@@ -300,7 +300,12 @@
                                             <div class="alert alert-info">Se encuentra vacio</div>
                                         </div>
 
-                                    </div> <input type="button" name="previous" class="previous action-button-previous btn btn-warning" value="<?= translate('previous_lang') ?>" /> <input type="button" name="make_payment" class="next action-button btn btn-info" value="<?= translate('finalize_lang') ?>" />
+                                    </div> <input type="button" name="previous" class="previous action-button-previous btn btn-warning" value="<?= translate('previous_lang') ?>" />
+                                    <button type="button" name="make_payment" class="next action-button btn btn-info">
+                                        <div style="display:none;    width: 17px;height: 17px;" id="spinnerFinalize" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
+                                        <span id="spanFinalize"><?= translate('finalize_lang') ?></span>
+                                    </button>
+                                    <!--                                     <input type="button" name="make_payment" class="next action-button btn btn-info" value="<?= translate('finalize_lang') ?>" /> -->
                                 </fieldset>
                             </form>
                         </div>
@@ -447,8 +452,83 @@
             } else if ($("fieldset").index(current_fs) == 2) {
                 validNext = false;
                 if (arrayRequest.varieties.length > 0) {
-                    validNext = true;
+                    $('#spinnerFinalize').show();
+                    $('#spanFinalize').text('Creando invoice...');
+                   // validNext = true;
                     //crear invoice
+                    let farms = $('select[name=farms] option').filter(':selected').val();
+                    farms = JSON.parse(decodeB64Utf8(farms));
+                    let date = $('#date').val().trim();
+                    let country = $('select[name=country] option').filter(':selected').val();
+                    country = JSON.parse(decodeB64Utf8(country));
+                    let to = $('#to').val().trim();
+                    let address = $('#address').val().trim();
+                    let customer = $('#customer').val().trim();
+                    let airline = $('#airline').val().trim();
+                    let shippementDate = $('#shippementDate').val().trim();
+                    let dueDate = $('#dueDate').val().trim();
+                    let awb = $('#awb').val().trim();
+                    let hawb = $('#hawb').val().trim();
+                    let freighForward = $('#freighForward').val().trim();
+                    let packingList = $('#packingList').val().trim();
+                    let dae = $('#dae').val().trim();
+                    arrayRequest = JSON.stringify(arrayRequest.varieties);
+                    let data = {
+                        farms,
+                        date,
+                        country,
+                        to,
+                        address,
+                        customer,
+                        airline,
+                        shippementDate,
+                        dueDate,
+                        awb,
+                        hawb,
+                        freighForward,
+                        packingList,
+                        dae,
+                        arrayRequest
+                    }
+                    setTimeout(function() {
+                        $.ajax({
+                            type: 'POST',
+                            url: "<?= site_url('invoice_farm/add') ?>",
+                            data: data,
+                            success: function(result) {
+                                result = JSON.parse(result);
+                                if (result.status == 200) {
+                                    const toast = swal.mixin({
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                        padding: '2em'
+                                    });
+                                    toast({
+                                        type: 'success',
+                                        title: '¡Correcto!',
+                                        padding: '2em',
+                                    })
+                                    setTimeout(function() {
+                                        $('#spinnerFinalize').hide();
+                                        $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
+                                        window.location = '<?= site_url('invoice_farm/index') ?>';
+                                    }, 1000);
+                                } else {
+                                    swal({
+                                        title: '¡Error!',
+                                        text: result.msj,
+                                        padding: '2em'
+                                    });
+                                    $('#spinnerFinalize').hide();
+                                    $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
+                                }
+
+                            }
+                        });
+                    }, 1500)
+
                 } else {
                     const toast = swal.mixin({
                         toast: true,

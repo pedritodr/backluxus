@@ -58,12 +58,12 @@
                                     </div>
                                     <div class="field-wrapper">
 
-                                        <a href="javascript:void(0);" id="btnIniciar" class="btn btn-primary btn-md mb-3 mr-3">
+                                        <a href="javascript:void(0);" onclick="login()" id="btnIniciar" class="btn btn-primary btn-md mb-3 mr-3">
                                             <div style="display:none" id="spinnerLogin" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
                                             <span id="spanInicia">Iniciar sesión</span>
                                         </a>
                                         <!--   <button type="submit" class="btn btn-primary" value="">
-                                           
+
                                         </button> -->
                                     </div>
                                 </div>
@@ -97,8 +97,7 @@
     <!-- END GLOBAL MANDATORY SCRIPTS -->
     <script src="<?= base_url('admin_template/assets/js/authentication/form-1.js') ?>"></script>
     <script>
-        $('#btnIniciar').click(() => {
-
+        const login = () => {
             let username = $('#username').val().trim();
             let password = $('#password').val().trim();
             if (username == "") {
@@ -162,12 +161,13 @@
                         }
                     });
                 }, 1500)
-
-
-
-
             }
-        })
+        }
+        $(document).keypress(function(e) {
+            if (e.which == 13) {
+                login();
+            }
+        });
     </script>
 
 
