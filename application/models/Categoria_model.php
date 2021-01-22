@@ -46,7 +46,11 @@ class Categoria_model extends CI_Model
         $result = $this->mongo_db->where(['category_id' => $id])->delete('category');
         return $result;
     }
-
+    function update_type($id, $data)
+    {
+        $result = $this->mongo_db->where('type_box.box_id', $id)->set(['type_box' => $data])->updateAll('category');
+        return $result;
+    }
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------

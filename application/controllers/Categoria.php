@@ -35,7 +35,9 @@ class Categoria extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-        $this->load_view_admin_g('categoria/add');
+        $this->load->model('Box_model', 'box');
+        $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
+        $this->load_view_admin_g('categoria/add', $data);
     }
 
     public function add()
@@ -46,16 +48,16 @@ class Categoria extends CI_Controller
         }
 
         $name = $this->input->post('name');
-
+        $type_box =  $this->input->post('typeBox');
         $this->form_validation->set_rules('name', "Nombre", 'required');
-
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
             redirect("categoria/add_index");
         } else {
             $name_file = $_FILES['archivo']['name'];
             $category_id = 'category_' . uniqid();
-
+            $this->load->model('Box_model', 'box');
+            $objBox = $this->box->get_by_id($type_box);
             if ($name_file != "") {
                 $w = 390;
                 $h = 510;
@@ -66,7 +68,7 @@ class Categoria extends CI_Controller
                 if ($allow_extension) {
                     $result = save_image_from_post('archivo', './uploads/categoria', time(), $w, $h);
                     if ($result[0]) {
-                        $data = ['category_id' => $category_id, 'name' => $name, 'is_active' => 1, 'photo' => $result[1]];
+                        $data = ['category_id' => $category_id, 'name' => $name, 'is_active' => 1, 'photo' => $result[1], 'type_box' => $objBox];
                         $this->categoria->create($data);
                         $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                         redirect("categoria/index", "location", 301);
@@ -79,7 +81,7 @@ class Categoria extends CI_Controller
                     redirect("categoria/add_index");
                 }
             } else {
-                $data = ['category_id' => $category_id, 'name' => $name, 'is_active' => 1, 'photo' => null];
+                $data = ['category_id' => $category_id, 'name' => $name, 'is_active' => 1, 'photo' => null, 'type_box' => $objBox];
                 $this->categoria->create($data);
                 $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                 redirect("categoria/index", "location", 301);
@@ -93,10 +95,10 @@ class Categoria extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-
         $categoria_object = $this->categoria->get_by_id($id);
-
         if ($categoria_object) {
+            $this->load->model('Box_model', 'box');
+            $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
             $data['categoria_object'] = $categoria_object;
             $this->load_view_admin_g('categoria/update', $data);
         } else {
@@ -110,8 +112,9 @@ class Categoria extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-        $this->load->model('Product_model', 'producto');
+        $this->load->model('Product_model', 'product');
         $name = $this->input->post('name');
+        $type_box =  $this->input->post('typeBox');
         $categoria_id = $this->input->post('categoria_id');
         $this->form_validation->set_rules('name', "Nombre", 'required');
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
@@ -126,57 +129,35 @@ class Categoria extends CI_Controller
             $allow_extension_array = ["JPEG", "JPG", "jpg", "jpeg", "png", "bmp", "gif"];
             $allow_extension = in_array($ext, $allow_extension_array);
             if ($allow_extension || $_FILES['archivo']['error'] == 4) {
-
                 if ($_FILES['archivo']['error'] == 4) {
-                    $data = ['name' => $name];
+                    $this->load->model('Box_model', 'box');
+                    $objBox = $this->box->get_by_id($type_box);
+                    $data = ['name' => $name,'type_box'=>$objBox];
                     $row =  $this->categoria->update($categoria_id, $data);
-                    /*          if ($row) {
-                        $obj_categoria = $this->categoria->get_by_id($categoria_id);
-                        if ($obj_categoria) {
-                            if (count($productos)) {
-                                foreach ($productos as $item) {
-                                    $this->producto->update($item->_id, ['categoria' => $obj_categoria]);
-                                }
-                            }
-                        }
-                    } */
+                    $categoria_object = $this->categoria->get_by_id($categoria_id);
+                    $this->product->update_categories($categoria_id,$categoria_object);
                     $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                     redirect("categoria/index", "location", 301);
                 } else {
-
                     $categoria_object = $this->categoria->get_by_id($categoria_id);
-
-                    if ($categoria_object) {
-
                         $result = save_image_from_post('archivo', './uploads/categoria', time(), $w, $h);
                         if ($result[0]) {
                             if (file_exists($categoria_object->photo))
                                 unlink($categoria_object->photo);
-
-                            $data = ['name' => $name, 'photo' => $result[1]];
+                                $this->load->model('Box_model', 'box');
+                                $objBox = $this->box->get_by_id($type_box);
+                            $data = ['name' => $name, 'photo' => $result[1],'type_box'=>$objBox];
                             $row =  $this->categoria->update($categoria_id, $data);
-                            /*      if ($row) {
-                                $obj_categoria = $this->categoria->get_by_id($categoria_id);
-                                if ($obj_categoria) {
-                                    if (count($productos)) {
-                                        foreach ($productos as $item) {
-                                            $this->producto->update($item->_id, ['categoria' => $obj_categoria]);
-                                        }
-                                    }
-                                }
-                            } */
+                            $categoria_object = $this->categoria->get_by_id($categoria_id);
+                            $this->product->update_categories($categoria_id,$categoria_object);
                             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                             redirect("categoria/index", "location", 301);
                         } else {
                             $this->response->set_message($result[1], ResponseMessage::ERROR);
                             redirect("categoria/update_index/" . $categoria_id);
                         }
-                    } else {
-                        show_404();
-                    }
                 }
             } else {
-
                 $this->response->set_message(translate("not_allow_extension"), ResponseMessage::ERROR);
                 redirect("categoria/update_index/" . $categoria_id);
             }

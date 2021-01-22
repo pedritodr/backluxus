@@ -93,6 +93,11 @@ class Box extends CI_Controller
         } else {
             $data = ['name' => $name];
             $row =  $this->box->update($box_id, $data);
+            $objBox = $this->box->get_by_id($box_id);
+            $this->load->model('Categoria_model', 'categoria');
+            $this->load->model('Product_model', 'product');
+            $this->categoria->update_type($box_id,$objBox);
+            $this->product->update_categories_type($box_id,$objBox);
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
             redirect("box/index", "location", 301);
         }

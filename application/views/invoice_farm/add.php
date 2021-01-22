@@ -174,7 +174,7 @@
                             <form id="msform">
                                 <!-- progressbar -->
                                 <ul id="progressbar">
-                                    <li class="active" id="farm"><strong><?= translate('farms_lang') ?></strong></li>
+                                    <li class="active" id="farm"><strong><?= translate('client_farm_lang') ?></strong></li>
                                     <li id="data"><strong><?= translate('data_lang') ?></strong></li>
                                     <li id="products"><strong><?= translate('details_lang') ?></strong></li>
                                 </ul> <!-- fieldsets -->
@@ -197,6 +197,19 @@
                                             </div>
                                             <div class="col-lg-2"></div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-lg-2"></div>
+                                            <div class="col-lg-8">
+                                                <label><?= translate("markings_lang"); ?></label>
+                                                <div class="input-group">
+                                                    <select id="markings" name="markings" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                                        <option value="0"><?= translate('select_opction_lang') ?></option>
+                                                        <option value="1">Luxus</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2"></div>
+                                        </div>
                                     </div>
 
                                     <input type="button" name="next" class="next action-button btn btn-info" value="<?= translate('next_lang') ?>" />
@@ -204,19 +217,38 @@
                                 <fieldset>
                                     <div class="form-card">
                                         <div class="row">
-                                            <div class="col-lg-3">
+                                            <div class="col-lg-4">
+                                                <label><?= translate("invoice_number_lang"); ?></label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control input-sm" name="invoceNumber" id="invoceNumber" placeholder="<?= translate('invoice_number_lang'); ?>">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <label><?= translate("dispatch_day_lang"); ?></label>
+                                                <div class="input-group">
+                                                    <input type="date" class="form-control input-sm" name="dispatchDay" id="dispatchDay" placeholder="<?= translate('dispatch_day_lang'); ?>">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <label><?= translate("awb_lang"); ?></label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control input-sm" id="awb" name="awb" placeholder="<?= translate('awb_lang'); ?>">
+                                                </div>
+                                            </div>
+
+                                            <div style="display:none" class="col-lg-3">
                                                 <label><?= translate("date2_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="date" class="form-control input-sm" id="date" name="date" placeholder="<?= translate('date2_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div style="display:none" class="col-lg-6">
                                                 <label><?= translate("to_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="text" class="form-control input-sm" id="to" name="to" placeholder="<?= translate('to_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-3">
+                                            <div style="display:none" class="col-lg-3">
                                                 <label><?= translate("country_lang"); ?></label>
                                                 <div class="input-group">
                                                     <select id="country" name="country" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
@@ -229,61 +261,56 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div style="display:none" class="col-lg-6">
                                                 <label><?= translate("address2_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="text" class="form-control input-sm" id="address" name="address" placeholder="<?= translate('address2_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div style="display:none" class="col-lg-6">
                                                 <label><?= translate("customer_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="text" class="form-control input-sm" id="customer" name="customer" placeholder="<?= translate('customer_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div style="display:none" class="col-lg-6">
                                                 <label><?= translate("airline_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="text" class="form-control input-sm" id="airline" name="airline" placeholder="<?= translate('airline_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-3">
+                                            <div style="display:none" class="col-lg-3">
                                                 <label><?= translate("shippement_date_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="date" class="form-control input-sm" id="shippementDate" name="shippement_date" placeholder="<?= translate('shippement_date_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-3">
+                                            <div style="display:none" class="col-lg-3">
                                                 <label><?= translate("due_date_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="date" class="form-control input-sm" id="dueDate" name="due_date" placeholder="<?= translate('due_date_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
-                                                <label><?= translate("awb_lang"); ?></label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control input-sm" id="awb" name="awb" placeholder="<?= translate('awb_lang'); ?>">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
+
+                                            <div style="display:none" class="col-lg-6">
                                                 <label><?= translate("hawb_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="text" class="form-control input-sm" id="hawb" name="hawb" placeholder="<?= translate('hawb_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-3">
+                                            <div style="display:none" class="col-lg-3">
                                                 <label><?= translate("freigh_forward_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="text" class="form-control input-sm" id="freighForward" name="freigh_forward" placeholder="<?= translate('freigh_forward_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-3">
+                                            <div style="display:none" class="col-lg-3">
                                                 <label><?= translate("packing_list_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="text" class="form-control input-sm" id="packingList" name="packing_list" placeholder="<?= translate('packing_list_lang'); ?>">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div style="display:none" class="col-lg-6">
                                                 <label><?= translate("dae_lang"); ?></label>
                                                 <div class="input-group">
                                                     <input type="text" class="form-control input-sm" name="dae" id="dae" placeholder="<?= translate('dae_lang'); ?>">
@@ -324,15 +351,24 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-lg-12">
-                        <label><?= translate("productos_lang"); ?></label>
+                        <label><?= translate("categorias_lang"); ?></label>
                         <div class="input-group">
-                            <select id="products" name="products" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                            <select id="categories" name="categories" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                 <option value="0"><?= translate('select_opction_lang') ?></option>
-                                <?php if ($products) { ?>
-                                    <?php foreach ($products as $item) { ?>
+                                <?php if ($categories) { ?>
+                                    <?php foreach ($categories as $item) { ?>
                                         <option value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
                                     <?php   } ?>
                                 <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("productos_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="product" disabled name="product" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option value="0"><?= translate('select_opction_lang') ?></option>
+
                             </select>
                         </div>
                     </div>
@@ -369,23 +405,30 @@
                         </div>
                     </div>
                     <div class="col-lg-12">
-                        <label><?= translate("bnc_box_lang"); ?></label>
+                        <label><?= translate("box_number_lang"); ?></label>
                         <div class="input-group">
-                            <input type="number" min="0" id="bncBox" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('bnc_box_lang'); ?>" value="1">
+                            <input type="number" min="0" id="boxNumber" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('box_number_lang'); ?>" value="1">
                         </div>
                     </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("bouquest_lang"); ?></label>
+                        <div class="input-group">
+                            <input type="number" min="0" id="bouquets" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('bouquest_lang'); ?>" value="1">
+                        </div>
+                    </div>
+
                     <div class="col-lg-12">
                         <label><?= translate("price2_lang"); ?></label>
                         <div class="input-group">
                             <input type="number" step="any" id="price" class="form-control input-sm" placeholder="<?= translate('price2_lang'); ?>">
                         </div>
                     </div>
-                    <div class="col-lg-12">
+                    <!--  <div class="col-lg-12">
                         <label><?= translate("bx_lang"); ?></label>
                         <div class="input-group">
                             <input type="number" min="0" pattern="^[1-9]+" id="bx" class="form-control input-sm" placeholder="<?= translate('bx_lang'); ?>" value="1">
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-lg-12">
                         <br>
                         <label><?= translate("total_stm_lang"); ?>: <span id="totalStm">0</span></label>
@@ -454,10 +497,11 @@
                 if (arrayRequest.varieties.length > 0) {
                     $('#spinnerFinalize').show();
                     $('#spanFinalize').text('Creando invoice...');
-                   // validNext = true;
+                    // validNext = true;
                     //crear invoice
                     let farms = $('select[name=farms] option').filter(':selected').val();
                     farms = JSON.parse(decodeB64Utf8(farms));
+                    delete farms.personal;
                     let date = $('#date').val().trim();
                     let country = $('select[name=country] option').filter(':selected').val();
                     country = JSON.parse(decodeB64Utf8(country));
@@ -625,21 +669,66 @@
             backdrop: false
         })
     }
-    $('[name=products]').change(() => {
-        let products = $('select[name=products] option').filter(':selected').val();
+    $('[name=categories]').change(() => {
+        $('#product').prop('disabled',true);
+        $('#product').empty();
+        let categorie = $('select[name=categories] option').filter(':selected').val();
+        if (categorie != 0) {
+            categorie = JSON.parse(decodeB64Utf8(categorie));
+            $.ajax({
+                type: 'POST',
+                url: "<?= site_url('invoice_farm/search_products') ?>",
+                data: {
+                    categorie: categorie.category_id
+                },
+                success: function(result) {
+                    result = JSON.parse(result);
+                    if (result.status == 200) {
+                        if (result.products.length > 0) {
+                            let cadenaProducts = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                            result.products.forEach(item => {
+                                cadenaProducts += '<option value="' + encodeB64Utf8(item) + '">' + item.name + '</option>'
+                            });
+                            $('#product').append(cadenaProducts);
+                            $('#product').prop('disabled',false);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: 'La categoria se encuentra sin productos',
+                                padding: '2em'
+                            });
+                        }
+                    } else {
+                        swal({
+                            title: '¡Error!',
+                            text: result.msj,
+                            padding: '2em'
+                        });
+                        $('#spinnerFinalize').hide();
+                        $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
+                    }
+
+                }
+            });
+        }
+
+    })
+
+    $('[name=product]').change(() => {
+        let products = $('select[name=product] option').filter(':selected').val();
         if (products != 0) {
             products = JSON.parse(decodeB64Utf8(products));
-            let bncBox = $('#bncBox').val();
+            let bouquets = $('#bouquets').val();
             let price = $('#price').val();
             $('#stems').val(products.stems_bunch);
             let stems = $('#stems').val();
-            if (bncBox > 0 && price > 0) {
-                let totalTSM = parseInt(bncBox) * parseInt(stems);
+            if (bouquets > 0 && price > 0 && stems >0) {
+                let totalTSM = parseInt(bouquets) * parseInt(stems);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
                 $('#total').text(totalPrice);
-            } else if (bncBox > 0) {
-                let totalTSM = parseInt(bncBox) * parseInt(stems);
+            } else if (bouquets > 0 && stems >0) {
+                let totalTSM = parseInt(bouquets) * parseInt(stems);
                 $('#totalStm').text(totalTSM);
             } else {
                 $('#totalStm').text('0');
@@ -653,12 +742,10 @@
     $('#stems').change(() => {
         let stems = $('#stems').val().trim();
         if (stems > 0) {
-            let bncBox = $('#bncBox').val().trim();
-            let products = $('select[name=products] option').filter(':selected').val();
-            if (bncBox > 0 && products != 0) {
-                products = JSON.parse(decodeB64Utf8(products));
-                let stems = $('#stems').val().trim();;
-                let totalTSM = parseInt(bncBox) * parseInt(stems);
+            let bouquets = $('#bouquets').val().trim();
+            let price = $('#price').val().trim();
+            if (bouquets > 0 && price >0) {
+                let totalTSM = parseInt(bouquets) * parseInt(stems);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
                 $('#total').text(totalPrice);
@@ -686,11 +773,9 @@
     $('#price').change(() => {
         let price = $('#price').val().trim();
         if (price > 0) {
-            let bncBox = $('#bncBox').val().trim();;
-            let products = $('select[name=products] option').filter(':selected').val();
-            if (bncBox > 0 && products != 0) {
-                products = JSON.parse(decodeB64Utf8(products));
-                let stems = $('#stems').val().trim();
+            let bouquets = $('#bouquets').val().trim();
+            let stems = $('#stems').val().trim();
+            if (bouquets > 0 && stems > 0) {
                 let totalTSM = parseInt(bncBox) * parseInt(stems);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
@@ -716,21 +801,17 @@
             })
         }
     })
-    $('#bncBox').change(() => {
-        let bncBox = $('#bncBox').val().trim();
-        if (bncBox > 0) {
+    $('#bouquets').change(() => {
+        let bouquets = $('#bouquets').val().trim();
+        if (bouquets > 0) {
             let price = $('#price').val().trim();
-            let products = $('select[name=products] option').filter(':selected').val();
-            if (price > 0 && products != 0) {
-                products = JSON.parse(decodeB64Utf8(products));
-                let stems = $('#stems').val().trim();
+            let stems = $('#stems').val().trim();
+            if (price > 0 && stems > 0) {
                 let totalTSM = parseInt(bncBox) * parseInt(stems);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
                 $('#total').text(totalPrice);
-            } else if (products != 0) {
-                products = JSON.parse(decodeB64Utf8(products));
-                let stems = $('#stems').val().trim();
+            } else if (stems > 0 && price <=0) {
                 let totalTSM = parseInt(bncBox) * parseInt(stems);
                 $('#totalStm').text(totalTSM);
                 $('#total').text('0');

@@ -25,7 +25,24 @@
                                         <input type="text" class="form-control input-sm" name="name" required placeholder="<?= translate('nombre_lang'); ?>" value="<?= $categoria_object->name; ?>">
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
+                                    <label><?= translate("type_box_lang").' ('.translate("default_lang").')' ?> </label>
+                                    <div class="input-group">
+                                        <select id="typeBox" name="typeBox" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                            <option value="0"><?= translate('select_opction_lang') ?></option>
+                                            <?php if ($boxs_type) { ?>
+                                                <?php foreach ($boxs_type as $item) { ?>
+                                                    <?php if(isset($categoria_object->type_box)){?>
+                                                    <option value="<?= $item->box_id ?>" <?php if($categoria_object->type_box->box_id == $item->box_id){?> selected <?php } ?> ><?= $item->name ?></option>
+                                                <?php }else { ?>
+                                                    <option value="<?= $item->box_id ?>" ><?= $item->name ?></option>
+                                                    <?php   } ?>
+                                                <?php   } ?>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
                                     <label><?= translate("image_lang"); ?> (390X510)</label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-image"></i></span>

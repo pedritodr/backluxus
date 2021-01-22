@@ -39,7 +39,9 @@ class Invoice_farm extends CI_Controller
         $this->load->model('Box_model', 'box');
         $this->load->model('measure_model', 'measure');
         $this->load->model('Country_model', 'country');
-        $data['products'] = $this->product->get_all(['is_active' => 1]);
+        $this->load->model('Categoria_model', 'categoria');
+        $data['categories']  = $this->categoria->get_all(['is_active' => 1]);
+        //  $data['products'] = $this->product->get_all(['is_active' => 1]);
         $data['farms'] = $this->farm->get_all_farms();
         $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
         $data['measures'] = $this->measure->get_all(['is_active' => 1]);
@@ -70,9 +72,6 @@ class Invoice_farm extends CI_Controller
         $packingList = trim(($this->input->post('packingList')));
         $dae = trim(($this->input->post('dae')));
         $farms = ($_POST['farms']);
-        if(isset($farms->personal)){
-            unset($farms->personal);
-        }
         $country = ($_POST['country']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $invoice_farm = 'invoice_farm' . uniqid();
@@ -94,15 +93,36 @@ class Invoice_farm extends CI_Controller
             'details' => $arrayRequest,
             'status' => 0,
         ];
-      $resquest=  $this->invoice_farm->create($data_invoice);
-      if($resquest){
-        echo json_encode(['status' => 200, 'msj' => 'correcto']);
-        exit();
-      }else{
-        echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
-        exit();
-      }
+        $resquest =  $this->invoice_farm->create($data_invoice);
+        if ($resquest) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
 
+    public function search_products()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $this->load->model('Product_model', 'product');
+        $categorie = $this->input->post('categorie');
+        $products =  $this->product->get_all(['categoria.category_id' => $categorie]);
+        if ($products) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'products' => $products]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
     }
 
     function update_index($id = 0)

@@ -79,6 +79,16 @@ class Product_model extends CI_Model
         $result = $this->mongo_db->where('product_id', $id)->set($data)->update('product');
         return $result;
     }
+    function update_categories($id, $data)
+    {
+        $result = $this->mongo_db->where('categoria.category_id', $id)->set(['categoria' => $data])->updateAll('product');
+        return $result;
+    }
+    function update_categories_type($id, $data)
+    {
+        $result = $this->mongo_db->where('categoria.type_box.box_id', $id)->set(['categoria.type_box' => $data])->updateAll('product');
+        return $result;
+    }
     function delete($id)
     {
         $result = $this->mongo_db->where(['product_id' => $id])->delete('product');

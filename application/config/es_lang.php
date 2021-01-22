@@ -64,6 +64,8 @@ $config['manage_bouquets_lang'] = "Gestionar bouquets";
 $config['listar_bouquests_lang'] = "Listar bouquets";
 $config['add_bouquest_lang'] = "Adicionar bouquets";
 $config['update_bouquest_lang'] = "Actualizar bouquets";
+$config['bouquest_lang'] = "Bouquets";
+$config['default_lang'] = "Default";
 
 $config['manage_countrys_lang'] = "Gestionar paises de entrega";
 $config['listar_countrys_lang'] = "Listar paises de entrega";
@@ -75,6 +77,11 @@ $config['total_stm_lang'] = "Total STM";
 $config['total_lang'] = "Total";
 $config['skype_lang'] = "Skype";
 $config['whatsapp_lang'] = "Whatsapp";
+$config['client_farm_lang'] = "Fincas y clientes";
+$config['dispatch_day_lang'] = "Dia de despacho";
+$config['guide_number_lang'] = "Nro de guía";
+$config['invoice_number_lang'] = "Nro de factura";
+$config['markings_lang'] = "Marcaciones";
 
 $config['manage_invoice_farms_lang'] = "Gestionar factura de fincas";
 $config['listar_invoice_farms_lang'] = "Listar facturas de fincas";
@@ -99,6 +106,7 @@ $config['details_lang'] = "Detalle";
 $config['data_lang'] = "Datos";
 $config['confirmation_lang'] = "Confirmación";
 $config['finalize_lang'] = "Finalizar";
+$config['box_number_lang'] = "Nro de cajas";
 
 $config['me_dicen_lang'] = "Me dicen";
 $config['reception_pedido_lang'] = "Recepción";
@@ -110,6 +118,7 @@ $config['users_lang'] = "Usuarios";
 $config['manage_users'] = "Gestionar usuarios";
 $config['manage_categories_lang'] = "Gestionar categorías para menús";
 $config['listar_categoria_lang'] = "Listar categorías";
+$config['categorias_lang'] = "Categorías";
 $config['manaage_category_lang'] = "Gestionar categoría";
 $config['image_lang'] = "Imagen";
 $config['update_category_lang'] = "Editar categoría";
