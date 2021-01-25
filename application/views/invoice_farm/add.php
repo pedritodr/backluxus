@@ -321,7 +321,7 @@
                                 </fieldset>
                                 <fieldset>
                                     <div class="form-card">
-                                        <h2 class="text-center"> <input onclick="addVarieties()" type="button" class="btn btn-success" value="<?= translate('add_producto_lang') ?>" /> </h2>
+                                        <h2 class="text-center"> <input onclick="addVarieties(false)" type="button" class="btn btn-success" value="<?= translate('add_producto_lang') ?>" /> </h2>
                                         <br>
                                         <div class="table-responsive" id="tableVarieties">
                                             <div class="alert alert-info">Se encuentra vacio</div>
@@ -354,10 +354,10 @@
                         <label><?= translate("categorias_lang"); ?></label>
                         <div class="input-group">
                             <select id="categories" name="categories" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
                                 <?php if ($categories) { ?>
                                     <?php foreach ($categories as $item) { ?>
-                                        <option value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                        <option itemId="<?= base64_encode(json_encode($item)) ?>" value="<?= $item->category_id ?>"><?= $item->name ?></option>
                                     <?php   } ?>
                                 <?php } ?>
                             </select>
@@ -367,7 +367,7 @@
                         <label><?= translate("productos_lang"); ?></label>
                         <div class="input-group">
                             <select id="product" disabled name="product" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
 
                             </select>
                         </div>
@@ -376,10 +376,10 @@
                         <label><?= translate("measure_lang"); ?></label>
                         <div class="input-group">
                             <select id="measures" name="measures" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
                                 <?php if ($measures) { ?>
                                     <?php foreach ($measures as $item) { ?>
-                                        <option value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                        <option itemId="<?= base64_encode(json_encode($item)) ?>" value="<?= $item->measure_id ?>"><?= $item->name ?></option>
                                     <?php   } ?>
                                 <?php } ?>
                             </select>
@@ -389,10 +389,10 @@
                         <label><?= translate("type_box_lang"); ?></label>
                         <div class="input-group">
                             <select id="typeBox" name="typeBox" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
                                 <?php if ($boxs_type) { ?>
                                     <?php foreach ($boxs_type as $item) { ?>
-                                        <option value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                        <option itemId="<?= base64_encode(json_encode($item)) ?>" value="<?= $item->box_id ?>"><?= $item->name ?></option>
                                     <?php   } ?>
                                 <?php } ?>
                             </select>
@@ -439,7 +439,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
-                <button onclick="addVarietiesInvoice()" class="btn btn-success"><?= translate('add_producto_lang') ?></button>
+                <button id="btnModalVarieties" onclick="addVarietiesInvoice()" class="btn btn-success"><?= translate('add_producto_lang') ?></button>
             </div>
         </div>
     </div>
@@ -656,30 +656,32 @@
         return decodeURIComponent(escape(atob(str)));
     }
 
-    const addVarieties = () => {
-        // $('select[name=products] option').filter(':selected').val("0");
-        $('[name=products]').val('0');
-        $('[name=measures]').val('0');
-        $('[name=typeBox]').val('0');
-        $('#bncBox').empty();
-        $('#price').empty();
-        $('#bx').empty();
-        //  $('#modalAddVarieties').modal('show');
-        $('#modalAddVarieties').modal({
-            backdrop: false
-        })
-    }
-    $('[name=categories]').change(() => {
-        $('#product').prop('disabled',true);
-        $('#product').empty();
-        let categorie = $('select[name=categories] option').filter(':selected').val();
-        if (categorie != 0) {
-            categorie = JSON.parse(decodeB64Utf8(categorie));
+    const addVarieties = (object) => {
+
+        if (!object) {
+            $('#btnModalVarieties').attr('onclick', 'addVarietiesInvoice()');
+            $('#btnModalVarieties').text('<?= translate('add_producto_lang') ?>');
+            $('#product').prop('disabled', true);
+            $('#product').empty();
+            $('[name=categories]').val('0');
+            $('[name=measures]').val('0');
+            $('[name=typeBox]').val('0');
+            $('#bouquets').val('1');
+            $('#price').val('');
+            $('#boxNumber').val('1');
+            $('#stems').val('1');
+        } else {
+            object = JSON.parse(decodeB64Utf8(object));
+            $('#btnModalVarieties').attr('onclick', 'updateVarietiesInvoice("' + object.indice + '")');
+            $('#btnModalVarieties').text('<?= translate('edit_producto_lang') ?>');
+            $('#product').prop('disabled', true);
+            $('#product').empty();
+            $('select[name=categories]').val(object.categorie);
             $.ajax({
                 type: 'POST',
                 url: "<?= site_url('invoice_farm/search_products') ?>",
                 data: {
-                    categorie: categorie.category_id
+                    categorie: object.categorie
                 },
                 success: function(result) {
                     result = JSON.parse(result);
@@ -687,10 +689,67 @@
                         if (result.products.length > 0) {
                             let cadenaProducts = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
                             result.products.forEach(item => {
-                                cadenaProducts += '<option value="' + encodeB64Utf8(item) + '">' + item.name + '</option>'
+                                if (object.products.product_id == item.product_id) {
+                                    cadenaProducts += '<option selected itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
+                                } else {
+                                    cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
+                                }
+
                             });
                             $('#product').append(cadenaProducts);
-                            $('#product').prop('disabled',false);
+                            $('#product').prop('disabled', false);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: 'La categoria se encuentra sin productos',
+                                padding: '2em'
+                            });
+                        }
+                    } else {
+                        swal({
+                            title: '¡Error!',
+                            text: result.msj,
+                            padding: '2em'
+                        });
+                        $('#spinnerFinalize').hide();
+                        $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
+                    }
+
+                }
+            });
+            $('[name=measures]').val(object.measures.measure_id);
+            $('[name=typeBox]').val(object.typeBoxs.box_id);
+            $('#bouquets').val(object.bouquets);
+            $('#price').val(object.price);
+            $('#boxNumber').val(object.boxNumber);
+            $('#stems').val(object.stems);
+        }
+        $('#modalAddVarieties').modal({
+            backdrop: false
+        })
+    }
+    $('[name=categories]').change(() => {
+        $('#product').prop('disabled', true);
+        $('#product').empty();
+        let categorie = $('select[name=categories] option').filter(':selected').val();
+        if (categorie != 0) {
+            // categorie = JSON.parse(decodeB64Utf8(categorie));
+            $.ajax({
+                type: 'POST',
+                url: "<?= site_url('invoice_farm/search_products') ?>",
+                data: {
+                    categorie
+                },
+                success: function(result) {
+                    result = JSON.parse(result);
+                    if (result.status == 200) {
+                        if (result.products.length > 0) {
+                            let cadenaProducts = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                            result.products.forEach(item => {
+                                cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
+                            });
+                            $('#product').append(cadenaProducts);
+                            $('#product').prop('disabled', false);
                         } else {
                             swal({
                                 title: '¡Error!',
@@ -713,21 +772,23 @@
         }
 
     })
-
     $('[name=product]').change(() => {
-        let products = $('select[name=product] option').filter(':selected').val();
+        let products = $('select[name=product] option').filter(':selected').attr('itemId');;
         if (products != 0) {
             products = JSON.parse(decodeB64Utf8(products));
+            if (typeof products.categoria.type_box !== 'undefined') {
+                $('#typeBox').val(products.categoria.type_box.box_id);
+            }
             let bouquets = $('#bouquets').val();
             let price = $('#price').val();
             $('#stems').val(products.stems_bunch);
             let stems = $('#stems').val();
-            if (bouquets > 0 && price > 0 && stems >0) {
+            if (bouquets > 0 && price > 0 && stems > 0) {
                 let totalTSM = parseInt(bouquets) * parseInt(stems);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
-                $('#total').text(totalPrice);
-            } else if (bouquets > 0 && stems >0) {
+                $('#total').text(totalPrice.toFixed(2));
+            } else if (bouquets > 0 && stems > 0) {
                 let totalTSM = parseInt(bouquets) * parseInt(stems);
                 $('#totalStm').text(totalTSM);
             } else {
@@ -744,11 +805,12 @@
         if (stems > 0) {
             let bouquets = $('#bouquets').val().trim();
             let price = $('#price').val().trim();
-            if (bouquets > 0 && price >0) {
-                let totalTSM = parseInt(bouquets) * parseInt(stems);
+            let boxNumber = $('#boxNumber').val().trim();
+            if (bouquets > 0 && price > 0 && boxNumber > 0) {
+                let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
-                $('#total').text(totalPrice);
+                $('#total').text(totalPrice.toFixed(2));
             } else {
                 $('#totalStm').text('0');
                 $('#total').text('0');
@@ -775,11 +837,12 @@
         if (price > 0) {
             let bouquets = $('#bouquets').val().trim();
             let stems = $('#stems').val().trim();
-            if (bouquets > 0 && stems > 0) {
-                let totalTSM = parseInt(bncBox) * parseInt(stems);
+            let boxNumber = $('#boxNumber').val().trim();
+            if (bouquets > 0 && stems > 0 && boxNumber > 0) {
+                let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
-                $('#total').text(totalPrice);
+                $('#total').text(totalPrice.toFixed(2));
             } else {
                 $('#totalStm').text('0');
                 $('#total').text('0');
@@ -806,15 +869,12 @@
         if (bouquets > 0) {
             let price = $('#price').val().trim();
             let stems = $('#stems').val().trim();
-            if (price > 0 && stems > 0) {
-                let totalTSM = parseInt(bncBox) * parseInt(stems);
+            let boxNumber = $('#boxNumber').val().trim();
+            if (price > 0 && stems > 0 && boxNumber > 0) {
+                let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
-                $('#total').text(totalPrice);
-            } else if (stems > 0 && price <=0) {
-                let totalTSM = parseInt(bncBox) * parseInt(stems);
-                $('#totalStm').text(totalTSM);
-                $('#total').text('0');
+                $('#total').text(totalPrice.toFixed(2));
             } else {
                 $('#totalStm').text('0');
                 $('#total').text('0');
@@ -836,14 +896,48 @@
             })
         }
     })
+    $('#boxNumber').change(() => {
+        let boxNumber = $('#boxNumber').val().trim();
+        if (boxNumber > 0) {
+            let price = $('#price').val().trim();
+            let stems = $('#stems').val().trim();
+            let bouquets = $('#bouquets').val().trim();
+            if (price > 0 && stems > 0 && boxNumber > 0) {
+                let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
+                let totalPrice = totalTSM * parseFloat(price);
+                $('#totalStm').text(totalTSM);
+                $('#total').text(totalPrice.toFixed(2));
+            } else {
+                $('#totalStm').text('0');
+                $('#total').text('0');
+            }
+        } else {
+            $('#totalStm').text('0');
+            $('#total').text('0');
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'La cantidad de cajas no puede ser 0',
+                padding: '3em',
+            })
+        }
+    })
+
     const addVarietiesInvoice = () => {
-        let products = $('select[name=products] option').filter(':selected').val();
-        let typeBoxs = $('select[name=typeBox] option').filter(':selected').val();
-        let measures = $('select[name=measures] option').filter(':selected').val();
-        let bncBox = $('#bncBox').val().trim();
+        let products = $('select[name=product] option').filter(':selected').attr('itemId');
+        let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
+        let measures = $('select[name=measures] option').filter(':selected').attr('itemId');
+        let categorie = $('select[name=categories] option').filter(':selected').val();
+        let bouquets = $('#bouquets').val().trim();
         let price = $('#price').val().trim();
-        let bx = $('#bx').val().trim();
         let stems = $('#stems').val().trim();
+        let boxNumber = $('#boxNumber').val().trim();
         if (products == 0) {
             const toast = swal.mixin({
                 toast: true,
@@ -896,7 +990,7 @@
                 title: 'El campo stems no puede ser 0',
                 padding: '3em',
             })
-        } else if (bncBox <= 0) {
+        } else if (boxNumber <= 0) {
             const toast = swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -906,7 +1000,20 @@
             });
             toast({
                 type: 'error',
-                title: 'El campo BNC|BOX no puede ser 0',
+                title: 'El campo Nro de cajas no puede ser 0',
+                padding: '3em',
+            })
+        } else if (bouquets <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo bouquets no puede ser 0',
                 padding: '3em',
             })
         } else if (price <= 0) {
@@ -922,19 +1029,6 @@
                 title: 'El campo precio no puede ser 0',
                 padding: '3em',
             })
-        } else if (bx <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo bx no puede estar vacio',
-                padding: '3em',
-            })
         } else {
             products = JSON.parse(decodeB64Utf8(products));
             typeBoxs = JSON.parse(decodeB64Utf8(typeBoxs));
@@ -944,9 +1038,10 @@
                 typeBoxs,
                 measures,
                 price,
-                bx,
-                bncBox,
-                stems
+                boxNumber,
+                bouquets,
+                stems,
+                categorie
             };
             addArrayRequest(object);
             $('#modalAddVarieties').modal('hide');
@@ -961,7 +1056,6 @@
                 showConfirmButton: false,
                 padding: '2em'
             })
-            console.log(arrayRequest)
         }
     }
     const cargarDetails = () => {
@@ -971,13 +1065,12 @@
             texto_tabla += '<table id="datatablesVarieties" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
             texto_tabla += '<thead>';
             texto_tabla += '<tr>';
-            texto_tabla += '<th>ORDER</th>';
-            texto_tabla += '<th>BX</th>';
+            texto_tabla += '<th>NRO BOX</th>';
             texto_tabla += '<th>BOX TYPE</th>';
             texto_tabla += '<th>VARIETIES</th>';
-            texto_tabla += '<th>BNC|BOX</th>';
             texto_tabla += '<th>CM</th>';
             texto_tabla += '<th>STEMS</th>';
+            texto_tabla += '<th>BOUQUETS</th>';
             texto_tabla += '<th>TOTAL STM</th>';
             texto_tabla += '<th>PRICE</th>';
             texto_tabla += '<th>TOTAL</th>';
@@ -986,19 +1079,11 @@
             texto_tabla += '</thead>';
 
             texto_tabla += '<tbody>';
-            let count = 1;
-            arrayRequest.varieties.forEach(item => {
+            arrayRequest.varieties.forEach((item, indice, array) => {
+                item.indice = indice;
                 texto_tabla += '<tr>';
                 texto_tabla += '<td>';
-                texto_tabla += count;
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                texto_tabla += item.bx;
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                texto_tabla += item.products.name;
+                texto_tabla += item.boxNumber;
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
@@ -1006,7 +1091,7 @@
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
-                texto_tabla += item.bncBox;
+                texto_tabla += item.products.name;
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
@@ -1014,11 +1099,15 @@
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
-                texto_tabla += item.products.stems_bunch;
+                texto_tabla += item.stems;
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
-                texto_tabla += parseInt(item.products.stems_bunch) * parseInt(item.bncBox);
+                texto_tabla += item.bouquets;
+                texto_tabla += '</td>';
+
+                texto_tabla += '<td>';
+                texto_tabla += parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets);
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
@@ -1026,7 +1115,8 @@
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
-                texto_tabla += parseFloat(item.price) * (parseInt(item.products.stems_bunch) * parseInt(item.bncBox));
+                let totalTable = parseFloat(item.price) * (parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets))
+                texto_tabla += totalTable.toFixed(2);
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
@@ -1037,14 +1127,60 @@
                 texto_tabla += '</svg>';
                 texto_tabla += '</button>';
                 texto_tabla += '<div class="dropdown-menu" aria-labelledby="btnOutline" style="will-change: transform;">';
-                //    texto_tabla += '<a class="dropdown-item" href="javascript:void(0);"  onclick=generarNotaCredito("' + item.pedido_mall_id + '");> Generar Nota de crédito</a>';
+                texto_tabla += '<a class="dropdown-item" href="javascript:void(0);"  onclick=addVarieties("' + encodeB64Utf8(JSON.stringify(item)) + '");> Editar</a>';
+                texto_tabla += '<a class="dropdown-item" href="javascript:void(0);"  onclick=deleteVarieties("' + indice + '");> Eliminar</a>';
                 texto_tabla += '</div>';
                 texto_tabla += '</div>';
                 texto_tabla += '</td>';
                 texto_tabla += '</tr>';
-                count++;
             });
             texto_tabla += '</tbody>';
+            texto_tabla += '<tfoot>';
+            texto_tabla += '<tr>';
+            texto_tabla += '<th>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+            texto_tabla += '</td>';
+                
+            texto_tabla += '</th>';
+            texto_tabla += '</tr>';
+            texto_tabla += '</tfoot>'
             texto_tabla += '</table>'
             $("#tableVarieties").html(texto_tabla);
             $("#datatablesVarieties").DataTable({
@@ -1072,5 +1208,154 @@
         } else {
             arrayRequest.varieties.push(object);
         }
+    }
+    const updateVarietiesInvoice = (indice) => {
+        let products = $('select[name=product] option').filter(':selected').attr('itemId');
+        let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
+        let measures = $('select[name=measures] option').filter(':selected').attr('itemId');
+        let categorie = $('select[name=categories] option').filter(':selected').val();
+        let bouquets = $('#bouquets').val().trim();
+        let price = $('#price').val().trim();
+        let stems = $('#stems').val().trim();
+        let boxNumber = $('#boxNumber').val().trim();
+        if (products == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una variedad',
+                padding: '3em',
+            })
+        } else if (measures == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una medida',
+                padding: '3em',
+            })
+        } else if (typeBoxs == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '3em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione un Type box',
+                padding: '3em',
+            })
+        } else if (stems <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo stems no puede ser 0',
+                padding: '3em',
+            })
+        } else if (boxNumber <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo Nro de cajas no puede ser 0',
+                padding: '3em',
+            })
+        } else if (bouquets <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo bouquets no puede ser 0',
+                padding: '3em',
+            })
+        } else if (price <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo precio no puede ser 0',
+                padding: '3em',
+            })
+        } else {
+            products = JSON.parse(decodeB64Utf8(products));
+            typeBoxs = JSON.parse(decodeB64Utf8(typeBoxs));
+            measures = JSON.parse(decodeB64Utf8(measures));
+            let object = {
+                products,
+                typeBoxs,
+                measures,
+                price,
+                boxNumber,
+                bouquets,
+                stems,
+                categorie
+            };
+            updateArrayRequest(object, indice);
+            $('#modalAddVarieties').modal('hide');
+            setTimeout(() => {
+                cargarDetails();
+            }, 2000);
+            swal({
+                title: '¡Perfecto!',
+                text: "Variedad agregada correctamente",
+                type: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+                padding: '2em'
+            })
+        }
+    }
+
+    const updateArrayRequest = (object, indice) => {
+        arrayRequest.varieties[indice] = object;
+
+    }
+    const deleteVarieties = (indice) => {
+        swal({
+            title: '¿ Estás seguro de realizar esta operación ?',
+            text: "Usted no podrá revertir este cambio !!!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                arrayRequest.varieties.splice(indice, 1);
+                cargarDetails();
+            }
+        })
     }
 </script>

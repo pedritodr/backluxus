@@ -120,7 +120,7 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 200, 'msj' => 'correcto', 'products' => $products]);
             exit();
         } else {
-            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            echo json_encode(['status' => 404, 'msj' => 'No se encuentran variedades asociadas a esta categoria']);
             exit();
         }
     }

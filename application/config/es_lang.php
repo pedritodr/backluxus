@@ -587,6 +587,7 @@ $config['listar_productos_lang'] = "Listar variedades";
 $config['productos_lang'] = "Variedades";
 $config['producto_lang'] = "Variedad";
 $config['add_producto_lang'] = "Adicionar variedad";
+$config['edit_producto_lang'] = "Actualizar variedad";
 $config['update_producto_lang'] = "Editar variedad";
 
 $config['manage_noticias_lang'] = "Gestionar noticias";
