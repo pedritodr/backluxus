@@ -30,6 +30,18 @@ class User extends CI_Controller
         $this->load_view_admin_g("user/index", $data);
     }
 
+    public function index_client()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $this->load->model('Country_model', 'country');
+        $all_users = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
+        $data['countrys'] = $this->country->get_all_countrys();
+        $data['all_users'] = $all_users;
+        $this->load_view_admin_g("user/index_client", $data);
+    }
     public function add_index()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -37,6 +49,15 @@ class User extends CI_Controller
             redirect('login/index');
         }
         $this->load_view_admin_g('user/add');
+    }
+
+    public function add_index_client()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $this->load_view_admin_g('user/add_client');
     }
 
     public function add()
@@ -54,6 +75,11 @@ class User extends CI_Controller
         $password = $this->input->post('password');
         $repeat_password = $this->input->post('repeat_password');
         $role = $this->input->post('role');
+        $validaEmail = $this->user->get_by_email($email);
+        if($validaEmail){
+            $this->response->set_message(translate('email_already_exist_lang'), ResponseMessage::ERROR);
+            redirect("user/add_index_client");
+        }
         if ($password != $repeat_password) {
             $this->response->set_message("El campo contraseña no coincide con el repetir contraseña", ResponseMessage::ERROR);
         }
@@ -87,6 +113,49 @@ class User extends CI_Controller
         }
     }
 
+    public function add_client()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $name_company = $this->input->post('name_company');
+        $email = $this->input->post('email');
+        $name_commercial = $this->input->post('name_commercial');
+        $password = $this->input->post('password');
+        $desc = $this->input->post('desc');
+        $validaEmail = $this->user->get_by_email($email);
+        if($validaEmail){
+            $this->response->set_message(translate('email_already_exist_lang'), ResponseMessage::ERROR);
+            redirect("user/add_index_client");
+        }
+        $fecha_create =  date('Y-m-d h:i:s');
+        //establecer reglas de validacion
+        $this->form_validation->set_rules('email', translate('email_lang'), 'required');
+        $this->form_validation->set_rules('password', translate('password_lang'), 'required');
+        if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
+            $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
+            redirect("user/add_index_client");
+        } else { //en caso de que todo este bien
+            $data_user = [
+                'user_id' => 'user_' . uniqid(),
+                'name_company' => $name_company,
+                'name_commercial' => $name_commercial,
+                'email' => $email,
+                'password' => md5($password),
+                'role_id' => 3,
+                'is_active' => 1,
+                'date_create' => $fecha_create,
+                'is_delete' => 0,
+                'observations'=>$desc
+            ];
+            $this->user->create($data_user);
+            $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
+            redirect("user/index_client");
+        }
+    }
+
     function update_index($user_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -103,6 +172,23 @@ class User extends CI_Controller
             show_404();
         }
     }
+    function update_index_client($user_id = 0)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $user_object = $this->user->get_by_id($user_id);
+
+        if ($user_object) {
+            $data['user_object'] = $user_object;
+            $this->load_view_admin_g('user/update_client', $data);
+        } else {
+            show_404();
+        }
+    }
+
     function profile_index()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -156,6 +242,35 @@ class User extends CI_Controller
             redirect("user/index");
         }
     }
+    public function update_client()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $name_company = $this->input->post('name_company');
+        $name_commercial = $this->input->post('name_commercial');
+        $desc = $this->input->post('desc');
+        $user_id = $this->input->post('user_id');
+        //establecer reglas de validacion
+        $this->form_validation->set_rules('name_company', translate('name_company_lang'), 'required');
+
+        if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
+            $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
+            redirect("user/update_index_client");
+        } else { //en caso de que todo este bien
+            $data_user = [
+                'name_company' => $name_company,
+                'name_commercial' => $name_commercial,
+                'observations'=>  $desc,
+                'address'=>null
+            ];
+            $this->user->update($user_id, $data_user);
+            $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
+            redirect("user/index_client");
+        }
+    }
 
     public function delete($user_id = 0)
     {
@@ -175,7 +290,24 @@ class User extends CI_Controller
             show_404();
         }
     }
+    public function delete_cliente($user_id = 0)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
 
+        $user_object = $this->user->get_by_id($user_id);
+
+
+        if ($user_object) {
+            $this->user->update($user_id, ['is_active' => 0]);
+            $this->response->set_message(translate('data_deleted_ok'), ResponseMessage::SUCCESS);
+            redirect("user/index_client");
+        } else {
+            show_404();
+        }
+    }
     public function execute_edit_profile()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -220,6 +352,27 @@ class User extends CI_Controller
             show_404();
         }
     }
+    public function change_status($user_id)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $user_object = $this->user->get_by_id($user_id);
+        if ($user_object) {
+            if ($user_object->is_active == 1) {
+                $this->user->update($user_id, ['is_active' => 2]);
+            } else if ($user_object->is_active == 2) {
+                $this->user->update($user_id, ['is_active' => 0]);
+            } else {
+                $this->user->update($user_id, ['is_active' => 1]);
+            }
+            $this->response->set_message(translate('data_changed_ok'), ResponseMessage::SUCCESS);
+            redirect("user/index_client");
+        } else {
+            show_404();
+        }
+    }
     public function execute_edit_credencial()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -249,6 +402,27 @@ class User extends CI_Controller
             $this->user->update($user_id, $data_user);
             $this->response->set_message('La contraseña se actualizo correctamente', ResponseMessage::SUCCESS);
             redirect("user/index");
+        }
+    }
+    public function add_address()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $address= $this->input->post('objectCountry');
+        $user_id= $this->input->post('userIdAdd');
+        $response =  $this->user->update($user_id,['address'=>$address]);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
         }
     }
 }

@@ -20,7 +20,6 @@
                                 <div class="col-lg-6">
                                     <label><?= translate("nombre_lang"); ?></label>
                                     <div class="input-group">
-
                                         <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
                                         <input type="text" class="form-control input-sm" name="name" placeholder="<?= translate('nombre_lang'); ?>">
                                     </div>

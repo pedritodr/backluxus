@@ -23,7 +23,7 @@ class Invoice_farm extends CI_Controller
             redirect('login/index');
         }
 
-        $all_invoice_farm = $this->invoice_farm->get_all(['is_active' => 1]);
+        $all_invoice_farm = $this->invoice_farm->get_all();
         $data['all_invoice_farm'] = $all_invoice_farm;
         $this->load_view_admin_g("invoice_farm/index", $data);
     }
@@ -45,7 +45,7 @@ class Invoice_farm extends CI_Controller
         $data['farms'] = $this->farm->get_all_farms();
         $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
         $data['measures'] = $this->measure->get_all(['is_active' => 1]);
-        $data['countrys'] = $this->country->get_all(['is_active' => 1]);
+      //  $data['countrys'] = $this->country->get_all(['is_active' => 1]);
         $this->load_view_admin_g('invoice_farm/add', $data);
     }
 
@@ -59,39 +59,24 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
-
-        $date = trim(($this->input->post('date')));
-        $to = trim(($this->input->post('to')));
-        $address = trim(($this->input->post('address')));
-        $customer = trim(($this->input->post('customer')));
-        $airline = trim(($this->input->post('airline')));
-        $shippementDate = trim(($this->input->post('shippementDate')));
         $awb = trim(($this->input->post('awb')));
-        $hawb = trim(($this->input->post('hawb')));
-        $freighForward = trim(($this->input->post('freighForward')));
-        $packingList = trim(($this->input->post('packingList')));
-        $dae = trim(($this->input->post('dae')));
+        $invoceNumber = trim(($this->input->post('invoceNumber')));
+        $dispatchDay = trim(($this->input->post('dispatchDay')));
         $farms = ($_POST['farms']);
-        $country = ($_POST['country']);
+        $markings = ($_POST['markings']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $invoice_farm = 'invoice_farm' . uniqid();
+        $date_create = date("Y-m-d H:i:s");
         $data_invoice = [
             'invoice_farm' => $invoice_farm,
-            'date' => $date,
-            'to' => $to,
-            'address' => $address,
-            'customer' => $customer,
-            'airline' => $airline,
-            'shippement_date' => $shippementDate,
+            'invoice_number' => $invoceNumber,
+            'dispatch_day' => $dispatchDay,
             'awb' => $awb,
-            'hawb' => $hawb,
-            'freigh_forward' => $freighForward,
-            'packing_list' => $packingList,
-            'dae' => $dae,
+            'markings' => $markings,
             'farms' => $farms,
-            'country' => $country,
             'details' => $arrayRequest,
             'status' => 0,
+            'date_create'=>$date_create
         ];
         $resquest =  $this->invoice_farm->create($data_invoice);
         if ($resquest) {

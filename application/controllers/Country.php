@@ -23,8 +23,7 @@ class Country extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-
-        $all_countrys = $this->country->get_all(['is_active' => 1]);
+        $all_countrys = $this->country->get_all_countrys();
         $data['all_countrys'] = $all_countrys;
         $this->load_view_admin_g("country/index", $data);
     }
@@ -54,10 +53,81 @@ class Country extends CI_Controller
             redirect("country/add_index");
         } else {
             $country_id = 'country_' . uniqid();
-            $data = ['country_id' => $country_id, 'name' => $name, 'is_active' => 1];
+            $data = ['country_id' => $country_id, 'name' => $name, 'is_active' => 1,'citys'=>[]];
             $this->country->create($data);
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
             redirect("country/index", "location", 301);
+        }
+    }
+    public function add_city()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $name = $this->input->post('nameCityAdd');
+        $country_id = $this->input->post('countryId');
+        $city_id = 'city_' . uniqid();
+        $data = ['city_id' => $city_id, 'name' => $name, 'is_active' => 1, 'country_id' => $country_id];
+        $response =  $this->country->create_city($country_id, $data);
+        $citys = $this->country->get_all_citys($country_id);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto','citys'=>$citys]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+
+    public function update_city()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $name = $this->input->post('nameCityEdit');
+        $city_id = $this->input->post('cityId');
+        $country_id = $this->input->post('countryId');
+        $response =  $this->country->update_city($city_id, $name);
+        $citys = $this->country->get_all_citys($country_id);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto','citys'=>$citys]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+
+    public function delete_city()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $city_id = $this->input->post('cityId');
+        $country_id = $this->input->post('countryId');
+        $response =  $this->country->update_status_city($city_id);
+        $citys = $this->country->get_all_citys($country_id);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto','citys'=>$citys]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
         }
     }
 

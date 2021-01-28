@@ -134,10 +134,10 @@
 
 </div><!-- /.content-wrapper -->
 <script>
-    var quill;
-    var quill2;
-    var quill3;
-    $(function() {
+    let quill;
+    let quill2;
+    let quill3;
+    $(()=> {
         quill = new Quill('#editor-container1', {
             modules: {
                 toolbar: [

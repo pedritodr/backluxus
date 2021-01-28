@@ -449,8 +449,8 @@
 <script>
     $(document).ready(function() {
 
-        var current_fs, next_fs, previous_fs; //fieldsets
-        var opacity;
+        let current_fs, next_fs, previous_fs; //fieldsets
+        let opacity;
 
         $(".next").click(function() {
             let validNext = false;
@@ -459,6 +459,7 @@
             if ($("fieldset").index(current_fs) == 0) {
                 validNext = false;
                 let farms = $('select[name=farms] option').filter(':selected').val();
+                let markings = $('select[name=markings] option').filter(':selected').val();
                 if (farms == 0) {
                     const toast = swal.mixin({
                         toast: true,
@@ -469,28 +470,84 @@
                     });
                     toast({
                         type: 'error',
-                        title: 'Seleccione una finca',
+                        title:`Seleccione <?= translate("farms_lang"); ?>`,
+                        padding: '3em',
+                    })
+                }else if(markings==0){
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        padding: '2em'
+                    });
+                    toast({
+                        type: 'error',
+                        title:`Seleccione <?= translate("markings_lang"); ?>`,
                         padding: '3em',
                     })
                 } else {
                     validNext = true;
                 }
             } else if ($("fieldset").index(current_fs) == 1) {
-                validNext = true;
-                let date = $('#date').val().trim();
-                let country = $('select[name=country] option').filter(':selected').val();
-                let to = $('#to').val().trim();
-                let address = $('#address').val().trim();
-                let customer = $('#customer').val().trim();
-                let airline = $('#airline').val().trim();
-                let shippementDate = $('#shippementDate').val().trim();
-                let dueDate = $('#dueDate').val().trim();
+                validNext = false;
+                // let date = $('#date').val().trim();
+                //  let country = $('select[name=country] option').filter(':selected').val();
+                //   let to = $('#to').val().trim();
+                //  let address = $('#address').val().trim();
+                //  let customer = $('#customer').val().trim();
+                //  let airline = $('#airline').val().trim();
+                // let shippementDate = $('#shippementDate').val().trim();
+                // let dueDate = $('#dueDate').val().trim();
                 let awb = $('#awb').val().trim();
-                let hawb = $('#hawb').val().trim();
-                let freighForward = $('#freighForward').val().trim();
-                let packingList = $('#packingList').val().trim();
-                let dae = $('#dae').val().trim();
-
+                // let hawb = $('#hawb').val().trim();
+                //  let freighForward = $('#freighForward').val().trim();
+                // let packingList = $('#packingList').val().trim();
+                // let dae = $('#dae').val().trim();
+                let invoceNumber = $('#invoceNumber').val().trim();
+                let dispatchDay = $('#dispatchDay').val().trim();
+                if (invoceNumber == "") {
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        padding: '2em'
+                    });
+                    toast({
+                        type: 'error',
+                        title: `El campo <?= translate('invoice_number_lang'); ?> es requerido`,
+                        padding: '3em',
+                    })
+                } else if (dispatchDay == "") {
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        padding: '2em'
+                    });
+                    toast({
+                        type: 'error',
+                        title: `El campo <?= translate('dispatch_day_lang'); ?> es requerido`,
+                        padding: '3em',
+                    })
+                } else if (awb == "") {
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        padding: '2em'
+                    });
+                    toast({
+                        type: 'error',
+                        title: `El campo <?= translate('awb_lang'); ?> es requerido`,
+                        padding: '3em',
+                    })
+                } else {
+                    validNext = true;
+                }
 
             } else if ($("fieldset").index(current_fs) == 2) {
                 validNext = false;
@@ -500,39 +557,20 @@
                     // validNext = true;
                     //crear invoice
                     let farms = $('select[name=farms] option').filter(':selected').val();
+                    let markings = $('select[name=markings] option').filter(':selected').val();
                     farms = JSON.parse(decodeB64Utf8(farms));
                     delete farms.personal;
-                    let date = $('#date').val().trim();
-                    let country = $('select[name=country] option').filter(':selected').val();
-                    country = JSON.parse(decodeB64Utf8(country));
-                    let to = $('#to').val().trim();
-                    let address = $('#address').val().trim();
-                    let customer = $('#customer').val().trim();
-                    let airline = $('#airline').val().trim();
-                    let shippementDate = $('#shippementDate').val().trim();
-                    let dueDate = $('#dueDate').val().trim();
                     let awb = $('#awb').val().trim();
-                    let hawb = $('#hawb').val().trim();
-                    let freighForward = $('#freighForward').val().trim();
-                    let packingList = $('#packingList').val().trim();
-                    let dae = $('#dae').val().trim();
+                    let invoceNumber = $('#invoceNumber').val().trim();
+                    let dispatchDay = $('#dispatchDay').val().trim();
                     arrayRequest = JSON.stringify(arrayRequest.varieties);
                     let data = {
                         farms,
-                        date,
-                        country,
-                        to,
-                        address,
-                        customer,
-                        airline,
-                        shippementDate,
-                        dueDate,
+                        dispatchDay,
+                        invoceNumber,
                         awb,
-                        hawb,
-                        freighForward,
-                        packingList,
-                        dae,
-                        arrayRequest
+                        arrayRequest,
+                        markings
                     }
                     setTimeout(function() {
                         $.ajax({
@@ -1060,6 +1098,12 @@
     }
     const cargarDetails = () => {
         $('#tableVarieties').empty();
+        let qtyBox = 0;
+        let qtyStems = 0;
+        let qtyBouquets = 0;
+        let acumTotalStm = 0;
+        let acumPrice = 0;
+        let acumTotal = 0;
         if (arrayRequest.varieties.length > 0) {
             let texto_tabla = '';
             texto_tabla += '<table id="datatablesVarieties" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
@@ -1077,13 +1121,13 @@
             texto_tabla += '<th>Acciones</th>';
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
-
             texto_tabla += '<tbody>';
             arrayRequest.varieties.forEach((item, indice, array) => {
                 item.indice = indice;
                 texto_tabla += '<tr>';
                 texto_tabla += '<td>';
                 texto_tabla += item.boxNumber;
+                qtyBox += parseInt(item.boxNumber);
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
@@ -1100,22 +1144,27 @@
 
                 texto_tabla += '<td>';
                 texto_tabla += item.stems;
+                qtyStems += parseInt(item.stems);
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
                 texto_tabla += item.bouquets;
+                qtyBouquets += parseInt(item.bouquets);
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
                 texto_tabla += parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets);
+                acumTotalStm += parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets);
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
-                texto_tabla += item.price;
+                texto_tabla += parseFloat(item.price).toFixed(2);
+                acumPrice += parseFloat(item.price);
                 texto_tabla += '</td>';
 
                 texto_tabla += '<td>';
-                let totalTable = parseFloat(item.price) * (parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets))
+                let totalTable = parseFloat(item.price) * (parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets));
+                acumTotal += totalTable;
                 texto_tabla += totalTable.toFixed(2);
                 texto_tabla += '</td>';
 
@@ -1137,48 +1186,43 @@
             texto_tabla += '</tbody>';
             texto_tabla += '<tfoot>';
             texto_tabla += '<tr>';
-            texto_tabla += '<th>';
 
             texto_tabla += '<td>';
-
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-
+            texto_tabla += qtyBox;
             texto_tabla += '</td>';
 
             texto_tabla += '<td>';
             texto_tabla += '</td>';
-                
-            texto_tabla += '</th>';
+
+            texto_tabla += '<td>';
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+            texto_tabla += qtyStems;
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+            texto_tabla += qtyBouquets;
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+            texto_tabla += acumTotalStm;
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+            texto_tabla += acumPrice.toFixed(2);
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+            texto_tabla += acumTotal.toFixed(2);
+            texto_tabla += '</td>';
+
+            texto_tabla += '<td>';
+            texto_tabla += '</td>';
+
             texto_tabla += '</tr>';
             texto_tabla += '</tfoot>'
             texto_tabla += '</table>'

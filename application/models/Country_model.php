@@ -47,7 +47,63 @@ class Country_model extends CI_Model
         return $result;
     }
 
+    function create_city($country_id = 0, $data = [])
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->where('country_id', $country_id)->push('citys', $data)->update('country');
+        return $newId;
+    }
+    function update_city($id, $data)
+    {
+        $result = $this->mongo_db->where('citys.city_id', $id)->set(['citys.$.name' => $data])->update('country');
+        return $result;
+    }
+    function update_status_city($id)
+    {
+        $result = $this->mongo_db->where('citys.city_id', $id)->set(['citys.$.is_active' => 0])->update('country');
+        return $result;
+    }
+    function get_citys_by_id($id)
+    {
+        $fields = [
+            'citys' => ['$filter'  => ['input' => '$citys', 'as' => 'city', 'cond' => ['$eq' => ['$$city.city_id', $id]]]],
+            '_id' => 1,
+        ];
+        $conditions = [];
+        $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []);
+        return (count($query) > 0) ? (object) $query[0]->citys[0] : false;
+    }
+    function get_all_citys($country_id)
+    {
+        $fields = [
+            'citys' => ['$filter'  => ['input' => '$citys', 'as' => 'city', 'cond' => ['$eq' => ['$$city.is_active', 1]]]],
+            '_id' => 1,
+        ];
+        $conditions = ['is_active'=>1,'country_id'=>$country_id];
+        $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []);
+        $citys = [];
+        foreach ($query as $item) {
+            if (count($item->citys) > 0) {
+                foreach ($item->citys as $city) {
+                    $citys[] = $city;
+                }
+            }
+        }
 
-
+        return (count($citys) > 0) ? $citys : false;
+    }
+    function get_all_countrys()
+    {
+        $fields = [
+            'citys' => ['$filter'  => ['input' => '$citys', 'as' => 'city', 'cond' => ['$eq' => ['$$city.is_active', 1]]]],
+            '_id' => 1,
+            'country_id' => 1,
+            'name' => 1,
+            'is_active' => 1
+        ];
+        $conditions = ['is_active' => 1];
+        $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []);
+        return $query;
+    }
     //------------------------------------------------------------------------------------------------------------------------------------------
 }
