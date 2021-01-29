@@ -150,15 +150,17 @@
     #progressbar li.active:after {
         background: skyblue
     }
+
+    #modalAddVarieties {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
 </style>
 <div class="main-container" id="container">
-
     <div class="layout-px-spacing" style="width:100%">
         <h3>
             <?= translate('manage_invoice_farms_lang') ?> | <a href="<?= site_url('invoice_farm/index'); ?>" class="btn btn-default"><i class="fa fa-arrow-circle-left"></i> <?= translate('back_lang'); ?>
             </a>
         </h3>
-
         <div class="col-lg-12 layout-spacing">
             <div class="statbox widget box box-shadow">
                 <div class="widget-header">
@@ -204,7 +206,11 @@
                                                 <div class="input-group">
                                                     <select id="markings" name="markings" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                                         <option value="0"><?= translate('select_opction_lang') ?></option>
-                                                        <option value="1">Luxus</option>
+                                                        <?php if ($clients) { ?>
+                                                            <?php foreach ($clients as $item) { ?>
+                                                                <option value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name_company . ' | ' . $item->name_commercial ?></option>
+                                                            <?php   } ?>
+                                                        <?php } ?>
                                                     </select>
                                                 </div>
                                             </div>
@@ -253,11 +259,7 @@
                                                 <div class="input-group">
                                                     <select id="country" name="country" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                                         <option value="0"><?= translate('select_opction_lang') ?></option>
-                                                        <?php if ($countrys) { ?>
-                                                            <?php foreach ($countrys as $item) { ?>
-                                                                <option value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
-                                                            <?php   } ?>
-                                                        <?php } ?>
+
                                                     </select>
                                                 </div>
                                             </div>
@@ -470,10 +472,10 @@
                     });
                     toast({
                         type: 'error',
-                        title:`Seleccione <?= translate("farms_lang"); ?>`,
+                        title: `Seleccione <?= translate("farms_lang"); ?>`,
                         padding: '3em',
                     })
-                }else if(markings==0){
+                } else if (markings == 0) {
                     const toast = swal.mixin({
                         toast: true,
                         position: 'top-end',
@@ -483,7 +485,7 @@
                     });
                     toast({
                         type: 'error',
-                        title:`Seleccione <?= translate("markings_lang"); ?>`,
+                        title: `Seleccione <?= translate("markings_lang"); ?>`,
                         padding: '3em',
                     })
                 } else {
@@ -558,6 +560,7 @@
                     //crear invoice
                     let farms = $('select[name=farms] option').filter(':selected').val();
                     let markings = $('select[name=markings] option').filter(':selected').val();
+                    markings = JSON.parse(decodeB64Utf8(markings));
                     farms = JSON.parse(decodeB64Utf8(farms));
                     delete farms.personal;
                     let awb = $('#awb').val().trim();
@@ -811,7 +814,7 @@
 
     })
     $('[name=product]').change(() => {
-        let products = $('select[name=product] option').filter(':selected').attr('itemId');;
+        let products = $('select[name=product] option').filter(':selected').attr('itemId');
         if (products != 0) {
             products = JSON.parse(decodeB64Utf8(products));
             if (typeof products.categoria.type_box !== 'undefined') {

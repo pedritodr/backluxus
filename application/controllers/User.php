@@ -156,7 +156,7 @@ class User extends CI_Controller
         }
     }
 
-    function update_index($user_id = 0)
+    public  function update_index($user_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
@@ -172,7 +172,7 @@ class User extends CI_Controller
             show_404();
         }
     }
-    function update_index_client($user_id = 0)
+    public function update_index_client($user_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
@@ -189,7 +189,7 @@ class User extends CI_Controller
         }
     }
 
-    function profile_index()
+    public function profile_index()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();

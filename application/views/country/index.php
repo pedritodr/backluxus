@@ -2,6 +2,15 @@
     .nav-margin-bottom {
         margin-bottom: 20px;
     }
+    #modalAddCity {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+    #modalEditCity {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+    #modalCitys {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">

@@ -25,13 +25,11 @@ class Dashboard extends CI_Controller
     }
 
     public function index()
-
     {
-        if (!in_array($this->session->userdata('role_id'), [1])) {
+        if (!in_array($this->session->userdata('role_id'), [1,2])) {
             $this->log_out();
             redirect('login/index');
         }
-
         $this->load_view_admin_g('dashboard/index_admin');
     }
 

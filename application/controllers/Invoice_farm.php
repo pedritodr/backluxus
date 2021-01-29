@@ -40,12 +40,13 @@ class Invoice_farm extends CI_Controller
         $this->load->model('measure_model', 'measure');
         $this->load->model('Country_model', 'country');
         $this->load->model('Categoria_model', 'categoria');
+        $this->load->model('User_model', 'user');
         $data['categories']  = $this->categoria->get_all(['is_active' => 1]);
-        //  $data['products'] = $this->product->get_all(['is_active' => 1]);
+        $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
         $data['farms'] = $this->farm->get_all_farms();
         $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
         $data['measures'] = $this->measure->get_all(['is_active' => 1]);
-      //  $data['countrys'] = $this->country->get_all(['is_active' => 1]);
+
         $this->load_view_admin_g('invoice_farm/add', $data);
     }
 

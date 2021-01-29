@@ -2,6 +2,9 @@
     .nav-margin-bottom {
         margin-bottom: 20px;
     }
+    #modalDetails {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">
@@ -36,6 +39,7 @@
                                     <?php foreach ($all_invoice_farm as $item) { ?>
                                         <tr>
                                             <td>
+                                            <p><?= $item->markings->name_company.' | '. $item->markings->name_commercial?></p>
                                             </td>
                                             <td>
                                                 <p><strong><?= translate("invoice_number_lang"); ?> : </strong><?= $item->invoice_number; ?></p>

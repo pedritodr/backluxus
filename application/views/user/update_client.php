@@ -28,13 +28,13 @@
                             <label><?= translate('name_commercial_lang') ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
-                                <input type="text" class="form-control input-sm" name="name_commercial" required placeholder="<?= translate('name_commercial_lang') ?>"value="<?= $user_object->name_commercial ?>">
+                                <input type="text" class="form-control input-sm" name="name_commercial" required placeholder="<?= translate('name_commercial_lang') ?>" value="<?= $user_object->name_commercial ?>">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="control-label"><?=translate('observations_lang') ?></label>
-                                <div id="editor-container1" class="form-control"><?= $user_object->observations?></div>
+                                <label class="control-label"><?= translate('observations_lang') ?></label>
+                                <div id="editor-container1" class="form-control"><?= $user_object->observations ?></div>
                                 <textarea style="display:none" name="desc" id="desc" cols="30" rows="10"></textarea>
                                 <br>
                             </div>
@@ -49,26 +49,26 @@
         </div><!-- /.row -->
 
     </div><!-- /.content-wrapper -->
-<script>
-   let quill;
-$(()=>{
+    <script>
+        let quill;
+        $(() => {
             quill = new Quill('#editor-container1', {
-            modules: {
-                toolbar: [
-                    [{
-                        header: [1, 2, false]
-                    }],
-                    ['bold', 'italic', 'underline'],
-                    ['image', 'code-block']
-                ]
-            },
-            placeholder: 'Escribe aqui la sobre nosotros...',
-            theme: 'snow' // or 'bubble'
-        });
-})
-let form = document.querySelector('form');
-    form.onsubmit = function() {
-        let contenido = $('#editor-container1').text();
-        $('#desc').html(contenido);
-    }
-</script>
+                modules: {
+                    toolbar: [
+                        [{
+                            header: [1, 2, false]
+                        }],
+                        ['bold', 'italic', 'underline'],
+                        ['image', 'code-block']
+                    ]
+                },
+                placeholder: 'Escribe aqui la sobre nosotros...',
+                theme: 'snow' // or 'bubble'
+            });
+        })
+        let form = document.querySelector('form');
+        form.onsubmit = function() {
+            let contenido = $('#editor-container1').text();
+            $('#desc').html(contenido);
+        }
+    </script>
