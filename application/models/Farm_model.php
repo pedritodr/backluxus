@@ -74,7 +74,7 @@ class Farm_model extends CI_Model
     {
         $data['_id'] = $this->mongo_db->create_document_id();
         $newId = $this->mongo_db->where('provider_id', $provider_id)->push('farms', $data)->update('providers');
-        return $newId;
+        return $data;
     }
     function create_person($id = 0, $data = [])
     {
