@@ -76,7 +76,7 @@ class User extends CI_Controller
         $repeat_password = $this->input->post('repeat_password');
         $role = $this->input->post('role');
         $validaEmail = $this->user->get_by_email($email);
-        if($validaEmail){
+        if ($validaEmail) {
             $this->response->set_message(translate('email_already_exist_lang'), ResponseMessage::ERROR);
             redirect("user/add_index_client");
         }
@@ -125,8 +125,9 @@ class User extends CI_Controller
         $name_commercial = $this->input->post('name_commercial');
         $password = $this->input->post('password');
         $desc = $this->input->post('desc');
+        $phone = $this->input->post('phone');
         $validaEmail = $this->user->get_by_email($email);
-        if($validaEmail){
+        if ($validaEmail) {
             $this->response->set_message(translate('email_already_exist_lang'), ResponseMessage::ERROR);
             redirect("user/add_index_client");
         }
@@ -148,7 +149,8 @@ class User extends CI_Controller
                 'is_active' => 1,
                 'date_create' => $fecha_create,
                 'is_delete' => 0,
-                'observations'=>$desc
+                'observations' => $desc,
+                'phone' => $phone,
             ];
             $this->user->create($data_user);
             $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
@@ -253,6 +255,7 @@ class User extends CI_Controller
         $name_commercial = $this->input->post('name_commercial');
         $desc = $this->input->post('desc');
         $user_id = $this->input->post('user_id');
+        $phone = $this->input->post('phone');
         //establecer reglas de validacion
         $this->form_validation->set_rules('name_company', translate('name_company_lang'), 'required');
 
@@ -263,8 +266,8 @@ class User extends CI_Controller
             $data_user = [
                 'name_company' => $name_company,
                 'name_commercial' => $name_commercial,
-                'observations'=>  $desc,
-                'address'=>null
+                'observations' =>  $desc,
+                'phone' => $phone,
             ];
             $this->user->update($user_id, $data_user);
             $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
@@ -414,11 +417,36 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
-        $address= $this->input->post('objectCountry');
-        $user_id= $this->input->post('userIdAdd');
-        $response =  $this->user->update($user_id,['address'=>$address]);
+        $address = $this->input->post('objectCountry');
+        $user_id = $this->input->post('userIdAdd');
+        $response =  $this->user->update($user_id, ['address' => $address]);
         if ($response) {
             echo json_encode(['status' => 200, 'msj' => 'correcto']);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+    public function add_marking()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $nameMarking = $this->input->post('nameMarking');
+        $userIdAdd = $this->input->post('userIdAdd');
+        $objectCountry = $this->input->post('objectCountry');
+        $address = $this->input->post('address');
+        $marking = 'mk_' . uniqid();
+        $data = ['marking_id' => $marking, 'name_marking' => $nameMarking, 'is_active' => 1, 'address' => $address,'country'=>$objectCountry];
+        $response = $this->user->create_marking($userIdAdd, $data);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' => []]);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);

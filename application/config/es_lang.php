@@ -84,6 +84,10 @@ $config['dispatch_day_lang'] = "Dia de despacho";
 $config['guide_number_lang'] = "Nro de guía";
 $config['invoice_number_lang'] = "Nro de factura";
 $config['markings_lang'] = "Marcaciones";
+$config['add_marking_lang'] = "Adicionar marcación";
+$config['edit_marking_lang'] = "Editar marcación";
+$config['delete_marking_lang'] = "Eliminar marcación";
+$config['marking_lang'] = "Marcación";
 
 $config['manage_invoice_farms_lang'] = "Gestionar factura de fincas";
 $config['listar_invoice_farms_lang'] = "Listar facturas de fincas";
