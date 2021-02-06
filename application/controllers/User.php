@@ -304,7 +304,7 @@ class User extends CI_Controller
 
 
         if ($user_object) {
-            $this->user->update($user_id, ['is_active' => 0]);
+            $this->user->update($user_id, ['is_delete' => 1]);
             $this->response->set_message(translate('data_deleted_ok'), ResponseMessage::SUCCESS);
             redirect("user/index_client");
         } else {
@@ -447,6 +447,54 @@ class User extends CI_Controller
         $response = $this->user->create_marking($userIdAdd, $data);
         if ($response) {
             echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' => []]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+    public function edit_marking()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $nameMarking = $this->input->post('nameMarking');
+        $userIdAdd = $this->input->post('userIdAdd');
+        $objectCountry = $this->input->post('objectCountry');
+        $address = $this->input->post('address');
+        $marking =  $this->input->post('markingId');
+        $data = ['markings.$.name_marking' => $nameMarking,'markings.$.address' => $address,'markings.$.country'=>$objectCountry];
+        $response = $this->user->update_marking($marking, $data);
+        $user_object = $this->user->get_by_id($userIdAdd);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' => $user_object->markings]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+    public function delete_marking()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $userIdAdd = $this->input->post('userIdAdd');
+        $marking =  $this->input->post('markingId');
+        $response = $this->user->delete_marking($userIdAdd,$marking);
+        $user_object = $this->user->get_by_id($userIdAdd);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' => $user_object->markings]);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);

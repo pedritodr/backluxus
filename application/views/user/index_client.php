@@ -317,6 +317,7 @@
                     </div>
                 </div>
                 <input type="hidden" id="clienteMarkingEdit">
+                <input type="hidden" id="markingId">
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="cancelEditMarking()"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
@@ -709,6 +710,7 @@
         $('#addressEdit').val(objectMarking.address);
         $('#nameMarkingEdit').val(objectMarking.name_marking);
         $('#countryMarkingEdit').val(objectMarking.country.country_id);
+        $('#markingId').val(objectMarking.marking_id);
         let country = $('select[name=countryMarkingEdit] option').filter(':selected').attr('itemId');
         if (country != 0) {
             country = JSON.parse(decodeB64Utf8(country));
@@ -860,7 +862,7 @@
         }
         $("#modalMarings").modal('show');
         $("#bodyModalMarkings").empty();
-        if (citys.length > 0) {
+        if (markings.length > 0) {
             let texto_tabla = '';
             texto_tabla += '<table id="datatablesMarkings" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
             texto_tabla += '<thead>';
@@ -944,4 +946,163 @@
         }
 
     })
+    const submitEditMarking = () => {
+        let country = $('select[name=countryMarkingEdit] option').filter(':selected').attr('itemId');
+        let city = $('select[name=citysMarkingEdit] option').filter(':selected').val();
+        let userIdAdd = $('#clienteMarkingEdit').val();
+        let nameMarking = $('#nameMarkingEdit').val();
+        let address = $('#addressEdit').val();
+        let markingId =  $('#markingId').val();
+        if (nameMarking == '') {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El nombre de la marcación es requerida',
+                padding: '3em',
+            })
+        } else if (country == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione un país para continuar',
+                padding: '3em',
+            })
+        } else if (city == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una ciudad',
+                padding: '3em',
+            })
+        } else {
+            country = JSON.parse(decodeB64Utf8(country));
+            city = JSON.parse(decodeB64Utf8(city));
+            $('#spinnerEditMarking').show();
+            $('#spanEditMarking').text('<?= translate('processing_lang') ?>' + '...');
+            let objectCity = {
+                city_id: city.city_id,
+                name: city.name,
+            }
+            let objectCountry = {
+                country_id: country.country_id,
+                name: country.name,
+                city: objectCity
+            }
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('user/edit_marking') ?>",
+                    data: {
+                        objectCountry,
+                        userIdAdd,
+                        nameMarking,
+                        address,
+                        markingId
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            $('#modalEditMarking').modal('hide');
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                $('#spinnerEditMarking').hide();
+                                $('#spanEditMarking').text('<?= translate('guardar_info_lang') ?>');
+                                loadMarkings(userIdAdd,result.markings,'0');
+                                //location.reload();
+                            }, 1000);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                            $('#spinnerEditMarking').hide();
+                            $('#spanEditMarking').text('<?= translate('guardar_info_lang') ?>');
+                        }
+
+                    }
+                });
+            }, 1500)
+        }
+    }
+    const deleteMarking = function(marking) {
+        marking = decodeB64Utf8(marking);
+        marking = JSON.parse(marking);
+        swal({
+            title: '¿ Estás seguro de realizar esta operación ?',
+            text: "Usted no podrá revertir este cambio !!!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('user/delete_marking') ?>",
+                    data: {
+                        userIdAdd:marking.userId,
+                        markingId:marking.marking_id
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                loadMarkings(marking.userId,result.markings,'0');
+                                //location.reload();
+                            }, 1000);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+
+                    }
+                });
+            }
+        })
+    }
 </script>

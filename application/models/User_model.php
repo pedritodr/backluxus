@@ -1,11 +1,12 @@
 <?php
-
+require 'vendor/autoload.php';
 class User_model extends CI_Model
 {
 
     function __construct()
     {
         parent::__construct();
+        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
         // $this->load->database();
     }
     function create($data)
@@ -67,4 +68,21 @@ class User_model extends CI_Model
         $newId = $this->mongo_db->where('user_id', $user_id)->push('markings', $data)->update('users');
         return $newId;
     }
+    function update_marking($id,$data)
+    {
+        foreach ($data as $key => $value) {
+            $this->mongo_db->set($key, $value);
+        }
+        $result = $this->mongo_db->where('markings.marking_id', $id)->update('users');
+        return $result;
+    }
+    function delete_marking($user_id, $marking_id)
+    {
+        $query = $this->mongodb->luxus->users->updateOne(
+            ['user_id' => $user_id],
+            ['$pull' => ['markings' => ['marking_id' => $marking_id]]]
+        );
+        return $query;
+    }
+
 }
