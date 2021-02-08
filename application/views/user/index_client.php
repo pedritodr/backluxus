@@ -22,6 +22,13 @@
     #modalMarings {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
+
+    #modalAddManagers {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+    #modalEditManagers{
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">
@@ -59,7 +66,7 @@
                                         <tr>
                                             <td>
                                                 <p><b><?= translate('name_company_lang') ?>:</b> <?= $item->name_company ?></p>
-                                                <p><b><?= translate('name_commercial_lang') ?>:</b> <?= $item->name_commercial ?></p>
+                                                <p><b><?= translate('director_lang') ?>:</b> <?= $item->name_commercial ?></p>
                                                 <p><b><?= translate('email_lang') ?>:</b> <?= $item->email ?></p>
                                                 <p><b><?= translate('phone_lang') ?>:</b> <?= $item->phone ?></p>
                                             </td>
@@ -107,7 +114,12 @@
                                                                 <a style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->markings)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
                                                         <?php }
                                                         } ?>
-
+                                                        <a style="cursor:pointer" onclick="addManager('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("add_manager_lang"); ?></a>
+                                                        <?php if (isset($item->managers)) {
+                                                            if (count($item->managers) > 0) { ?>
+                                                                <a style="cursor:pointer" onclick="loadManagers('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->managers)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("managers_lang"); ?></a>
+                                                        <?php }
+                                                        } ?>
                                                         <?php if ($item->user_id != $this->session->userdata('user_id')) { ?>
                                                             <a onclick="sureUser('<?= $item->user_id; ?>');" class="dropdown-item btn btn-danger"><i class="fa fa-remove"></i> <?= translate("delete_lang"); ?></a>
                                                         <?php } ?>
@@ -340,6 +352,126 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalAddManagers" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('add_manager_lang') ?></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label><?= translate("nombre_lang"); ?></label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                            <input required type="text" class="form-control input-sm" id="nameManager" placeholder="<?= translate('nombre_lang'); ?>">
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("email_lang"); ?></label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                            <input required type="text" class="form-control input-sm" id="emailManager" placeholder="<?= translate('email_lang'); ?>">
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("phone_lang"); ?></label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                            <input required type="text" class="form-control input-sm" id="phoneManager" placeholder="<?= translate('phone_lang'); ?>">
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("functions_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="functions" name="functions" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option value="1"><?= translate('sales_lang') ?></option>
+                                <option value="2"><?= translate('logistics_lang') ?></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="userIdManager">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
+                <button onclick="submitAddManager()" type="button" class="btn btn-primary"><i class="fa fa-check-square"></i>
+                    <div style="display:none;    width: 17px;height: 17px;" id="spinnerAddManager" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
+                    <span id="spanAddManager"><?= translate('guardar_info_lang') ?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalManagers" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('managers_lang') ?></h5>
+            </div>
+            <div class="modal-body" id="bodyModalManagers">
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalEditManagers" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('edit_manager_lang') ?></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label><?= translate("nombre_lang"); ?></label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                            <input required type="text" class="form-control input-sm" id="nameEditManager" placeholder="<?= translate('nombre_lang'); ?>">
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("email_lang"); ?></label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                            <input required type="text" class="form-control input-sm" id="emailEditManager" placeholder="<?= translate('email_lang'); ?>">
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("phone_lang"); ?></label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                            <input required type="text" class="form-control input-sm" id="phoneEditManager" placeholder="<?= translate('phone_lang'); ?>">
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("functions_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="functionsEdit" name="functionsEdit" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option value="1"><?= translate('sales_lang') ?></option>
+                                <option value="2"><?= translate('logistics_lang') ?></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="userIdEditManager">
+                <input type="hidden" id="managerId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="cancelEditManager()"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
+                <button onclick="submitEditManager()" type="button" class="btn btn-primary"><i class="fa fa-check-square"></i>
+                    <div style="display:none;    width: 17px;height: 17px;" id="spinnerEditManager" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
+                    <span id="spanEditManager"><?= translate('guardar_info_lang') ?></span>
+                </button>
             </div>
         </div>
     </div>
@@ -717,9 +849,9 @@
             if (country.citys.length > 0) {
                 let cadena = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
                 country.citys.forEach(item => {
-                    if(objectMarking.country.city.city_id ==item.city_id ){
+                    if (objectMarking.country.city.city_id == item.city_id) {
                         cadena += '<option selected value="' + encodeB64Utf8(JSON.stringify(item)) + '" itemId="' + item.city_id + '">' + item.name + '</option>'
-                    }else{
+                    } else {
                         cadena += '<option value="' + encodeB64Utf8(JSON.stringify(item)) + '" itemId="' + item.city_id + '">' + item.name + '</option>'
                     }
                 });
@@ -838,7 +970,8 @@
                             setTimeout(function() {
                                 $('#spinnerAddMarking').hide();
                                 $('#spanAddMarking').text('<?= translate('guardar_info_lang') ?>');
-                                location.reload();
+                                //location.reload();
+                                loadMarkings(userIdAdd, result.markings, '0');
                             }, 1000);
                         } else {
                             swal({
@@ -904,7 +1037,7 @@
         }
 
     }
-    const cancelEditMarking= () =>{
+    const cancelEditMarking = () => {
         $("#modalEditMarking").modal('hide');
         $('#modalMarings').modal({
             backdrop: false
@@ -952,7 +1085,7 @@
         let userIdAdd = $('#clienteMarkingEdit').val();
         let nameMarking = $('#nameMarkingEdit').val();
         let address = $('#addressEdit').val();
-        let markingId =  $('#markingId').val();
+        let markingId = $('#markingId').val();
         if (nameMarking == '') {
             const toast = swal.mixin({
                 toast: true,
@@ -1036,7 +1169,7 @@
                             setTimeout(function() {
                                 $('#spinnerEditMarking').hide();
                                 $('#spanEditMarking').text('<?= translate('guardar_info_lang') ?>');
-                                loadMarkings(userIdAdd,result.markings,'0');
+                                loadMarkings(userIdAdd, result.markings, '0');
                                 //location.reload();
                             }, 1000);
                         } else {
@@ -1070,8 +1203,8 @@
                     type: 'POST',
                     url: "<?= site_url('user/delete_marking') ?>",
                     data: {
-                        userIdAdd:marking.userId,
-                        markingId:marking.marking_id
+                        userIdAdd: marking.userId,
+                        markingId: marking.marking_id
                     },
                     success: function(result) {
                         result = JSON.parse(result);
@@ -1089,7 +1222,364 @@
                                 padding: '2em',
                             })
                             setTimeout(function() {
-                                loadMarkings(marking.userId,result.markings,'0');
+                                loadMarkings(marking.userId, result.markings, '0');
+                                //location.reload();
+                            }, 1000);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+
+                    }
+                });
+            }
+        })
+    }
+    const addManager = (userId) => {
+        $('#userIdManager').val(userId);
+        $('#modalAddManagers').modal({
+            backdrop: false
+        })
+    }
+    const submitAddManager = () => {
+        let functions = $('select[name=functions] option').filter(':selected').val();
+        let userId = $('#userIdManager').val();
+        let name = $('#nameManager').val().trim();
+        let phone = $('#phoneManager').val().trim();
+        let email = $('#emailManager').val().trim();
+        if (name == '') {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El nombre es requerida',
+                padding: '3em',
+            })
+        } else if (email == "") {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'EL email es requerido',
+                padding: '3em',
+            })
+        } else if (phone == "") {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'EL teléfono es requerido',
+                padding: '3em',
+            })
+        } else if (functions == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una función',
+                padding: '3em',
+            })
+        } else {
+
+            $('#spinnerAddManager').show();
+            $('#spanAddManager').text('<?= translate('processing_lang') ?>' + '...');
+
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('user/add_manager') ?>",
+                    data: {
+                        name,
+                        email,
+                        phone,
+                        functions,
+                        userId
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            $('#modalAddManagers').modal('hide');
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                $('#spinnerAddManager').hide();
+                                $('#spanAddManager').text('<?= translate('guardar_info_lang') ?>');
+                                loadManagers(userId, result.managers, '0');
+                                //location.reload();
+                            }, 1000);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                            $('#spinnerAddManager').hide();
+                            $('#spanAddManager').text('<?= translate('guardar_info_lang') ?>');
+                        }
+
+                    }
+                });
+            }, 1500)
+        }
+    }
+    const loadManagers = (user_id, managers = [], type = 0) => {
+        if (type == "1") {
+            managers = decodeB64Utf8(managers);
+            managers = JSON.parse(managers);
+        }
+        $("#modalManagers").modal('show');
+        $("#bodyModalManagers").empty();
+        if (managers.length > 0) {
+            let texto_tabla = '';
+            texto_tabla += '<table id="datatablesManagers" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
+            texto_tabla += '<thead>';
+            texto_tabla += '<tr>';
+            texto_tabla += '<th>Encargados</th>';
+            texto_tabla += '<th>Acciones</th>';
+            texto_tabla += '</tr>';
+            texto_tabla += '</thead>';
+            texto_tabla += '<tbody>';
+            managers.forEach((item, indice, array) => {
+                item.userId = user_id;
+                texto_tabla += '<tr>';
+                texto_tabla += '<td>';
+                texto_tabla += '<p><b><?= translate('nombre_lang') ?>: </b> ' + item.name + '</p>';
+                texto_tabla += '<p><b><?= translate('email_lang') ?>: </b> ' + item.email + '</p>';
+                texto_tabla += '<p><b><?= translate('phone_lang') ?>: </b> ' + item.phone + '</p>';
+                if (item.function == 1) {
+                    let funcitonManager = '<?= translate('sales_lang') ?>';
+                    texto_tabla += '<p><b><?= translate('function_lang') ?>: </b> ' + funcitonManager + '</p>';
+                } else {
+                    let funcitonManager = '<?= translate('logistics_lang') ?>';
+                    texto_tabla += '<p><b><?= translate('function_lang') ?>: </b> ' + funcitonManager + '</p>';
+                }
+                texto_tabla += '</td>';
+
+                texto_tabla += '<td>';
+
+                texto_tabla += '<a class="btn btn-primary" href="javascript:void(0);"  onclick=editManager("' + encodeB64Utf8(JSON.stringify(item)) + '");> Editar</a>';
+                texto_tabla += '<a class="btn btn-danger" href="javascript:void(0);"   onclick=deleteManager("' + encodeB64Utf8(JSON.stringify(item)) + '");> Eliminar</a>';
+
+                texto_tabla += '</td>';
+                texto_tabla += '</tr>';
+            });
+            texto_tabla += '</tbody>';
+
+            texto_tabla += '</table>'
+            $("#bodyModalManagers").html(texto_tabla);
+            $("#datatablesManagers").DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                }
+            });
+        } else {
+            $('#bodyModalManagers').append('<div class="alert alert-info">Se encuentra vacio</div>');
+        }
+
+    }
+    const editManager = (objectManager) => {
+
+        objectManager = decodeB64Utf8(objectManager);
+        objectManager = JSON.parse(objectManager);
+        $("#modalManagers").modal('hide');
+        $('#nameEditManager').val(objectManager.name);
+        $('#phoneEditManager').val(objectManager.phone);
+        $('#emailEditManager').val(objectManager.email);
+        $('#functionsEdit').val(objectManager.function);
+        $('#managerId').val(objectManager.manager_id);
+        $('#userIdEditManager').val(objectManager.userId);
+        $('#modalEditManagers').modal({
+            backdrop: false
+        })
+    }
+    const cancelEditManager = () => {
+        $("#modalEditManagers").modal('hide');
+        $('#modalManagers').modal({
+            backdrop: false
+        })
+    }
+    const submitEditManager = () => {
+        let functions = $('select[name=functionsEdit] option').filter(':selected').val();
+        let userId = $('#userIdEditManager').val();
+        let managerId = $('#managerId').val();
+        let name = $('#nameEditManager').val().trim();
+        let phone = $('#phoneEditManager').val().trim();
+        let email = $('#emailEditManager').val().trim();
+        if (name == '') {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El nombre es requerida',
+                padding: '3em',
+            })
+        } else if (email == "") {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'EL email es requerido',
+                padding: '3em',
+            })
+        } else if (phone == "") {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'EL teléfono es requerido',
+                padding: '3em',
+            })
+        } else if (functions == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una función',
+                padding: '3em',
+            })
+        } else {
+
+            $('#spinnerEditManager').show();
+            $('#spanEditManager').text('<?= translate('processing_lang') ?>' + '...');
+
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('user/update_manager') ?>",
+                    data: {
+                        name,
+                        email,
+                        phone,
+                        functions,
+                        userId,
+                        managerId
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            $('#modalEditManagers').modal('hide');
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                $('#spinnerEditManager').hide();
+                                $('#spanEditManager').text('<?= translate('guardar_info_lang') ?>');
+                                loadManagers(userId, result.managers, '0');
+                               /// location.reload();
+                            }, 1000);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                            $('#spinnerEditManager').hide();
+                            $('#spanEditManager').text('<?= translate('guardar_info_lang') ?>');
+                        }
+
+                    }
+                });
+            }, 1500)
+        }
+    }
+    const deleteManager = function(manager) {
+        manager = decodeB64Utf8(manager);
+        manager = JSON.parse(manager);
+        swal({
+            title: '¿ Estás seguro de realizar esta operación ?',
+            text: "Usted no podrá revertir este cambio !!!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('user/delete_manager') ?>",
+                    data: {
+                        userId: manager.userId,
+                        managerId: manager.manager_id
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                loadManagers(manager.userId, result.managers, '0');
                                 //location.reload();
                             }, 1000);
                         } else {

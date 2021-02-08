@@ -47,6 +47,7 @@ $config['days_credit_lang'] = "Días de crédito con nuestra empresa";
 $config['name_legal_lang'] = "Nombre jurídico";
 $config['name_company_lang'] = "Nombre empresa";
 $config['name_commercial_lang'] = "Nombre comercial";
+$config['director_lang'] = "Director";
 $config['address_farm_lang'] = "Dirección finca";
 $config['address_oficce_lang'] = "Dirección oficina";
 $config['listar_providers_lang'] = "Listar de proveedores";
@@ -60,6 +61,11 @@ $config['data_personal_lang'] = "Datos del personal";
 $config['listar_personal_lang'] = "Listar del personal";
 $config['add_person_lang'] = "Adicionar persona";
 $config['update_person_lang'] = "Actualizar persona";
+
+$config['data_manager_lang'] = "Datos del encargado";
+$config['listar_managers_lang'] = "Listar del encargados";
+$config['add_manager_lang'] = "Adicionar encargado";
+$config['edit_manager_lang'] = "Editar encargado";
 
 $config['manage_bouquets_lang'] = "Gestionar bouquets";
 $config['listar_bouquests_lang'] = "Listar bouquets";
@@ -403,7 +409,11 @@ $config['enviar_mensaje_lang'] = "Enviar mensaje ahora";
 $config['referencia_lang'] = "Referencia";
 $config['manipular_platos_menu_lang'] = "Manipular platos del menú";
 $config['lista_clientes_lang'] = "Lista de clientes";
-
+$config['functions_lang'] = "Funciones";
+$config['function_lang'] = "Función";
+$config['sales_lang'] = "Ventas";
+$config['logistics_lang'] = "Logística";
+$config['managers_lang'] = "Encargados";
 
 
 

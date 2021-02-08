@@ -15,7 +15,6 @@ class User extends CI_Controller
         $this->load_language();
         $this->init_form_validation();
     }
-
     public function index()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -29,7 +28,6 @@ class User extends CI_Controller
 
         $this->load_view_admin_g("user/index", $data);
     }
-
     public function index_client()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -50,7 +48,6 @@ class User extends CI_Controller
         }
         $this->load_view_admin_g('user/add');
     }
-
     public function add_index_client()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -59,7 +56,6 @@ class User extends CI_Controller
         }
         $this->load_view_admin_g('user/add_client');
     }
-
     public function add()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -112,7 +108,6 @@ class User extends CI_Controller
             redirect("user/index");
         }
     }
-
     public function add_client()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -157,7 +152,6 @@ class User extends CI_Controller
             redirect("user/index_client");
         }
     }
-
     public  function update_index($user_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -190,7 +184,6 @@ class User extends CI_Controller
             show_404();
         }
     }
-
     public function profile_index()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -274,7 +267,6 @@ class User extends CI_Controller
             redirect("user/index_client");
         }
     }
-
     public function delete($user_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -339,7 +331,6 @@ class User extends CI_Controller
             redirect("dashboard/index");
         }
     }
-
     public function credenciales_index()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
@@ -443,10 +434,11 @@ class User extends CI_Controller
         $objectCountry = $this->input->post('objectCountry');
         $address = $this->input->post('address');
         $marking = 'mk_' . uniqid();
-        $data = ['marking_id' => $marking, 'name_marking' => $nameMarking, 'is_active' => 1, 'address' => $address,'country'=>$objectCountry];
+        $data = ['marking_id' => $marking, 'name_marking' => $nameMarking, 'is_active' => 1, 'address' => $address, 'country' => $objectCountry];
         $response = $this->user->create_marking($userIdAdd, $data);
+        $user_object = $this->user->get_by_id($userIdAdd);
         if ($response) {
-            echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' => []]);
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' =>$user_object->markings]);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
@@ -468,7 +460,7 @@ class User extends CI_Controller
         $objectCountry = $this->input->post('objectCountry');
         $address = $this->input->post('address');
         $marking =  $this->input->post('markingId');
-        $data = ['markings.$.name_marking' => $nameMarking,'markings.$.address' => $address,'markings.$.country'=>$objectCountry];
+        $data = ['markings.$.name_marking' => $nameMarking, 'markings.$.address' => $address, 'markings.$.country' => $objectCountry];
         $response = $this->user->update_marking($marking, $data);
         $user_object = $this->user->get_by_id($userIdAdd);
         if ($response) {
@@ -491,10 +483,87 @@ class User extends CI_Controller
         }
         $userIdAdd = $this->input->post('userIdAdd');
         $marking =  $this->input->post('markingId');
-        $response = $this->user->delete_marking($userIdAdd,$marking);
+        $response = $this->user->delete_marking($userIdAdd, $marking);
         $user_object = $this->user->get_by_id($userIdAdd);
         if ($response) {
             echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' => $user_object->markings]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+    public function add_manager()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $name = $this->input->post('name');
+        $userId = $this->input->post('userId');
+        $email = $this->input->post('email');
+        $phone = $this->input->post('phone');
+        $function = $this->input->post('functions');
+        $manager_id = 'mg_' . uniqid();
+        $data = ['manager_id' => $manager_id, 'name' => $name, 'is_active' => 1, 'phone' => $phone, 'email' => $email, 'function' => $function];
+        $response = $this->user->create_manager($userId, $data);
+        $user_object = $this->user->get_by_id($userId);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'managers' => $user_object->managers]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+    public function update_manager()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $name = $this->input->post('name');
+        $userId = $this->input->post('userId');
+        $email = $this->input->post('email');
+        $phone = $this->input->post('phone');
+        $function = $this->input->post('functions');
+        $managerId =  $this->input->post('managerId');
+        $data = ['managers.$.name' => $name, 'managers.$.email' => $email, 'managers.$.phone' => $phone, 'managers.$.function' => $function];
+
+        $response = $this->user->update_manager($managerId, $data);
+        $user_object = $this->user->get_by_id($userId);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'managers' => $user_object->managers]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+    public function delete_manager()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $userId = $this->input->post('userId');
+        $managerId =  $this->input->post('managerId');
+        $response = $this->user->delete_manager($userId, $managerId);
+        $user_object = $this->user->get_by_id($userId);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'managers' => $user_object->managers]);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);

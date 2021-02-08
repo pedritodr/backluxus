@@ -84,5 +84,27 @@ class User_model extends CI_Model
         );
         return $query;
     }
+    function create_manager($user_id = 0, $data = [])
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->where('user_id', $user_id)->push('managers', $data)->update('users');
+        return $newId;
+    }
+    function update_manager($id,$data)
+    {
 
+        foreach ($data as $key => $value) {
+            $this->mongo_db->set($key, $value);
+        }
+        $result = $this->mongo_db->where('managers.manager_id', $id)->update('users');
+        return $result;
+    }
+    function delete_manager($user_id, $marking_id)
+    {
+        $query = $this->mongodb->luxus->users->updateOne(
+            ['user_id' => $user_id],
+            ['$pull' => ['managers' => ['manager_id' => $marking_id]]]
+        );
+        return $query;
+    }
 }

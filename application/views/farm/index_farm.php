@@ -10,6 +10,7 @@
             <?= translate('manage_farms_lang'); ?>
             <small class="titulo-2"></small>
             | <a href="<?= site_url('farm/add_farm_index/') . $provider_object->provider_id; ?>" class="btn btn-primary"><i class="fa fa-plus-circle"></i> <?= translate('add_item_lang'); ?></a>
+            | <a href="<?= site_url('farm/index_provider'); ?>" class="btn btn-default"><i class="fa fa-arrow-circle-left"></i> <?= translate('back_lang'); ?></a>
         </p>
         <div class="col-xs-12">
             <div class="statbox widget box box-shadow">
