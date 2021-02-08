@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" />
-    <title>Luxus - Login</title>
+    <title>LUXUS - Login</title>
     <link rel="icon" type="image/x-icon" href="<?= base_url('admin_template/assets/img/favicon.ico') ?>" />
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
     <link href="https://fonts.googleapis.com/css?family=Quicksand:400,500,600,700&amp;display=swap')?>" rel="stylesheet" />
@@ -26,7 +26,7 @@
                     <div class="form-content">
                         <h1 class="">
                             Iniciar sesión en
-                            <a href="<?=site_url() ?>"><span class="brand-name">Luxus</span></a>
+                            <a href="<?= site_url()?>"><span class="brand-name">Luxus</span></a>
                         </h1>
                         <!--   <p class="signup-link">
                             New Here? <a href="auth_register.html">Create an account</a>
@@ -143,9 +143,11 @@
                                     title: '¡Correcto!',
                                     padding: '2em',
                                 })
-                                $('#spinnerLogin').hide();
-                                $('#spanInicia').text('Iniciar sesión');
-                                window.location = '<?= site_url('dashboard/index') ?>';
+                                setTimeout(function() {
+                                    $('#spinnerLogin').hide();
+                                    $('#spanInicia').text('Iniciar sesión');
+                                    window.location = '<?= site_url('dashboard/index') ?>';
+                                }, 1000);
                             } else {
                                 swal({
                                     title: '¡Error!',
