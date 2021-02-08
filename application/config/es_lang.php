@@ -127,6 +127,7 @@ $config['comensales_lang'] = "Comensales";
 $config['description_menu_lang'] = "Descripción del menú";
 $config['category_lang'] = "Categoría";
 $config['users_lang'] = "Usuarios";
+$config['users_luxus_lang'] = "Ejecutivo luxus";
 $config['manage_users'] = "Gestionar usuarios";
 $config['manage_categories_lang'] = "Gestionar categorías para menús";
 $config['listar_categoria_lang'] = "Listar categorías";

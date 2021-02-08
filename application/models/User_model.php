@@ -20,6 +20,11 @@ class User_model extends CI_Model
         $result = $this->mongo_db->where(['user_id' => $id])->get('users');
         return (count($result) > 0) ? (object) $result[0] : false;
     }
+    function get_all_users()
+    {
+        $result = $this->mongo_db->where(['role_id' => $this->mongo_db->ne(3),'is_active'=>1])->get('users');
+        return (count($result) > 0) ? $result : false;
+    }
     function get_all($conditions = [], $get_as_row = FALSE)
     {
         if (count($conditions) > 0) {
@@ -105,6 +110,14 @@ class User_model extends CI_Model
             ['user_id' => $user_id],
             ['$pull' => ['managers' => ['manager_id' => $marking_id]]]
         );
+        return $query;
+    }
+    function update_user_person($user_id, $data)
+    {
+        foreach ($data as $key => $value) {
+           $this->mongo_db->set('person_luxus.'.$key,$value);
+        }
+        $query = $this->mongo_db->where('person_luxus.user_id', $user_id)->updateAll('users');
         return $query;
     }
 }

@@ -22,8 +22,7 @@ class User extends CI_Controller
             redirect('login/index');
         }
 
-        $all_users = $this->user->get_all(['is_active' => 1]);
-
+        $all_users = $this->user->get_all_users();
         $data['all_users'] = $all_users;
 
         $this->load_view_admin_g("user/index", $data);
@@ -36,8 +35,10 @@ class User extends CI_Controller
         }
         $this->load->model('Country_model', 'country');
         $all_users = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
+        $users_luxus = $this->user->get_all(['role_id' => 1, 'is_delete' => 0]);
         $data['countrys'] = $this->country->get_all_countrys();
         $data['all_users'] = $all_users;
+        $data['users_luxus'] = $users_luxus;
         $this->load_view_admin_g("user/index_client", $data);
     }
     public function add_index()
@@ -96,7 +97,7 @@ class User extends CI_Controller
                 'name' => $name,
                 'email' => $email,
                 'password' => md5($password),
-                'role_id' => $role,
+                'role_id' => (int)$role,
                 'address' => $address,
                 'phone' => $phone,
                 'surname' => $surname,
@@ -227,12 +228,15 @@ class User extends CI_Controller
             $data_user = [
                 'name' => $name,
                 'surname' => $surname,
-                'role_id' => $role,
+                'role_id' => (int)$role,
                 'address' => $address,
                 'phone' => $phone,
                 'is_active' => 1
             ];
             $this->user->update($user_id, $data_user);
+            if($role!=3){
+                $this->user->update_user_person($user_id, $data_user);
+            }
             $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
             redirect("user/index");
         }
@@ -438,7 +442,7 @@ class User extends CI_Controller
         $response = $this->user->create_marking($userIdAdd, $data);
         $user_object = $this->user->get_by_id($userIdAdd);
         if ($response) {
-            echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' =>$user_object->markings]);
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'markings' => $user_object->markings]);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
@@ -564,6 +568,30 @@ class User extends CI_Controller
         $user_object = $this->user->get_by_id($userId);
         if ($response) {
             echo json_encode(['status' => 200, 'msj' => 'correcto', 'managers' => $user_object->managers]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+    public function add_person_luxus()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $personLuxus = (object)$this->input->post('personLuxus');
+        $userId = $this->input->post('userId');
+        $person_id = 'pl_' . uniqid();
+        $personLuxus->person_luxus_id = $person_id;
+        $personLuxus->person_is_active = 1;
+        $response = $this->user->update($userId, ['person_luxus' => $personLuxus]);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);

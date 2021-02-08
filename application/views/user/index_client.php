@@ -26,7 +26,12 @@
     #modalAddManagers {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
-    #modalEditManagers{
+
+    #modalEditManagers {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+    #modalPersonLuxus {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
 </style>
@@ -55,6 +60,7 @@
                                 <tr>
                                     <th><?= translate("data_lang"); ?></th>
                                     <th><?= translate("observations_lang"); ?></th>
+                                    <th><?= translate("person_luxus_commercial_lang"); ?></th>
                                     <th><?= translate("direccion_lang"); ?></th>
                                     <th><?= translate("state_lang"); ?></th>
                                     <th><?= translate("actions_lang"); ?></th>
@@ -72,6 +78,13 @@
                                             </td>
                                             <td>
                                                 <?= $item->observations ?>
+                                            </td>
+                                            <td>
+                                            <?php if (isset($item->person_luxus)) { ?>
+                                                <p><b><?= translate('nombre_lang') ?>:</b> <?= $item->person_luxus->name ?></p>
+                                                <p><b><?= translate('email_lang') ?>:</b> <?= $item->person_luxus->email ?></p>
+                                                <p><b><?= translate('phone_lang') ?>:</b> <?= $item->person_luxus->phone ?></p>
+                                            <?php }?>
                                             </td>
                                             <td>
                                                 <?php if (isset($item->address)) { ?>
@@ -108,18 +121,22 @@
                                                             <a style="cursor:pointer" onclick="addAdress('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("add_location_lang"); ?></a>
                                                         <?php } ?>
 
-                                                        <a style="cursor:pointer" onclick="addMarking('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("add_marking_lang"); ?></a>
                                                         <?php if (isset($item->markings)) {
                                                             if (count($item->markings) > 0) { ?>
                                                                 <a style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->markings)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
                                                         <?php }
                                                         } ?>
-                                                        <a style="cursor:pointer" onclick="addManager('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("add_manager_lang"); ?></a>
+
                                                         <?php if (isset($item->managers)) {
                                                             if (count($item->managers) > 0) { ?>
                                                                 <a style="cursor:pointer" onclick="loadManagers('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->managers)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("managers_lang"); ?></a>
                                                         <?php }
                                                         } ?>
+                                                        <?php if (isset($item->person_luxus)) { ?>
+                                                            <a style="cursor:pointer" onclick="loadPersonLuxus('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->person_luxus)) ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("person_luxus_commercial_lang"); ?></a>
+                                                        <?php } else { ?>
+                                                            <a style="cursor:pointer" onclick="loadPersonLuxus('<?= $item->user_id; ?>','<?= false ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("person_luxus_commercial_lang"); ?></a>
+                                                        <?php } ?>
                                                         <?php if ($item->user_id != $this->session->userdata('user_id')) { ?>
                                                             <a onclick="sureUser('<?= $item->user_id; ?>');" class="dropdown-item btn btn-danger"><i class="fa fa-remove"></i> <?= translate("delete_lang"); ?></a>
                                                         <?php } ?>
@@ -133,6 +150,7 @@
                                 <tr>
                                     <th><?= translate("data_lang"); ?></th>
                                     <th><?= translate("observations_lang"); ?></th>
+                                    <th><?= translate("person_luxus_commercial_lang"); ?></th>
                                     <th><?= translate("direccion_lang"); ?></th>
                                     <th><?= translate("state_lang"); ?></th>
                                     <th><?= translate("actions_lang"); ?></th>
@@ -275,7 +293,7 @@
                 <input type="hidden" id="clienteMarking">
             </div>
             <div class="modal-footer">
-                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
+                <button class="btn" onclick="cancelaAddMarking()"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
                 <button onclick="submitAddMarking()" type="button" class="btn btn-primary"><i class="fa fa-check-square"></i>
                     <div style="display:none;    width: 17px;height: 17px;" id="spinnerAddMarking" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
                     <span id="spanAddMarking"><?= translate('guardar_info_lang') ?></span>
@@ -345,7 +363,8 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel"><?= translate('markings_lang') ?></h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('markings_lang') ?></h5> <a id="btnAddMarking" onclick="" class="btn btn-primary"><i class="fa fa-plus-circle"></i> <?= translate('add_marking_lang'); ?>
+                </a>
             </div>
             <div class="modal-body" id="bodyModalMarkings">
 
@@ -399,7 +418,7 @@
                 <input type="hidden" id="userIdManager">
             </div>
             <div class="modal-footer">
-                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
+                <button class="btn" onclick="cancelAddManager()"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
                 <button onclick="submitAddManager()" type="button" class="btn btn-primary"><i class="fa fa-check-square"></i>
                     <div style="display:none;    width: 17px;height: 17px;" id="spinnerAddManager" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
                     <span id="spanAddManager"><?= translate('guardar_info_lang') ?></span>
@@ -412,7 +431,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel"><?= translate('managers_lang') ?></h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('managers_lang') ?></h5> <a id="btnAddManager" onclick="" class="btn btn-primary"><i class="fa fa-plus-circle"></i> <?= translate('add_manager_lang'); ?></a>
             </div>
             <div class="modal-body" id="bodyModalManagers">
 
@@ -471,6 +490,40 @@
                 <button onclick="submitEditManager()" type="button" class="btn btn-primary"><i class="fa fa-check-square"></i>
                     <div style="display:none;    width: 17px;height: 17px;" id="spinnerEditManager" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
                     <span id="spanEditManager"><?= translate('guardar_info_lang') ?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalPersonLuxus" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('person_luxus_commercial_lang') ?></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label><?= translate("users_luxus_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="userLuxus" name="userLuxus" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <?php if ($users_luxus) { ?>
+                                    <?php foreach ($users_luxus as $item) { ?>
+                                        <option value="<?= $item->user_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                    <?php   } ?>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="userIdPerson">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
+                <button onclick="submitPersonLuxus()" type="button" class="btn btn-primary"><i class="fa fa-check-square"></i>
+                    <div style="display:none;    width: 17px;height: 17px;" id="spinnerPersonLuxus" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
+                    <span id="spanPersonLuxus"><?= translate('guardar_info_lang') ?></span>
                 </button>
             </div>
         </div>
@@ -829,6 +882,7 @@
     const addMarking = (userId) => {
         $('#citysMarking').prop('disabled', true);
         $('#clienteMarking').val(userId);
+        $('#modalMarings').modal('hide');
         $('#modalAddMarking').modal({
             backdrop: false
         })
@@ -994,6 +1048,7 @@
             markings = JSON.parse(markings);
         }
         $("#modalMarings").modal('show');
+        $('#btnAddMarking').attr('onclick', 'addMarking("' + user_id + '")');
         $("#bodyModalMarkings").empty();
         if (markings.length > 0) {
             let texto_tabla = '';
@@ -1036,6 +1091,12 @@
             $('#bodyModalMarkings').append('<div class="alert alert-info">Se encuentra vacio</div>');
         }
 
+    }
+    const cancelaAddMarking = () => {
+        $("#modalAddMarking").modal('hide');
+        $('#modalMarings').modal({
+            backdrop: false
+        })
     }
     const cancelEditMarking = () => {
         $("#modalEditMarking").modal('hide');
@@ -1240,6 +1301,7 @@
     }
     const addManager = (userId) => {
         $('#userIdManager').val(userId);
+        $('#modalManagers').modal('hide');
         $('#modalAddManagers').modal({
             backdrop: false
         })
@@ -1360,6 +1422,7 @@
             managers = decodeB64Utf8(managers);
             managers = JSON.parse(managers);
         }
+        $('#btnAddManager').attr('onclick', 'addManager("' + user_id + '")');
         $("#modalManagers").modal('show');
         $("#bodyModalManagers").empty();
         if (managers.length > 0) {
@@ -1427,6 +1490,12 @@
     }
     const cancelEditManager = () => {
         $("#modalEditManagers").modal('hide');
+        $('#modalManagers').modal({
+            backdrop: false
+        })
+    }
+    const cancelAddManager = () => {
+        $("#modalAddManagers").modal('hide');
         $('#modalManagers').modal({
             backdrop: false
         })
@@ -1527,7 +1596,7 @@
                                 $('#spinnerEditManager').hide();
                                 $('#spanEditManager').text('<?= translate('guardar_info_lang') ?>');
                                 loadManagers(userId, result.managers, '0');
-                               /// location.reload();
+                                /// location.reload();
                             }, 1000);
                         } else {
                             swal({
@@ -1544,7 +1613,7 @@
             }, 1500)
         }
     }
-    const deleteManager = function(manager) {
+    const deleteManager = (manager) => {
         manager = decodeB64Utf8(manager);
         manager = JSON.parse(manager);
         swal({
@@ -1594,5 +1663,83 @@
                 });
             }
         })
+    }
+    const loadPersonLuxus = (userId, object) => {
+        $('#userIdPerson').val(userId);
+        if (object) {
+            object = decodeB64Utf8(object);
+            object = JSON.parse(object);
+            $('#userLuxus').val(object.user_id);
+        }
+        $('#modalPersonLuxus').modal({
+            backdrop: false
+        })
+
+    }
+    const submitPersonLuxus = () => {
+        let personLuxus = $('select[name=userLuxus] option').filter(':selected').attr('itemId');
+        let userId = $('#userIdPerson').val();
+        if (personLuxus == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una persona',
+                padding: '3em',
+            })
+        } else {
+
+            $('#spinnerPersonLuxus').show();
+            $('#spanPersonLuxus').text('<?= translate('processing_lang') ?>' + '...');
+            personLuxus = JSON.parse(decodeB64Utf8(personLuxus));
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('user/add_person_luxus') ?>",
+                    data: {
+                        userId,
+                        personLuxus
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            $('#modalEditManagers').modal('hide');
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                $('#spinnerPersonLuxus').hide();
+                                $('#spanPersonLuxus').text('<?= translate('guardar_info_lang') ?>');
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                            $('#spinnerEditManager').hide();
+                            $('#spanEditManager').text('<?= translate('guardar_info_lang') ?>');
+                        }
+
+                    }
+                });
+            }, 1500)
+        }
+
     }
 </script>
