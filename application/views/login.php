@@ -143,11 +143,9 @@
                                     title: '¡Correcto!',
                                     padding: '2em',
                                 })
-                                setTimeout(function() {
-                                    $('#spinnerLogin').hide();
+                                $('#spinnerLogin').hide();
                                     $('#spanInicia').text('Iniciar sesión');
                                     window.location = '<?= site_url('dashboard/index') ?>';
-                                }, 1000);
                             } else {
                                 swal({
                                     title: '¡Error!',
