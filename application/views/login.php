@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" />
-    <title>Admin Template - Login</title>
+    <title>Luxus - Login</title>
     <link rel="icon" type="image/x-icon" href="<?= base_url('admin_template/assets/img/favicon.ico') ?>" />
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
     <link href="https://fonts.googleapis.com/css?family=Quicksand:400,500,600,700&amp;display=swap')?>" rel="stylesheet" />
@@ -26,7 +26,7 @@
                     <div class="form-content">
                         <h1 class="">
                             Iniciar sesión en
-                            <a href="index.html"><span class="brand-name">Luxus</span></a>
+                            <a href="<?=site_url() ?>"><span class="brand-name">LUXUS</span></a>
                         </h1>
                         <!--   <p class="signup-link">
                             New Here? <a href="auth_register.html">Create an account</a>
@@ -50,7 +50,7 @@
                                 </div>
                                 <div class="d-sm-flex justify-content-between">
                                     <div class="field-wrapper toggle-pass">
-                                        <p class="d-inline-block">Mostrar contraseñas</p>
+                                        <p class="d-inline-block">Mostrar contraseña</p>
                                         <label class="switch s-primary">
                                             <input type="checkbox" id="toggle-password" class="d-none" />
                                             <span class="slider round"></span>
