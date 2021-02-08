@@ -61,4 +61,10 @@ class User_model extends CI_Model
         $result = $this->mongo_db->where(['email' => (string) $email])->get('users');
         return (count($result) > 0) ? (object) $result[0] : false;
     }
+    function create_marking($user_id = 0, $data = [])
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->where('user_id', $user_id)->push('markings', $data)->update('users');
+        return $newId;
+    }
 }

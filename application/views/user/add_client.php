@@ -30,14 +30,21 @@
                                 <input type="text" class="form-control input-sm" name="name_commercial" required placeholder="<?= translate('name_commercial_lang') ?>">
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
+                            <label><?= translate('phone_lang') ?></label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                                <input type="text" class="form-control input-sm" name="phone" required placeholder="<?= translate('phone_lang') ?>">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
                             <label><?= translate('email_lang') ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
                                 <input type="text" class="form-control input-sm" name="email" required placeholder="<?= translate('email_lang') ?>">
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <label><?= translate("password_lang"); ?></label>
                             <div class="input-group">
                                 <input type="password" class="form-control input-sm" id="password" name="password" required placeholder="<?= translate('password_lang'); ?>">
