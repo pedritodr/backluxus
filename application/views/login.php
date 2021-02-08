@@ -26,7 +26,7 @@
                     <div class="form-content">
                         <h1 class="">
                             Iniciar sesión en
-                            <a href="<?=site_url() ?>"><span class="brand-name">LUXUS</span></a>
+                            <a href="<?=site_url() ?>"><span class="brand-name">Luxus</span></a>
                         </h1>
                         <!--   <p class="signup-link">
                             New Here? <a href="auth_register.html">Create an account</a>
