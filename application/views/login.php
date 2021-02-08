@@ -50,7 +50,7 @@
                                 </div>
                                 <div class="d-sm-flex justify-content-between">
                                     <div class="field-wrapper toggle-pass">
-                                        <p class="d-inline-block">Mostrar contraseña</p>
+                                        <p class="d-inline-block">Mostrar contraseñas</p>
                                         <label class="switch s-primary">
                                             <input type="checkbox" id="toggle-password" class="d-none" />
                                             <span class="slider round"></span>
@@ -144,8 +144,8 @@
                                     padding: '2em',
                                 })
                                 $('#spinnerLogin').hide();
-                                    $('#spanInicia').text('Iniciar sesión');
-                                    window.location = '<?= site_url('dashboard/index') ?>';
+                                $('#spanInicia').text('Iniciar sesión');
+                                window.location = '<?= site_url('dashboard/index') ?>';
                             } else {
                                 swal({
                                     title: '¡Error!',
