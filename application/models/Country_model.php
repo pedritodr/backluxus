@@ -1,11 +1,12 @@
 <?php
-
+require 'vendor/autoload.php';
 class Country_model extends CI_Model
 {
 
     function __construct()
     {
         parent::__construct();
+        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
     }
 
     function create($data)
@@ -103,6 +104,37 @@ class Country_model extends CI_Model
         ];
         $conditions = ['is_active' => 1];
         $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []);
+        return $query;
+    }
+    function get_country_by_cliente($country_id)
+    {
+        $tuberia = [
+            ['$project' => ['user_id'=>1,'address'=>1]],
+            ['$unwind' => '$address'],
+            ['$match' => ['address.country_id' => $country_id]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('users', $tuberia);
+        return (count($query) > 0) ? $query : false;
+    }
+    function update_country_user($country_id, $data)
+    {
+        $query = $this->mongo_db->where('address.country_id', $country_id)->set(['address.name' => $data->name])->updateAll('users');
+        return $query;
+    }
+    function update_country_user_marking($country_id, $data)
+    {
+        $query = $this->mongo_db->where('markings.country.country_id', $country_id)->set(['markings.$.country.name' => $data->name])->updateAll('users');
+        return $query;
+    }
+    function update_city_user($city_id, $name)
+    {
+        $query = $this->mongo_db->where('address.city.city_id', $city_id)->set(['address.city.name' => $name])->updateAll('users');
+        return $query;
+    }
+    function update_city_user_marking($city_id, $name)
+    {
+        $query = $this->mongo_db->where('markings.country.city.city_id', $city_id)->set(['markings.$.country.city.name' => $name])->updateAll('users');
         return $query;
     }
     //------------------------------------------------------------------------------------------------------------------------------------------

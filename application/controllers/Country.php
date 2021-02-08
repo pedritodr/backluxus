@@ -53,7 +53,7 @@ class Country extends CI_Controller
             redirect("country/add_index");
         } else {
             $country_id = 'country_' . uniqid();
-            $data = ['country_id' => $country_id, 'name' => $name, 'is_active' => 1,'citys'=>[]];
+            $data = ['country_id' => $country_id, 'name' => $name, 'is_active' => 1, 'citys' => []];
             $this->country->create($data);
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
             redirect("country/index", "location", 301);
@@ -76,7 +76,7 @@ class Country extends CI_Controller
         $response =  $this->country->create_city($country_id, $data);
         $citys = $this->country->get_all_citys($country_id);
         if ($response) {
-            echo json_encode(['status' => 200, 'msj' => 'correcto','citys'=>$citys]);
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'citys' => $citys]);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
@@ -98,9 +98,11 @@ class Country extends CI_Controller
         $city_id = $this->input->post('cityId');
         $country_id = $this->input->post('countryId');
         $response =  $this->country->update_city($city_id, $name);
+        $this->country->update_city_user($city_id,$name);
+        $this->country->update_city_user_marking($city_id,$name);
         $citys = $this->country->get_all_citys($country_id);
         if ($response) {
-            echo json_encode(['status' => 200, 'msj' => 'correcto','citys'=>$citys]);
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'citys' => $citys]);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
@@ -121,9 +123,10 @@ class Country extends CI_Controller
         $city_id = $this->input->post('cityId');
         $country_id = $this->input->post('countryId');
         $response =  $this->country->update_status_city($city_id);
+
         $citys = $this->country->get_all_citys($country_id);
         if ($response) {
-            echo json_encode(['status' => 200, 'msj' => 'correcto','citys'=>$citys]);
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'citys' => $citys]);
             exit();
         } else {
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
@@ -163,6 +166,8 @@ class Country extends CI_Controller
         } else {
             $data = ['name' => $name];
             $row =  $this->country->update($country_id, $data);
+            $this->country->update_country_user($country_id, (object)$data);
+            $this->country->update_country_user_marking($country_id, (object)$data);
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
             redirect("country/index", "location", 301);
         }

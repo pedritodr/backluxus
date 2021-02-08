@@ -1,11 +1,12 @@
 <?php
-
+require 'vendor/autoload.php';
 class User_model extends CI_Model
 {
 
     function __construct()
     {
         parent::__construct();
+        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
         // $this->load->database();
     }
     function create($data)
@@ -18,6 +19,11 @@ class User_model extends CI_Model
     {
         $result = $this->mongo_db->where(['user_id' => $id])->get('users');
         return (count($result) > 0) ? (object) $result[0] : false;
+    }
+    function get_all_users()
+    {
+        $result = $this->mongo_db->where(['role_id' => $this->mongo_db->ne(3),'is_active'=>1])->get('users');
+        return (count($result) > 0) ? $result : false;
     }
     function get_all($conditions = [], $get_as_row = FALSE)
     {
@@ -66,5 +72,52 @@ class User_model extends CI_Model
         $data['_id'] = $this->mongo_db->create_document_id();
         $newId = $this->mongo_db->where('user_id', $user_id)->push('markings', $data)->update('users');
         return $newId;
+    }
+    function update_marking($id,$data)
+    {
+        foreach ($data as $key => $value) {
+            $this->mongo_db->set($key, $value);
+        }
+        $result = $this->mongo_db->where('markings.marking_id', $id)->update('users');
+        return $result;
+    }
+    function delete_marking($user_id, $marking_id)
+    {
+        $query = $this->mongodb->luxus->users->updateOne(
+            ['user_id' => $user_id],
+            ['$pull' => ['markings' => ['marking_id' => $marking_id]]]
+        );
+        return $query;
+    }
+    function create_manager($user_id = 0, $data = [])
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->where('user_id', $user_id)->push('managers', $data)->update('users');
+        return $newId;
+    }
+    function update_manager($id,$data)
+    {
+
+        foreach ($data as $key => $value) {
+            $this->mongo_db->set($key, $value);
+        }
+        $result = $this->mongo_db->where('managers.manager_id', $id)->update('users');
+        return $result;
+    }
+    function delete_manager($user_id, $marking_id)
+    {
+        $query = $this->mongodb->luxus->users->updateOne(
+            ['user_id' => $user_id],
+            ['$pull' => ['managers' => ['manager_id' => $marking_id]]]
+        );
+        return $query;
+    }
+    function update_user_person($user_id, $data)
+    {
+        foreach ($data as $key => $value) {
+           $this->mongo_db->set('person_luxus.'.$key,$value);
+        }
+        $query = $this->mongo_db->where('person_luxus.user_id', $user_id)->updateAll('users');
+        return $query;
     }
 }
