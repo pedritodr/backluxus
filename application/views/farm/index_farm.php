@@ -2,6 +2,9 @@
     .nav-margin-bottom {
         margin-bottom: 20px;
     }
+    #modalPersonLuxus {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">
@@ -49,6 +52,11 @@
                                                         <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                             <a class="dropdown-item" href="<?= site_url('farm/update_index/' . $item->farm_id); ?>"><i class="fa fa-edit"></i> <?= translate("edit_lang"); ?></a>
                                                             <a class="dropdown-item" href="<?= site_url('farm/index_personal/' . $provider_object->provider_id.'/'. $item->farm_id); ?>"> <?= translate("personal_lang"); ?></a>
+                                                            <?php if (isset($item->person_luxus)) { ?>
+                                                            <a style="cursor:pointer" onclick="loadPersonLuxus('<?= $item->farm_id; ?>','<?= base64_encode(json_encode($item->person_luxus)) ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("person_luxus_commercial_lang"); ?></a>
+                                                        <?php } else { ?>
+                                                            <a style="cursor:pointer" onclick="loadPersonLuxus('<?= $item->farm_id; ?>','<?= false ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("person_luxus_commercial_lang"); ?></a>
+                                                        <?php } ?>
                                                             <a class="dropdown-item btn btn-danger" href="javascript:void(0)" onclick="deleteFarm('<?= $item->farm_id ?>')"><i class="fa fa-edit"></i> <?= translate("delete_lang"); ?></a>
                                                         </div>
                                                     </div>
@@ -72,7 +80,40 @@
     </div><!-- /.row -->
 
 </div><!-- /.content-wrapper -->
-
+<div class="modal fade" id="modalPersonLuxus" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('person_luxus_commercial_lang') ?></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label><?= translate("users_luxus_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="userLuxus" name="userLuxus" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <?php if ($users_luxus) { ?>
+                                    <?php foreach ($users_luxus as $item) { ?>
+                                        <option value="<?= $item->user_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                    <?php   } ?>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="farmId">
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelModalPersonLuxus" class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
+                <button onclick="submitPersonLuxus()" type="button" class="btn btn-primary"><i class="fa fa-check-square"></i>
+                    <div style="display:none;    width: 17px;height: 17px;" id="spinnerPersonLuxus" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
+                    <span id="spanPersonLuxus"><?= translate('guardar_info_lang') ?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const deleteFarm = (farmId) => {
@@ -99,4 +140,90 @@
         });
 
     });
+    const encodeB64Utf8 = (str) => {
+        return btoa(unescape(encodeURIComponent(str)));
+    }
+    const decodeB64Utf8 = (str) => {
+        return decodeURIComponent(escape(atob(str)));
+    }
+    const loadPersonLuxus = (farmId, object) => {
+        $('#farmId').val(farmId);
+        if (object) {
+            object = decodeB64Utf8(object);
+            object = JSON.parse(object);
+            $('#userLuxus').val(object.user_id);
+        }
+        $('#modalPersonLuxus').modal({
+            backdrop: false
+        })
+
+    }
+    const submitPersonLuxus = () => {
+        $('#btnCancelModalPersonLuxus').prop('disabled',true);
+        let personLuxus = $('select[name=userLuxus] option').filter(':selected').attr('itemId');
+        let farmId = $('#farmId').val();
+        if (personLuxus == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una persona',
+                padding: '3em',
+            })
+        } else {
+
+            $('#spinnerPersonLuxus').show();
+            $('#spanPersonLuxus').text('<?= translate('processing_lang') ?>' + '...');
+            personLuxus = JSON.parse(decodeB64Utf8(personLuxus));
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('farm/add_person_luxus') ?>",
+                    data: {
+                        farmId,
+                        personLuxus
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                $('#spinnerPersonLuxus').hide();
+                                $('#spanPersonLuxus').text('<?= translate('guardar_info_lang') ?>');
+                                $('#btnCancelModalPersonLuxus').prop('disabled',false);
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                            $('#spinnerEditManager').hide();
+                            $('#spanEditManager').text('<?= translate('guardar_info_lang') ?>');
+                            $('#btnCancelModalPersonLuxus').prop('disabled',false);
+                        }
+
+                    }
+                });
+            }, 1500)
+        }
+
+    }
 </script>

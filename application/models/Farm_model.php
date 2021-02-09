@@ -80,13 +80,24 @@ class Farm_model extends CI_Model
     {
         $data['_id'] = $this->mongo_db->create_document_id();
         $result = $this->get_all_personal($id);
-        $result[] = (object)$data;
-        $result = $this->mongo_db->where('farms.farm_id', $id)->set(['farms.$.personal' => $result])->update('providers');
+        $datos =[];
+        if($result){
+            foreach ($result as $item) {
+                $datos[] =$item->farms->personal;
+            }
+            $datos[] = (object)$data;
+        }else{
+            $datos[] = (object)$data;
+        }
+        $result = $this->mongo_db->where('farms.farm_id', $id)->set(['farms.$.personal' => $datos])->update('providers');
         return $result;
     }
     function update_farm($id, $data)
     {
-        $result = $this->mongo_db->where('farms.farm_id', $id)->set(['farms.$' => $data])->update('providers');
+        foreach ($data as $key => $value) {
+            $this->mongo_db->set('farms.$.'.$key, $value);
+        }
+        $result = $this->mongo_db->where('farms.farm_id', $id)->update('providers');
         return $result;
     }
     function update_farm2($id)
@@ -136,6 +147,7 @@ class Farm_model extends CI_Model
                 'farms.$[far].personal.$[per].skype' => $data->skype,
                 'farms.$[far].personal.$[per].phone' => $data->phone,
                 'farms.$[far].personal.$[per].whatsapp' => $data->whatsapp,
+                'farms.$[far].personal.$[per].function' => $data->function,
             ]],
             ['arrayFilters' => [
                 ['far.farm_id' => ['$eq' => $params->farm_id]],
@@ -176,6 +188,14 @@ class Farm_model extends CI_Model
         }
 
         return (count($farms) > 0) ? $farms : false;
+    }
+    function update_user_person($user_id, $data)
+    {
+        foreach ($data as $key => $value) {
+           $this->mongo_db->set('farms.$.person_luxus.'.$key,$value);
+        }
+        $query = $this->mongo_db->where('farms.person_luxus.user_id', $user_id)->updateAll('providers');
+        return $query;
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------

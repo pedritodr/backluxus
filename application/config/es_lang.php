@@ -415,7 +415,9 @@ $config['function_lang'] = "Función";
 $config['sales_lang'] = "Ventas";
 $config['logistics_lang'] = "Logística";
 $config['managers_lang'] = "Encargados";
-
+$config['owner_lang'] = "Dueño";
+$config['seller_lang'] = "Vendedor";
+$config['seller_payment_lang'] = "vendedor/cobros";
 
 
 

@@ -122,8 +122,10 @@ class Farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
+        $this->load->model('User_model', 'user');
         $provider_object = $this->farm->get_provider_by_id($provider_id);
-
+        $users_luxus = $this->user->get_all(['role_id' => 1, 'is_delete' => 0]);
+        $data['users_luxus'] = $users_luxus;
         $data['provider_object'] = $provider_object;
 
         $this->load_view_admin_g("farm/index_farm", $data);
@@ -208,7 +210,7 @@ class Farm extends CI_Controller
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
             redirect("farm/add_farm_index/") . $provider_id;
         } else {
-            $data = ['name_legal' => $name_legal, 'name_commercial' => $name_commercial, 'address_farm' => $address_farm, 'address_office' => $address_office, 'hectare' => $hectare, 'is_active' => $farm_object->is_active, 'farm_id' => $farm_id, '_id' => $farm_object->_id];
+            $data = ['name_legal' => $name_legal, 'name_commercial' => $name_commercial, 'address_farm' => $address_farm, 'address_office' => $address_office, 'hectare' => $hectare];
             $this->farm->update_farm($farm_id, $data);
             $this->response->set_message(translate("data_update_ok"), ResponseMessage::SUCCESS);
             redirect("farm/index/" . $provider_id, "location", 301);
@@ -222,8 +224,8 @@ class Farm extends CI_Controller
         }
         $farm_object = $this->farm->get_farm_by_id($farm_id);
         if ($farm_object) {
-            //  $data = ['name_legal' => $farm_object->name_legal, 'name_commercial' => $farm_object->name_commercial, 'address_farm' => $farm_object->address_farm, 'address_office' => $farm_object->address_office, 'hectare' => $farm_object->hectare, 'is_active' => 0, 'farm_id' => $farm_id, '_id' => $farm_object->_id];
-            $this->farm->update_farm2($farm_id);
+            $data = ['is_active' => 0];
+            $this->farm->update_farm($farm_id,$data);
             $this->response->set_message(translate('data_deleted_ok'), ResponseMessage::SUCCESS);
             redirect("farm/index/" . $farm_object->provider_id, "location", 301);
         } else {
@@ -246,14 +248,14 @@ class Farm extends CI_Controller
         $this->load_view_admin_g("farm/index_personal", $data);
     }
 
-    public function add_persona_index($farm_id = 0)
+    public function add_persona_index($provider_id=0,$farm_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
             redirect('login/index');
         }
 
-        $this->load_view_admin_g('farm/add_person', ['farm_id' => $farm_id]);
+        $this->load_view_admin_g('farm/add_person', ['farm_id' => $farm_id,'provider_id'=>$provider_id]);
     }
 
     public function add_persona()
@@ -268,6 +270,8 @@ class Farm extends CI_Controller
         $skype = $this->input->post('skype');
         $whatsapp = $this->input->post('whatsapp');
         $farm_id = $this->input->post('farm_id');
+        $function = $this->input->post('functions');
+        $provider_id = $this->input->post('provider_id');
         $rol = $this->input->post('rol');
         $this->form_validation->set_rules('name', translate('nombre_lang'), 'required');
         $this->form_validation->set_rules('phone', translate('phone_lang'), 'required');
@@ -276,10 +280,10 @@ class Farm extends CI_Controller
             redirect("farm/add_persona_index/") . $farm_id;
         } else {
             $person_id = 'person_' . uniqid();
-            $data = ['person_id' => $person_id, 'name' => $name, 'skype' => $skype, 'phone' => $phone, 'whatsapp' => $whatsapp, 'rol' => $rol, 'is_active' => 1,"farm_id"=>$farm_id];
+            $data = ['person_id' => $person_id, 'name' => $name, 'skype' => $skype, 'phone' => $phone, 'whatsapp' => $whatsapp, 'rol' => $rol, 'is_active' => 1,"farm_id"=>$farm_id,'function'=>(int)$function];
             $this->farm->create_person($farm_id, $data);
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
-            redirect("farm/index_personal/" . $farm_id, "location", 301);
+            redirect("farm/index_personal/" .$provider_id.'/'. $farm_id, "location", 301);
         }
     }
     function update_persona_index($provider_id=0,$farm_id=0,$person_id = 0)
@@ -311,13 +315,14 @@ class Farm extends CI_Controller
         $person_id = $this->input->post('person_id');
         $farm_id = $this->input->post('farm_id');
         $provider_id = $this->input->post('provider_id');
+        $function = $this->input->post('functions');
         $this->form_validation->set_rules('name', translate('nombre_lang'), 'required');
         $this->form_validation->set_rules('phone', translate('phone_lang'), 'required');
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
             redirect("farm/update_persona_index/") .$provider_id.'/'. $farm_id.'/'.$person_id;
         } else {
-            $data = ['name' => $name, 'skype' => $skype, 'phone' => $phone, 'whatsapp' => $whatsapp];
+            $data = ['name' => $name, 'skype' => $skype, 'phone' => $phone, 'whatsapp' => $whatsapp,'function'=>(int)$function];
             $params = ['provider_id' => $provider_id, 'farm_id' => $farm_id, 'person_id' => $person_id];
             $this->farm->update_person((object)$params, (object)$data);
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
@@ -338,6 +343,30 @@ class Farm extends CI_Controller
             redirect("farm/index_personal/" .$provider_id.'/'. $farm_id, "location", 301);
         } else {
             show_404();
+        }
+    }
+    public function add_person_luxus()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $personLuxus = (object)$this->input->post('personLuxus');
+        $farm_id = $this->input->post('farmId');
+        $person_id = 'pl_' . uniqid();
+        $personLuxus->person_luxus_id = $person_id;
+        $personLuxus->person_is_active = 1;
+        $response = $this->farm->update_farm($farm_id, ['person_luxus' => $personLuxus]);
+        if ($response) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
         }
     }
 }
