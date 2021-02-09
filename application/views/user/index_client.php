@@ -80,11 +80,11 @@
                                                 <?= $item->observations ?>
                                             </td>
                                             <td>
-                                            <?php if (isset($item->person_luxus)) { ?>
-                                                <p><b><?= translate('nombre_lang') ?>:</b> <?= $item->person_luxus->name ?></p>
-                                                <p><b><?= translate('email_lang') ?>:</b> <?= $item->person_luxus->email ?></p>
-                                                <p><b><?= translate('phone_lang') ?>:</b> <?= $item->person_luxus->phone ?></p>
-                                            <?php }?>
+                                                <?php if (isset($item->person_luxus)) { ?>
+                                                    <p><b><?= translate('nombre_lang') ?>:</b> <?= $item->person_luxus->name ?></p>
+                                                    <p><b><?= translate('email_lang') ?>:</b> <?= $item->person_luxus->email ?></p>
+                                                    <p><b><?= translate('phone_lang') ?>:</b> <?= $item->person_luxus->phone ?></p>
+                                                <?php } ?>
                                             </td>
                                             <td>
                                                 <?php if (isset($item->address)) { ?>
@@ -123,15 +123,22 @@
 
                                                         <?php if (isset($item->markings)) {
                                                             if (count($item->markings) > 0) { ?>
-                                                                <a style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->markings)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
-                                                        <?php }
-                                                        } ?>
-
+                                                                <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->markings)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
+                                                            <?php } else { ?>
+                                                                <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
+                                                            <?php } ?>
+                                                        <?php } else { ?>
+                                                            <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
+                                                        <?php } ?>
                                                         <?php if (isset($item->managers)) {
                                                             if (count($item->managers) > 0) { ?>
-                                                                <a style="cursor:pointer" onclick="loadManagers('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->managers)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("managers_lang"); ?></a>
-                                                        <?php }
-                                                        } ?>
+                                                                <a id="btnActionManagers" style="cursor:pointer" onclick="loadManagers('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->managers)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("managers_lang"); ?></a>
+                                                            <?php } else { ?>
+                                                                <a id="btnActionManagers" style="cursor:pointer" onclick="loadManagers('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("managers_lang"); ?></a>
+                                                            <?php } ?>
+                                                        <?php } else { ?>
+                                                            <a id="btnActionManagers" style="cursor:pointer" onclick="loadManagers('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("managers_lang"); ?></a>
+                                                        <?php } ?>
                                                         <?php if (isset($item->person_luxus)) { ?>
                                                             <a style="cursor:pointer" onclick="loadPersonLuxus('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->person_luxus)) ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("person_luxus_commercial_lang"); ?></a>
                                                         <?php } else { ?>
@@ -705,7 +712,7 @@
 
     })
     const submitAddAddress = () => {
-        $('#btnCancelModalAddAddress').prop('disabled',true);
+        $('#btnCancelModalAddAddress').prop('disabled', true);
         let country = $('select[name=country] option').filter(':selected').val();
         let city = $('select[name=citys] option').filter(':selected').val();
         let userIdAdd = $('#userIdAdd').val();
@@ -774,7 +781,7 @@
                                 padding: '2em',
                             })
                             setTimeout(function() {
-                                $('#btnCancelModalAddAddress').prop('disabled',false);
+                                $('#btnCancelModalAddAddress').prop('disabled', false);
                                 $('#spinnerAddAddress').hide();
                                 $('#spanAddAddress').text('<?= translate('guardar_info_lang') ?>');
                                 location.reload();
@@ -785,7 +792,7 @@
                                 text: result.msj,
                                 padding: '2em'
                             });
-                            $('#btnCancelModalAddAddress').prop('disabled',false);
+                            $('#btnCancelModalAddAddress').prop('disabled', false);
                             $('#spinnerAddAddress').hide();
                             $('#spanAddAddress').text('<?= translate('guardar_info_lang') ?>');
                         }
@@ -796,7 +803,7 @@
         }
     }
     const submitEditAddress = () => {
-        $('#btnCancelModalEditAddress').prop('disabled',true);
+        $('#btnCancelModalEditAddress').prop('disabled', true);
         let country = $('select[name=countryEdit] option').filter(':selected').attr('itemId');
         let city = $('select[name=citysEdit] option').filter(':selected').val();
         let userIdAdd = $('#userIdEdit').val();
@@ -865,7 +872,7 @@
                                 padding: '2em',
                             })
                             setTimeout(function() {
-                                $('#btnCancelModalEditAddress').prop('disabled',false);
+                                $('#btnCancelModalEditAddress').prop('disabled', false);
                                 $('#spinnerEditAddress').hide();
                                 $('#spanEditAddress').text('<?= translate('guardar_info_lang') ?>');
                                 location.reload();
@@ -876,7 +883,7 @@
                                 text: result.msj,
                                 padding: '2em'
                             });
-                            $('#btnCancelModalEditAddress').prop('disabled',false);
+                            $('#btnCancelModalEditAddress').prop('disabled', false);
                             $('#spinnerEditAddress').hide();
                             $('#spanEditAddress').text('<?= translate('guardar_info_lang') ?>');
                         }
@@ -943,7 +950,7 @@
         })
     }
     const submitAddMarking = () => {
-        $('#btnCancelModalAddMarking').prop('disabled',true);
+        $('#btnCancelModalAddMarking').prop('disabled', true);
         let country = $('select[name=countryMarking] option').filter(':selected').val();
         let city = $('select[name=citysMarking] option').filter(':selected').val();
         let userIdAdd = $('#clienteMarking').val();
@@ -1029,11 +1036,13 @@
                                 padding: '2em',
                             })
                             setTimeout(function() {
-                                $('#btnCancelModalAddMarking').prop('disabled',false);
+                                $('#btnCancelModalAddMarking').prop('disabled', false);
                                 $('#spinnerAddMarking').hide();
                                 $('#spanAddMarking').text('<?= translate('guardar_info_lang') ?>');
                                 //location.reload();
                                 loadMarkings(userIdAdd, result.markings, '0');
+                                $('#btnActionMarking').attr('onclick', 'loadMarkings("' + userIdAdd + '","' + encodeB64Utf8(JSON.stringify(result.markings)) + '","1")');
+
                             }, 1000);
                         } else {
                             swal({
@@ -1041,7 +1050,7 @@
                                 text: result.msj,
                                 padding: '2em'
                             });
-                            $('#btnCancelModalAddMarking').prop('disabled',false);
+                            $('#btnCancelModalAddMarking').prop('disabled', false);
                             $('#spinnerAddMarking').hide();
                             $('#spanAddMarking').text('<?= translate('guardar_info_lang') ?>');
                         }
@@ -1150,7 +1159,7 @@
 
     })
     const submitEditMarking = () => {
-        $('#btnCancelModalEditMarking').prop('disabled',true);
+        $('#btnCancelModalEditMarking').prop('disabled', true);
         let country = $('select[name=countryMarkingEdit] option').filter(':selected').attr('itemId');
         let city = $('select[name=citysMarkingEdit] option').filter(':selected').val();
         let userIdAdd = $('#clienteMarkingEdit').val();
@@ -1239,9 +1248,10 @@
                             })
                             setTimeout(function() {
                                 $('#spinnerEditMarking').hide();
-                                $('#btnCancelModalEditMarking').prop('disabled',false);
+                                $('#btnCancelModalEditMarking').prop('disabled', false);
                                 $('#spanEditMarking').text('<?= translate('guardar_info_lang') ?>');
                                 loadMarkings(userIdAdd, result.markings, '0');
+                                $('#btnActionMarking').attr('onclick', 'loadMarkings("' + userIdAdd + '","' + encodeB64Utf8(JSON.stringify(result.markings)) + '","1")');
                                 //location.reload();
                             }, 1000);
                         } else {
@@ -1250,7 +1260,7 @@
                                 text: result.msj,
                                 padding: '2em'
                             });
-                            $('#btnCancelModalEditMarking').prop('disabled',false);
+                            $('#btnCancelModalEditMarking').prop('disabled', false);
                             $('#spinnerEditMarking').hide();
                             $('#spanEditMarking').text('<?= translate('guardar_info_lang') ?>');
                         }
@@ -1296,6 +1306,7 @@
                             })
                             setTimeout(function() {
                                 loadMarkings(marking.userId, result.markings, '0');
+                                $('#btnActionMarking').attr('onclick', 'loadMarkings("' + marking.userId + '","' + encodeB64Utf8(JSON.stringify(result.markings)) + '","1")');
                                 //location.reload();
                             }, 1000);
                         } else {
@@ -1319,7 +1330,7 @@
         })
     }
     const submitAddManager = () => {
-        $('#btnCancelModalAddManager').prop('disabled',true);
+        $('#btnCancelModalAddManager').prop('disabled', true);
         let functions = $('select[name=functions] option').filter(':selected').val();
         let userId = $('#userIdManager').val();
         let name = $('#nameManager').val().trim();
@@ -1410,10 +1421,11 @@
                                 padding: '2em',
                             })
                             setTimeout(function() {
-                                $('#btnCancelModalAddManager').prop('disabled',false);
+                                $('#btnCancelModalAddManager').prop('disabled', false);
                                 $('#spinnerAddManager').hide();
                                 $('#spanAddManager').text('<?= translate('guardar_info_lang') ?>');
                                 loadManagers(userId, result.managers, '0');
+                                $('#btnActionManagers').attr('onclick', 'loadManagers("' + userId + '","' + encodeB64Utf8(JSON.stringify(result.managers)) + '","1")');
                                 //location.reload();
                             }, 1000);
                         } else {
@@ -1422,7 +1434,7 @@
                                 text: result.msj,
                                 padding: '2em'
                             });
-                            $('#btnCancelModalAddManager').prop('disabled',false);
+                            $('#btnCancelModalAddManager').prop('disabled', false);
                             $('#spinnerAddManager').hide();
                             $('#spanAddManager').text('<?= translate('guardar_info_lang') ?>');
                         }
@@ -1516,7 +1528,7 @@
         })
     }
     const submitEditManager = () => {
-        $('#btnCancelModalEditManager').prop('disabled',true);
+        $('#btnCancelModalEditManager').prop('disabled', true);
         let functions = $('select[name=functionsEdit] option').filter(':selected').val();
         let userId = $('#userIdEditManager').val();
         let managerId = $('#managerId').val();
@@ -1609,10 +1621,11 @@
                                 padding: '2em',
                             })
                             setTimeout(function() {
-                                $('#btnCancelModalEditManager').prop('disabled',false);
+                                $('#btnCancelModalEditManager').prop('disabled', false);
                                 $('#spinnerEditManager').hide();
                                 $('#spanEditManager').text('<?= translate('guardar_info_lang') ?>');
                                 loadManagers(userId, result.managers, '0');
+                                $('#btnActionManagers').attr('onclick', 'loadManagers("' + userId + '","' + encodeB64Utf8(JSON.stringify(result.managers)) + '","1")');
                                 /// location.reload();
                             }, 1000);
                         } else {
@@ -1621,7 +1634,7 @@
                                 text: result.msj,
                                 padding: '2em'
                             });
-                            $('#btnCancelModalEditManager').prop('disabled',false);
+                            $('#btnCancelModalEditManager').prop('disabled', false);
                             $('#spinnerEditManager').hide();
                             $('#spanEditManager').text('<?= translate('guardar_info_lang') ?>');
                         }
@@ -1667,6 +1680,7 @@
                             })
                             setTimeout(function() {
                                 loadManagers(manager.userId, result.managers, '0');
+                                $('#btnActionManagers').attr('onclick', 'loadManagers("' + manager.userId + '","' + encodeB64Utf8(JSON.stringify(result.managers)) + '","1")');
                                 //location.reload();
                             }, 1000);
                         } else {
@@ -1695,7 +1709,7 @@
 
     }
     const submitPersonLuxus = () => {
-        $('#btnCancelModalPersonLuxus').prop('disabled',true);
+        $('#btnCancelModalPersonLuxus').prop('disabled', true);
         let personLuxus = $('select[name=userLuxus] option').filter(':selected').attr('itemId');
         let userId = $('#userIdPerson').val();
         if (personLuxus == 0) {
@@ -1740,7 +1754,7 @@
                             })
                             setTimeout(function() {
                                 $('#spinnerPersonLuxus').hide();
-                                $('#btnCancelModalPersonLuxus').prop('disabled',false);
+                                $('#btnCancelModalPersonLuxus').prop('disabled', false);
                                 $('#spanPersonLuxus').text('<?= translate('guardar_info_lang') ?>');
                                 location.reload();
                             }, 1000);
@@ -1750,7 +1764,7 @@
                                 text: result.msj,
                                 padding: '2em'
                             });
-                            $('#btnCancelModalPersonLuxus').prop('disabled',false);
+                            $('#btnCancelModalPersonLuxus').prop('disabled', false);
                             $('#spinnerEditManager').hide();
                             $('#spanEditManager').text('<?= translate('guardar_info_lang') ?>');
                         }

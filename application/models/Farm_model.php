@@ -19,8 +19,42 @@ class Farm_model extends CI_Model
     }
     function get_provider_by_id($id)
     {
-        $result = $this->mongo_db->where(['provider_id' => $id])->get('providers');
+        $result = $this->mongo_db->where(['farm_id' => $id])->get('providers');
         return (count($result) > 0) ? (object) $result[0] : false;
+    }
+    function get_min_farm_by_id($id)
+    {
+        $fields = [
+			'farm_id'=> 1,
+			'name_legal'=> 1,
+			'name_commercial'=> 1,
+			'owner'=> 1,
+			'_id'=> 0
+		];
+		$conditions = [
+			'farm_id' => $id
+		];
+		$query = $this->mongo_db->get_customize_fields('providers', $fields, $conditions);
+		if (count($query) > 0) {
+			return $query[0];
+		} else {
+			return false;
+		}
+    }
+    function get_all_farm_father()
+    {
+        $result = $this->mongo_db->where(['farm_father'=>false,'is_active'=>1])->get('providers');
+        return (count($result) > 0) ? $result : false;
+    }
+    function get_all_farm_father_edit($id)
+    {
+        $result = $this->mongo_db->where(['farm_father'=>false,'is_active'=>1,'farm_id' => $this->mongo_db->ne($id)])->get('providers');
+        return (count($result) > 0) ? $result : false;
+    }
+    function get_all_farm_sons($id)
+    {
+        $result = $this->mongo_db->where(['farm_father.farm_id'=>$id,'farm_id' => $this->mongo_db->ne($id),'is_active'=>1])->get('providers');
+        return (count($result) > 0) ? $result : false;
     }
     function get_farms($id)
     {
@@ -60,7 +94,7 @@ class Farm_model extends CI_Model
     }
     function update_provider($id, $data)
     {
-        $result = $this->mongo_db->where('provider_id', $id)->set($data)->update('providers');
+        $result = $this->mongo_db->where('farm_id', $id)->set($data)->update('providers');
         return $result;
     }
     function delete_provider($id)
@@ -70,28 +104,13 @@ class Farm_model extends CI_Model
         return $result;
     }
 
-    function create_farm($provider_id = 0, $data = [])
+    function create_person($farm_id = 0, $data = [])
     {
         $data['_id'] = $this->mongo_db->create_document_id();
-        $newId = $this->mongo_db->where('provider_id', $provider_id)->push('farms', $data)->update('providers');
+        $newId = $this->mongo_db->where('farm_id', $farm_id)->push('personal', $data)->update('providers');
         return $newId;
     }
-    function create_person($id = 0, $data = [])
-    {
-        $data['_id'] = $this->mongo_db->create_document_id();
-        $result = $this->get_all_personal($id);
-        $datos =[];
-        if($result){
-            foreach ($result as $item) {
-                $datos[] =$item->farms->personal;
-            }
-            $datos[] = (object)$data;
-        }else{
-            $datos[] = (object)$data;
-        }
-        $result = $this->mongo_db->where('farms.farm_id', $id)->set(['farms.$.personal' => $datos])->update('providers');
-        return $result;
-    }
+
     function update_farm($id, $data)
     {
         foreach ($data as $key => $value) {
@@ -138,7 +157,7 @@ class Farm_model extends CI_Model
             return false;
         }
     }
-    function update_person($params, $data)
+   /*  function update_person($params, $data)
     {
         $query = $this->mongodb->luxus->providers->updateOne(
             ['provider_id' => ['$eq' => $params->provider_id]],
@@ -155,18 +174,21 @@ class Farm_model extends CI_Model
             ]]
         );
         return $query;
+    } */
+    function update_person($id, $data)
+    {
+        foreach ($data as $key => $value) {
+            $this->mongo_db->set('personal.$.'.$key, $value);
+        }
+        $result = $this->mongo_db->where('personal.person_id', $id)->update('providers');
+        return $result;
     }
-    function delete_person($params)
+
+    function delete_person($farm_id, $person_id)
     {
         $query = $this->mongodb->luxus->providers->updateOne(
-            ['provider_id' => ['$eq' => $params->provider_id]],
-            ['$set' => [
-                'farms.$[far].personal.$[per].is_active' => 0
-            ]],
-            ['arrayFilters' => [
-                ['far.farm_id' => ['$eq' => $params->farm_id]],
-                ['per.person_id' => ['$eq' => $params->person_id]]
-            ]]
+            ['farm_id' => $farm_id],
+            ['$pull' => ['personal' => ['person_id' => $person_id]]]
         );
         return $query;
     }
@@ -192,9 +214,18 @@ class Farm_model extends CI_Model
     function update_user_person($user_id, $data)
     {
         foreach ($data as $key => $value) {
-           $this->mongo_db->set('farms.$.person_luxus.'.$key,$value);
+           $this->mongo_db->set('person_luxus.'.$key,$value);
         }
-        $query = $this->mongo_db->where('farms.person_luxus.user_id', $user_id)->updateAll('providers');
+        $query = $this->mongo_db->where('person_luxus.user_id', $user_id)->updateAll('providers');
+        return $query;
+    }
+    function update_farm_sons($farm_id, $data)
+    {
+        foreach ($data as $key => $value) {
+           $this->mongo_db->set('farm_father.'.$key,$value);
+        }
+        $query = $this->mongo_db->where('farm_father.farm_id', $farm_id)->updateAll('providers');
+
         return $query;
     }
 
