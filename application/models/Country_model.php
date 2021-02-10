@@ -148,5 +148,10 @@ class Country_model extends CI_Model
         $query = $this->mongo_db->where('markings.country.city.city_id', $city_id)->set(['markings.$.country.city.name' => $name])->updateAll('users');
         return $query;
     }
+    function update_city_user_markets($country_id, $name)
+    {
+        $query = $this->mongo_db->where('markets.country_id', $country_id)->set(['markets.$.name' => $name])->updateAll('providers');
+        return $query;
+    }
     //------------------------------------------------------------------------------------------------------------------------------------------
 }

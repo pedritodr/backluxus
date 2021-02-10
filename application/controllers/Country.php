@@ -168,6 +168,7 @@ class Country extends CI_Controller
             $row =  $this->country->update($country_id, $data);
             $this->country->update_country_user($country_id, (object)$data);
             $this->country->update_country_user_marking($country_id, (object)$data);
+            $this->country->update_city_user_markets($country_id,$name);
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
             redirect("country/index", "location", 301);
         }
