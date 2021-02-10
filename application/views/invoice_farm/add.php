@@ -202,15 +202,27 @@
                                         <div class="row">
                                             <div class="col-lg-2"></div>
                                             <div class="col-lg-8">
-                                                <label><?= translate("markings_lang"); ?></label>
+                                                <label><?= translate("clientes_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <select id="markings" name="markings" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                                    <select id="clients" name="clients" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                                         <option value="0"><?= translate('select_opction_lang') ?></option>
                                                         <?php if ($clients) { ?>
                                                             <?php foreach ($clients as $item) { ?>
                                                                 <option value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name_company . ' | ' . $item->name_commercial ?></option>
                                                             <?php   } ?>
                                                         <?php } ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2"></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-2"></div>
+                                            <div class="col-lg-8">
+                                                <label><?= translate("markings_lang"); ?></label>
+                                                <div class="input-group">
+                                                    <select id="markings" name="markings" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                                        <option value="0"><?= translate('select_opction_lang') ?></option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -329,7 +341,7 @@
                                             <div class="alert alert-info">Se encuentra vacio</div>
                                         </div>
 
-                                    </div> <input type="button" name="previous" class="previous action-button-previous btn btn-warning" value="<?= translate('previous_lang') ?>" />
+                                    </div> <input id="btnPrevius" type="button" name="previous" class="previous action-button-previous btn btn-warning" value="<?= translate('previous_lang') ?>" />
                                     <button type="button" name="make_payment" class="next action-button btn btn-info">
                                         <div style="display:none;    width: 17px;height: 17px;" id="spinnerFinalize" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
                                         <span id="spanFinalize"><?= translate('finalize_lang') ?></span>
@@ -472,7 +484,7 @@
                     });
                     toast({
                         type: 'error',
-                        title: `Seleccione <?= translate("farms_lang"); ?>`,
+                        title: `Seleccione la finca`,
                         padding: '3em',
                     })
                 } else if (markings == 0) {
@@ -485,7 +497,7 @@
                     });
                     toast({
                         type: 'error',
-                        title: `Seleccione <?= translate("markings_lang"); ?>`,
+                        title: `Seleccione la marcación`,
                         padding: '3em',
                     })
                 } else {
@@ -556,10 +568,12 @@
                 if (arrayRequest.varieties.length > 0) {
                     $('#spinnerFinalize').show();
                     $('#spanFinalize').text('Creando invoice...');
-                    // validNext = true;
+                   $('#btnPrevius').prop('disabled',true);
                     //crear invoice
                     let farms = $('select[name=farms] option').filter(':selected').val();
-                    let markings = $('select[name=markings] option').filter(':selected').val();
+                    let markings = $('select[name=markings] option').filter(':selected').attr('itemId');
+                    let client = $('select[name=clients] option').filter(':selected').val();
+                    client = JSON.parse(decodeB64Utf8(client));
                     markings = JSON.parse(decodeB64Utf8(markings));
                     farms = JSON.parse(decodeB64Utf8(farms));
                     delete farms.personal;
@@ -573,7 +587,8 @@
                         invoceNumber,
                         awb,
                         arrayRequest,
-                        markings
+                        markings,
+                        client
                     }
                     setTimeout(function() {
                         $.ajax({
@@ -596,6 +611,7 @@
                                         padding: '2em',
                                     })
                                     setTimeout(function() {
+                                        $('#btnPrevius').prop('disabled',false);
                                         $('#spinnerFinalize').hide();
                                         $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
                                         window.location = '<?= site_url('invoice_farm/index') ?>';
@@ -606,6 +622,7 @@
                                         text: result.msj,
                                         padding: '2em'
                                     });
+                                    $('#btnPrevius').prop('disabled',false);
                                     $('#spinnerFinalize').hide();
                                     $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
                                 }
@@ -696,7 +713,29 @@
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
+    $('[name=clients]').change(() => {
+        $('#markings').prop('disabled', true);
+        $('#markings').empty();
+        let clients = $('select[name=clients] option').filter(':selected').val();
+        if (clients != 0) {
+            clients = JSON.parse(decodeB64Utf8(clients));
+            if (clients.markings.length > 0) {
+                let cadenaMarkings = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                clients.markings.forEach(item => {
+                    cadenaMarkings += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.marking_id + '">' + item.name_marking + '</option>'
+                });
+                $('#markings').append(cadenaMarkings);
+                $('#markings').prop('disabled', false);
+            } else {
+                swal({
+                    title: '¡Error!',
+                    text: 'El cliente no tiene marcaciones creadas',
+                    padding: '2em'
+                });
+            }
+        }
 
+    })
     const addVarieties = (object) => {
 
         if (!object) {

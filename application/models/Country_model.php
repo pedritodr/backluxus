@@ -106,6 +106,17 @@ class Country_model extends CI_Model
         $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []);
         return $query;
     }
+    function get_all_countrys_farms()
+    {
+        $fields = [
+            'country_id' => 1,
+            'name' => 1,
+            'is_active' => 1
+        ];
+        $conditions = ['is_active' => 1];
+        $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []);
+        return $query;
+    }
     function get_country_by_cliente($country_id)
     {
         $tuberia = [

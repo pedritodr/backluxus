@@ -39,7 +39,8 @@
                                     <?php foreach ($all_invoice_farm as $item) { ?>
                                         <tr>
                                             <td>
-                                            <p><?= $item->markings->name_company.' | '. $item->markings->name_commercial?></p>
+                                            <p><?= $item->client->name_company.' | '. $item->client->name_commercial?></p>
+                                            <p><b><?= translate("marking_lang"); ?>: <?= $item->markings->name_marking?></b></p>
                                             </td>
                                             <td>
                                                 <p><strong><?= translate("invoice_number_lang"); ?> : </strong><?= $item->invoice_number; ?></p>

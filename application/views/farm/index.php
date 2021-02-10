@@ -14,6 +14,10 @@
     #modalEditManagers {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
+
+    #modalMarkets {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">
@@ -68,10 +72,10 @@
                                                     <p><b><?= translate("name_legal_lang") . ":</b> " . $item->farm_father->name_legal; ?></p>
                                                     <p><b><?= translate("name_commercial_lang") . ": </b>" . $item->farm_father->name_commercial; ?></p>
                                                 <?php } else { ?>
-                                                        <?php if (isset($item->farms_sons)) { ?>
-                                                            <?php if ($item->farms_sons) { ?>
-                                                                <h6><b><?= translate("farm_group_lang") . "</b> " ?></h6>
-                                                                <div class="row">
+                                                    <?php if (isset($item->farms_sons)) { ?>
+                                                        <?php if ($item->farms_sons) { ?>
+                                                            <h6><b><?= translate("farm_group_lang") . "</b> " ?></h6>
+                                                            <div class="row">
                                                                 <?php foreach ($item->farms_sons as $sons) { ?>
                                                                     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                                                                         <p><b><?= translate("owner_lang") . ":</b> " . $sons->owner; ?></p>
@@ -79,9 +83,9 @@
                                                                         <p><b><?= translate("name_commercial_lang") . ": </b>" . $sons->name_commercial; ?></p>
                                                                     </div>
                                                                 <?php } ?>
-                                                                </div>
-                                                            <?php } ?>
+                                                            </div>
                                                         <?php } ?>
+                                                    <?php } ?>
                                                 <?php  } ?>
                                             </td>
                                             <td>
@@ -90,11 +94,20 @@
                                                             <polyline points="6 9 12 15 18 9"></polyline>
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
-                                                    <a class="dropdown-item" href="<?= site_url('farm/update_index_provider/' . $item->farm_id); ?>"><i class="fa fa-edit"></i> <?= translate("edit_lang"); ?></a>
+                                                        <a class="dropdown-item" href="<?= site_url('farm/update_index_provider/' . $item->farm_id); ?>"><i class="fa fa-edit"></i> <?= translate("edit_lang"); ?></a>
                                                         <?php if (isset($item->person_luxus)) { ?>
                                                             <a style="cursor:pointer" href="javascript:void(0)" onclick="loadPersonLuxus('<?= $item->farm_id; ?>','<?= base64_encode(json_encode($item->person_luxus)) ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("person_luxus_commercial_lang"); ?></a>
                                                         <?php } else { ?>
                                                             <a style="cursor:pointer" href="javascript:void(0)" onclick="loadPersonLuxus('<?= $item->farm_id; ?>','<?= false ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("person_luxus_commercial_lang"); ?></a>
+                                                        <?php } ?>
+                                                        <?php if (isset($item->markets)) { ?>
+                                                            <?php if (count($item->markets) > 0) { ?>
+                                                                <a style="cursor:pointer" href="javascript:void(0)" onclick="markets('<?= $item->farm_id; ?>','<?= base64_encode(json_encode($item->markets)) ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markets_lang"); ?></a>
+                                                            <?php } else { ?>
+                                                                <a style="cursor:pointer" href="javascript:void(0)" onclick="markets('<?= $item->farm_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markets_lang"); ?></a>
+                                                            <?php } ?>
+                                                        <?php } else { ?>
+                                                            <a style="cursor:pointer" href="javascript:void(0)" onclick="markets('<?= $item->farm_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markets_lang"); ?></a>
                                                         <?php } ?>
                                                         <?php if (isset($item->personal)) {
                                                             if (count($item->personal) > 0) { ?>
@@ -297,6 +310,42 @@
         </div>
     </div>
 </div>
+<div class="modal  fade" id="modalMarkets" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('markets_lang') ?></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label><?= translate("countrys_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="countrysMarkets" name="countrysMarkets" class="form-control tagging" multiple="multiple" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?>...</option>
+                                <?php if (isset($countrys)) { ?>
+                                    <?php if ($countrys) { ?>
+                                        <?php foreach ($countrys as $item) { ?>
+                                            <option value="<?= $item->country_id ?>"><?= $item->name ?></option>
+                                        <?php } ?>
+                                    <?php } ?>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="farmIdMarket">
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelMarkets" class="btn" onclick="cancelMarkets()"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
+                <button onclick="submitAddMarkets()" type="button" class="btn btn-primary"><i class="fa fa-check-square"></i>
+                    <div style="display:none;    width: 17px;height: 17px;" id="spinnerAddMarkets" class="spinner-border text-white mr-2 align-self-center loader-sm "></div>
+                    <span id="spanAddMarkets"><?= translate('guardar_info_lang') ?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     const deleteFarm = (providerId) => {
         swal({
@@ -314,6 +363,12 @@
         })
     }
     $(function() {
+        $(".tagging").select2({
+            tags: true,
+            dropdownParent: $("#modalMarkets"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: true,
+        });
         $("#example1").DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
@@ -821,5 +876,107 @@
                 });
             }
         })
+    }
+    const markets = (farmId, markets = false) => {
+        $('#farmIdMarket').val(farmId);
+        if (markets) {
+            markets = JSON.parse(decodeB64Utf8(markets));
+            let countrySelecteds = [];
+            if (markets.length > 0) {
+                markets.forEach(item => {
+                    countrySelecteds.push(item.country_id);
+                });
+                $("#countrysMarkets").select2().val(countrySelecteds).trigger("change");
+            }else{
+                $('#countrysMarkets').val(null).trigger('change');
+            }
+        }else{
+            $('#countrysMarkets').val(null).trigger('change');
+        }
+        $('#modalMarkets').modal({
+            backdrop: false
+        })
+    }
+    const cancelMarkets = () => {
+        $('#modalMarkets').modal('hide');
+    }
+    const submitAddMarkets = () => {
+        $('#btnCancelMarkets').prop('disabled', true);
+        let farmId = $('#farmIdMarket').val();
+        let country = $('#countrysMarkets').val();
+        if (country == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione un país para continuar ',
+                padding: '2em',
+            })
+        } else {
+            $('#spinnerAddMarkets').show();
+            $('#spanAddMarkets').text('<?= translate('processing_lang') ?>' + '...');
+            let countrys = [];
+            let countrysMarket = '<?= json_encode($countrys) ?>';
+            countrysMarket = JSON.parse(countrysMarket);
+            country.forEach((item) => {
+                let results = countrysMarket.filter((element) => {
+                    return element.country_id == item;
+                });
+                let objCountry = (results.length > 0) ? results[0] : null;
+
+                if (objCountry) {
+                    countrys.push(objCountry);
+                }
+            });
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('farm/markets') ?>",
+                    data: {
+                        countrys,
+                        farmId
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            $('#modalMarkets').modal('hide');
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                $('#btnCancelMarkets').prop('disabled', false);
+                                $('#spinnerAddMarkets').hide();
+                                $('#spanAddMarkets').text('<?= translate('guardar_info_lang') ?>');
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                            $('#btnCancelMarkets').prop('disabled', false);
+                            $('#spinnerAddMarkets').hide();
+                            $('#spanAddMarkets').text('<?= translate('guardar_info_lang') ?>');
+                        }
+
+                    }
+                });
+            }, 1500)
+        }
     }
 </script>

@@ -64,6 +64,7 @@ $config['update_person_lang'] = "Actualizar persona";
 $config['personal_lang'] = "Personal";
 $config['farm_group_lang'] = "Grupo de fincas";
 $config['farm_father_lang'] = "Finca padre";
+$config['markets_lang'] = "Mercados";
 
 $config['data_manager_lang'] = "Datos del encargado";
 $config['listar_managers_lang'] = "Listar del encargados";

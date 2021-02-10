@@ -43,10 +43,9 @@ class Invoice_farm extends CI_Controller
         $this->load->model('User_model', 'user');
         $data['categories']  = $this->categoria->get_all(['is_active' => 1]);
         $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
-        $data['farms'] = $this->farm->get_all_farms();
+        $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);;
         $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
         $data['measures'] = $this->measure->get_all(['is_active' => 1]);
-
         $this->load_view_admin_g('invoice_farm/add', $data);
     }
 
@@ -65,6 +64,7 @@ class Invoice_farm extends CI_Controller
         $dispatchDay = trim(($this->input->post('dispatchDay')));
         $farms = ($_POST['farms']);
         $markings = ($_POST['markings']);
+        $client = ($_POST['client']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $invoice_farm = 'invoice_farm' . uniqid();
         $date_create = date("Y-m-d H:i:s");
@@ -73,6 +73,7 @@ class Invoice_farm extends CI_Controller
             'invoice_number' => $invoceNumber,
             'dispatch_day' => $dispatchDay,
             'awb' => $awb,
+            'client'=>$client,
             'markings' => $markings,
             'farms' => $farms,
             'details' => $arrayRequest,

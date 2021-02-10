@@ -24,6 +24,7 @@ class Farm extends CI_Controller
             redirect('login/index');
         }
         $this->load->model('User_model', 'user');
+        $this->load->model('Country_model', 'country');
         $all_providers = $this->farm->get_all_providers(['is_active' => 1]);
         foreach ($all_providers as $item) {
             if (!$item->farm_father) {
@@ -31,6 +32,7 @@ class Farm extends CI_Controller
             }
         }
         $users_luxus = $this->user->get_all(['role_id' => 1, 'is_delete' => 0]);
+        $data['countrys'] = $this->country->get_all_countrys_farms();
         $data['users_luxus'] = $users_luxus;
         $data['all_providers'] = $all_providers;
         $this->load_view_admin_g("farm/index", $data);
@@ -406,5 +408,25 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
             exit();
         }
+    }
+    public function markets()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+
+        $countrys = $this->input->post('countrys');
+        $farm_id = $this->input->post('farmId');
+        $data = [
+            'markets' => $countrys,
+        ];
+        $this->farm->update_provider($farm_id, $data);
+        echo json_encode(['status' => 200, 'msj' => 'correcto']);
+        exit();
     }
 }
