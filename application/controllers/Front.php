@@ -21,28 +21,15 @@ class Front extends CI_Controller
 
     public function index()
     {
+        $data = [];
 
-        $this->load->model('Banner_model', 'banner');
-        $this->load->model('Categoria_model', 'categoria');
-        $this->load->model('Product_model', 'product');
-
-        $categorias_destacadas = $this->categoria->get_all(['is_active' => 1, 'destacado' => 1]);
-        $categorias = $this->categoria->get_all(['is_active' => 1]);
-        foreach ($categorias as $item) {
-            $item->productos = $this->product->get_all(['categorie_id' => $item->_id]);
-        }
-        $categorias = object_to_array($categorias);;
-        $all_banners = $this->banner->get_all(['is_active' => 1]);
-        $data['all_banners'] = $all_banners;
-        $data['categorias_destacadas'] = $categorias_destacadas;
-        $data['categorias'] = $categorias;
         $e = array(
             'general' => true, //description
             'og' => true,
             'twitter' => true,
             'robot' => true
         );
-        $data_header = array($e, $title = "Ranic", $desc = substr(strip_tags("Tienda deportiva ranic, implementos deportivos"), 0, 250), $imgurl = base_url('assets/ranic.png'), $url = base_url('portada'));
+        $data_header = array($e, $title = "Luxus", $desc = substr(strip_tags("Las mejores flores del Ecuador"), 0, 250), $imgurl = base_url('assets/img/imagen-no-found.png'), $url = base_url('portada'));
         $this->load_view_front('front/index', $data, 0, $data_header);
     }
     public function colecciones($id)
