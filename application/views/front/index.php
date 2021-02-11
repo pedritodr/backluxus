@@ -761,8 +761,6 @@
 					<!-- ------------end wedding---- -->
 					<!-- ------------tab holiday----------------- -->
 					<div id="menu-tab-holiday" class="tab-pane fade">
-
-
 						<div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 product-category">
 							<div class="product-image-category">
 								<figure class="sale"><a href="#"><img src="<?=base_url('front_template/img/340x420.png')?>" class="img-responsive" alt="holiwood"></a></figure>
