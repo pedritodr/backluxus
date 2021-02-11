@@ -11,7 +11,7 @@ class Dashboard extends CI_Controller
         /*  $this->load->model('User_model', 'user');
         $this->load->model('Pedido_model', 'pedido');
         $this->load->model('Product_model', 'producto'); */
-        $this->load->library(array('session'));
+      //  $this->load->library(array('session'));
         $this->load->helper("mabuya");
 
         @session_start();
@@ -27,11 +27,12 @@ class Dashboard extends CI_Controller
     public function index()
     {
 
+
         if (!in_array($this->session->userdata('role_id'), [1,2])) {
             $this->log_out();
             redirect('login/index');
         }
-     //   var_dump($this->session->userdata('role_id'));die();
+
         $this->load_view_admin_g('dashboard/index_admin');
     }
 

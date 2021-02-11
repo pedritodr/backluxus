@@ -86,10 +86,10 @@ class Farm_model extends CI_Model
             if (count($result) > 0) {
                 return (object) $result[0];
             } else {
-                return false;
+                return $result;
             }
         } else {
-            return ($result) ? array_to_object($result) : FALSE;
+            return $result;
         }
     }
     function update_provider($id, $data)
