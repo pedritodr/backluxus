@@ -17,14 +17,14 @@
     <!-- bootstrap vs fontawesome-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="icon" href="img/favicon.png" type="image/x-icon" />
+    <link rel="icon" href="<?=base_url('front_template/img/favicon.png')?>" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="<?= base_url('front_template/css/style-homev3.css') ?>">
     <link rel="stylesheet" type="text/css" href="<?= base_url('front_template/css/style-res-v3.css') ?>">
     <link rel="stylesheet" type="text/css" href="<?= base_url('front_template/css/style-fix-nav.css') ?>">
     <link rel="stylesheet" type="text/css" href="<?= base_url('front_template/css/style-form-search-mobile.css') ?>">
     <!-- slick -->
-    <link rel="stylesheet" type="text/css" href="<?base_url('front_template/slick/slick.css')?>">
-    <link rel="stylesheet" type="text/css" href="<?base_url('front_template/slick/slick-theme.css')?>">
+    <link rel="stylesheet" type="text/css" href="<?=base_url('front_template/slick/slick.css')?>">
+    <link rel="stylesheet" type="text/css" href="<?=base_url('front_template/slick/slick-theme.css')?>">
     <!-- GG FONT -->
     <link href="https://fonts.googleapis.com/css?family=Abril+Fatface" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700" rel="stylesheet">
@@ -41,7 +41,7 @@
 
                     <form class="hidden-lg hidden-md form-group form-search-mobile">
                         <input type="text" name="search" placeholder="Search here..." class="form-control">
-                        <button type="submit"><img src="img/Search.png" alt="search" class="img-responsive"></button>
+                        <button type="submit"><img src="<?=base_url('front_template/img/Search.png')?>" alt="search" class="img-responsive"></button>
                     </form>
                     <ul class="nav navbar-nav menu-main">
 

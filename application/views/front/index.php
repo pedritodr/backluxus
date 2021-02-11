@@ -683,7 +683,7 @@
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 product-category">
 							<div class="product-image-category">
-								<a href="#"><img src="img/340x420.png" class="<?=base_url('front_template/img-responsive"')?> alt="holiwood"></a>
+								<a href="#"><img src="<?=base_url('front_template/img/340x420.png')?>" class="img-responsive" alt="holiwood"></a>
 								<div class="product-icon-category">
 									<a href="#"><i class="far fa-eye"></i></a>
 									<a href="#"><i class="fas fa-shopping-basket"></i></a>
@@ -699,7 +699,7 @@
 						<!-- ------------------------------------------------ -->
 						<div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 product-category">
 							<div class="product-image-category">
-								<a href="#"><img src="img/340x420.png" class="<?=base_url('front_template/img-responsive"')?> alt="holiwood"></a>
+								<a href="#"><img src="<?=base_url('front_template/img/340x420.png')?>" class="img-responsive" alt="holiwood"></a>
 								<div class="product-icon-category">
 									<a href="#"><i class="far fa-eye"></i></a>
 									<a href="#"><i class="fas fa-shopping-basket"></i></a>
@@ -1035,7 +1035,7 @@
 	</div>
 
 
-<!-- 	<div class="container">
+	<div class="container">
 		<div class="row">
 			<div class="product-slick slider">
 				<div class="product-slic">
@@ -1161,7 +1161,7 @@
 			</div>
 		</div>
 
-	</div> -->
+	</div>
 
 
 
