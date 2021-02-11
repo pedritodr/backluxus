@@ -14,19 +14,19 @@ class Login extends CI_Controller
         @session_start();
         $this->load_language();
         $this->init_form_validation();
-        header('Access-Control-Allow-Origin: *');
+
     }
 
 
 
     public function index()
     {
-
         $this->load->view("login");
     }
 
     public function auth()
     {
+        header('Access-Control-Allow-Origin: *');
         $email = trim(strtolower($this->input->post('email')));
         $password = md5(trim($this->input->post('password')));
         $user = $this->user->get_by_email($email);
@@ -34,7 +34,7 @@ class Login extends CI_Controller
             if ($user->password == $password) {
                 $session_data = object_to_array($user);
                 $this->session->set_userdata($session_data);
-                echo json_encode(['status' => 200, 'msj' => 'correcto','user_id'=>$this->session->userdata('user_id')]);
+                echo json_encode(['status' => 200, 'msj' => 'correcto','user'=>$this->session->userdata()]);
             } else {
                 echo json_encode(['status' => 500, 'msj' => 'La contraseña no coincide con la registrada en la base de datos']);
             }

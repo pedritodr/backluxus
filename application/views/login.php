@@ -129,7 +129,6 @@
                         },
                         success: function(result) {
                             result = JSON.parse(result);
-                            console.log(result);
 
                             if (result.status == 200) {
                                 const toast = swal.mixin({
@@ -148,7 +147,7 @@
                                 setTimeout(function() {
                                     $('#spinnerLogin').hide();
                                     $('#spanInicia').text('Iniciar sesión');
-                                    window.location = '<?= site_url('dashboard/index') ?>';
+                                    location.href = '<?= site_url('dashboard/index') ?>';
                                 }, 1000);
                             } else {
                                 swal({

@@ -51,6 +51,7 @@ class CI_Controller
 
             throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
         });
+
     }
 
     function check_user_logged()
@@ -136,13 +137,9 @@ class CI_Controller
         $this->load->model('company_model', 'empresa');
         $data_header['empresa_object'] = $this->empresa->get_by_id(1);
         $data_footer['empresa_object'] = $data_header['empresa_object'];
-        $this->load->model('Categoria_model', 'categoria');
-        $data_header['all_categorias'] = $this->categoria->get_all(['is_active' => 1]);
 
         $this->load->view("front_template/header", $data_header);
         $this->load->view($url, $data, $like_file);
-
-        // $data_footer['categories_footer'] = $this->cat->get_all();
         $this->load->view("front_template/footer", $data_footer);
     }
 
@@ -165,14 +162,6 @@ class CI_Controller
             switch ($_SESSION['lang']) {
                 case "es": {
                         $this->config->load('es_lang'); // cargo el idioma espanniol
-                        break;
-                    }
-                case "en": {
-                        $this->config->load('en_lang');   // cargo el idioma ingles
-                        break;
-                    }
-                case "por": {
-                        $this->config->load("por_lang");
                         break;
                     }
                 default: {

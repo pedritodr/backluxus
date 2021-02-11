@@ -120,4 +120,9 @@ class User_model extends CI_Model
         $query = $this->mongo_db->where('person_luxus.user_id', $user_id)->updateAll('users');
         return $query;
     }
+    function login($email, $password)
+	{
+		$query = $this->mongo_db->where(['email' => $email, 'password' => $password])->get('users');
+		return (count($query) > 0) ? $query[0] : false;
+	}
 }
