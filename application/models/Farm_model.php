@@ -109,6 +109,7 @@ class Farm_model extends CI_Model
         $data['_id'] = $this->mongo_db->create_document_id();
         $newId = $this->mongo_db->where('farm_id', $farm_id)->push('personal', $data)->update('providers');
         return $newId;
+
     }
 
     function update_farm($id, $data)

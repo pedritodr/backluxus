@@ -1,12 +1,12 @@
 {
-	"description": "The CodeIgniter framework",
-	"name": "codeigniter/framework",
-	"license": "MIT",
-	"require": {
-	  "php": ">=5.2.4",
-	  "mongodb/mongodb": "^1.7"
-	},
-	"require-dev": {
+    "description": "The CodeIgniter framework",
+    "name": "codeigniter/framework",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.2.4",
+        "mongodb/mongodb": "^1.7"
+    },
+    "require-dev": {
 
-	}
-  }
+    }
+}
