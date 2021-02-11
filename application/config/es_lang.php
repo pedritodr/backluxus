@@ -61,6 +61,10 @@ $config['data_personal_lang'] = "Datos del personal";
 $config['listar_personal_lang'] = "Listar del personal";
 $config['add_person_lang'] = "Adicionar persona";
 $config['update_person_lang'] = "Actualizar persona";
+$config['personal_lang'] = "Personal";
+$config['farm_group_lang'] = "Grupo de fincas";
+$config['farm_father_lang'] = "Finca padre";
+$config['markets_lang'] = "Mercados";
 
 $config['data_manager_lang'] = "Datos del encargado";
 $config['listar_managers_lang'] = "Listar del encargados";
@@ -415,8 +419,10 @@ $config['function_lang'] = "Función";
 $config['sales_lang'] = "Ventas";
 $config['logistics_lang'] = "Logística";
 $config['managers_lang'] = "Encargados";
-
-
+$config['owner_lang'] = "Dueño";
+$config['seller_lang'] = "Vendedor";
+$config['seller_payment_lang'] = "vendedor/cobros";
+$config['not_group_lang'] = "No pertence a un grupo";
 
 
 

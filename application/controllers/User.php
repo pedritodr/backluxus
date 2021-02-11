@@ -236,6 +236,8 @@ class User extends CI_Controller
             $this->user->update($user_id, $data_user);
             if($role!=3){
                 $this->user->update_user_person($user_id, $data_user);
+                $this->load->model('Farm_model', 'farm');
+                $this->farm->update_user_person($user_id, $data_user);
             }
             $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
             redirect("user/index");

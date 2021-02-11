@@ -23,6 +23,9 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 # Sub git
 .git/
 
+# uploads
+uploads/*
+
 # IDE Files
 /nbproject/
 .idea/*

@@ -25,13 +25,13 @@
                                 <input type="hidden" name="provider_id" value="<?= $provider_id ?>">
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-3">
                             <label><?= translate("phone_lang"); ?></label>
                             <div class="input-group">
                                 <input type="text" class="form-control input-sm" name="phone" required placeholder="<?= translate('phone_lang'); ?>" value="<?= $person_object->phone ?>">
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-3">
                             <label><?= translate("skype_lang"); ?></label>
                             <div class="input-group">
                                 <input type="text" class="form-control input-sm" name="skype"  placeholder="<?= translate('skype_lang'); ?>" value="<?= $person_object->skype ?>">
@@ -41,6 +41,17 @@
                             <label><?= translate("whatsapp_lang"); ?></label>
                             <div class="input-group">
                                 <input type="text" class="form-control input-sm" name="whatsapp"  placeholder="<?= translate('whatsapp_lang'); ?>" value="<?= $person_object->whatsapp ?>">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label><?= translate("functions_lang"); ?></label>
+                            <div class="input-group">
+                                <select id="functions" name="functions" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                    <option value="0"><?= translate('select_opction_lang') ?></option>
+                                    <option <?php if($person_object->function ==1){?> selected <?php }?> value="1"><?= translate('seller_lang') ?></option>
+                                    <option <?php if($person_object->function ==2){?> selected <?php }?> value="2"><?= translate('seller_payment_lang') ?></option>
+                                    <option <?php if($person_object->function ==3){?> selected <?php }?> value="3"><?= translate('owner_lang') ?></option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-lg-12" style="text-align: right;">
