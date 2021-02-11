@@ -14,7 +14,7 @@ class Login extends CI_Controller
         @session_start();
         $this->load_language();
         $this->init_form_validation();
-
+        header('Access-Control-Allow-Origin: *');
     }
 
 
@@ -26,7 +26,6 @@ class Login extends CI_Controller
 
     public function auth()
     {
-        header('Access-Control-Allow-Origin: *');
         $email = trim(strtolower($this->input->post('email')));
         $password = md5(trim($this->input->post('password')));
         $user = $this->user->get_by_email($email);
