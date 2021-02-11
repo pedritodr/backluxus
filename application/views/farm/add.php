@@ -69,7 +69,7 @@
                         <div class="col-lg-6">
                             <label><?= translate("address_oficce_lang"); ?></label>
                             <div class="input-group">
-                                <input type="text" class="form-control input-sm" id="address_office" name="address_office" required placeholder="<?= translate('address_oficce_lang'); ?>">
+                                <input type="text" class="form-control input-sm" id="address_office" name="address_office"  placeholder="<?= translate('address_oficce_lang'); ?>">
                             </div>
                         </div>
                         <div class="col-lg-12">
@@ -135,7 +135,6 @@
             $('#name_commercial').val();
             $('#address_farm').val(farms.address_farm);
             $('#address_office').val(farms.address_office);
-            $('#editor-container1').text(farms.observations);
         }else{
             $('#owner').val("");
             $('#days').val("");
@@ -144,8 +143,6 @@
             $('#name_commercial').val();
             $('#address_farm').val("");
             $('#address_office').val("");
-            $('#editor-container1').text("");
-
         }
     })
 </script>
