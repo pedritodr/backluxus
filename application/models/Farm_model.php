@@ -229,6 +229,22 @@ class Farm_model extends CI_Model
 
         return $query;
     }
+    function create_variety($farm_id = 0, $data = [])
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->where('farm_id', $farm_id)->push('varieties', $data)->update('providers');
+        return $newId;
+
+    }
+
+    function delete_variety($farm_id, $variety_id)
+    {
+        $query = $this->mongodb->luxus->providers->updateOne(
+            ['farm_id' => $farm_id],
+            ['$pull' => ['varieties' => ['variety_id' => $variety_id]]]
+        );
+        return $query;
+    }
 
     //------------------------------------------------------------------------------------------------------------------------------------------
 }
