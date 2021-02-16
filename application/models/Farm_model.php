@@ -241,10 +241,9 @@ class Farm_model extends CI_Model
     {
         $query = $this->mongodb->luxus->providers->updateOne(
             ['farm_id' => $farm_id],
-            ['$pull' => ['varieties' => ['variety_id' => $variety_id]]]
+            ['$pull' => ['varieties' => ['product_id' => $variety_id]]]
         );
         return $query;
     }
-
     //------------------------------------------------------------------------------------------------------------------------------------------
 }

@@ -203,4 +203,23 @@ class Categoria extends CI_Controller
             show_404();
         }
     }
+    public function categories()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $all_categorias = $this->categoria->get_all(['is_active' => 1]);
+        if ($all_categorias) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'categories' => $all_categorias]);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'No se encuentran categorias']);
+            exit();
+        }
+    }
 }

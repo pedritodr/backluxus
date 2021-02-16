@@ -429,4 +429,42 @@ class Farm extends CI_Controller
         echo json_encode(['status' => 200, 'msj' => 'correcto']);
         exit();
     }
+    public function add_varieties()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+
+        $varieties = json_decode($this->input->post('varietiesLoad'));
+        $farm_id = $this->input->post('farmId');
+        $data = [
+            'varieties' => $varieties,
+        ];
+        $this->farm->update_provider($farm_id, $data);
+        $farm = $this->farm->get_provider_by_id($farm_id);
+        echo json_encode(['status' => 200, 'msj' => 'correcto','data'=>$farm->varieties]);
+        exit();
+    }
+    public function delete_variety()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $product_id = $this->input->post('productId');
+        $farm_id = $this->input->post('farmId');
+        $this->farm->delete_variety($farm_id, $product_id);
+        $farm = $this->farm->get_provider_by_id($farm_id);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $farm->varieties]);
+        exit();
+    }
 }
