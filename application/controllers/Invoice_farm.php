@@ -62,7 +62,7 @@ class Invoice_farm extends CI_Controller
         $awb = trim(($this->input->post('awb')));
         $invoceNumber = trim(($this->input->post('invoceNumber')));
         $dispatchDay = trim(($this->input->post('dispatchDay')));
-        $farms = ($_POST['farms']);
+        $farms = (object)($_POST['farms']);
         $markings = ($_POST['markings']);
         $client = ($_POST['client']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
@@ -73,15 +73,40 @@ class Invoice_farm extends CI_Controller
             'invoice_number' => $invoceNumber,
             'dispatch_day' => $dispatchDay,
             'awb' => $awb,
-            'client'=>$client,
+            'client' => $client,
             'markings' => $markings,
             'farms' => $farms,
             'details' => $arrayRequest,
             'status' => 0,
-            'date_create'=>$date_create
+            'date_create' => $date_create
         ];
         $resquest =  $this->invoice_farm->create($data_invoice);
         if ($resquest) {
+            $this->load->model('Farm_model', 'farm');
+            $obj_farm = $this->farm->get_provider_by_id($farms->farm_id);
+            if ($obj_farm) {
+                if (isset($obj_farm->varieties)) {
+                    $arrayTemp = $obj_farm->varieties;
+                    $arrayProducts = [];
+                    foreach ($arrayRequest as $rq) {
+                        $encontro = false;
+                        foreach ($obj_farm->varieties as $item) {
+                            if($item->product_id == $rq->products->product_id){
+                                $encontro= true;
+                            }
+                        }
+                        if(!$encontro){
+                            $arrayTemp[]=$rq->products;
+                        }
+                    }
+                    if(count($obj_farm->varieties)!=count($arrayTemp)){
+                        $data = [
+                            'varieties' => $arrayTemp,
+                        ];
+                        $this->farm->update_provider($farms->farm_id, $data);
+                    }
+                }
+            }
             echo json_encode(['status' => 200, 'msj' => 'correcto']);
             exit();
         } else {

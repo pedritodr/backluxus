@@ -94,14 +94,8 @@ class Color extends CI_Controller
             $row =  $this->color->update($color_id, $data);
             if ($row) {
                 $this->load->model('Product_model', 'product');
-                $products =  $this->product->get_all(['color.color_id' => $color_id]);
-                $color_object = $this->color->get_by_id($color_id);
-                if ($products) {
-                    foreach ($products as $item) {
-                        $data_product = ['color' => $color_object];
-                        $this->product->update($item->product_id, $data_product);
-                    }
-                }
+                $this->product->update_product_color($color_id, $name);
+                $this->product->update_color_farm($color_id,$name);
             }
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
             redirect("color/index", "location", 301);

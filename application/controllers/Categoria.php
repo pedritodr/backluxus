@@ -136,6 +136,7 @@ class Categoria extends CI_Controller
                     $row =  $this->categoria->update($categoria_id, $data);
                     $categoria_object = $this->categoria->get_by_id($categoria_id);
                     $this->product->update_categories($categoria_id,$categoria_object);
+                    $this->product->update_category_farm($categoria_id,$categoria_object);
                     $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                     redirect("categoria/index", "location", 301);
                 } else {
@@ -150,6 +151,7 @@ class Categoria extends CI_Controller
                             $row =  $this->categoria->update($categoria_id, $data);
                             $categoria_object = $this->categoria->get_by_id($categoria_id);
                             $this->product->update_categories($categoria_id,$categoria_object);
+                            $this->product->update_category_farm($categoria_id,$categoria_object);
                             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                             redirect("categoria/index", "location", 301);
                         } else {

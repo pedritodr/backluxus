@@ -1154,12 +1154,24 @@
                 texto_tabla += '<tr>';
                 texto_tabla += '<td>';
                 texto_tabla += '<p><b><?= translate('nombre_lang') ?>: </b> ' + item.name + '</p>';
+                if (typeof item.categoria !== 'undefined') {
+                    if (item.categoria) {
+                        texto_tabla += '<p><b><?= translate('category_lang') ?>: </b> ' + item.categoria.name + '</p>';
+                    }
+                }
+                if (typeof item.type !== 'undefined') {
+                    if (item.type) {
+                        texto_tabla += '<p><b><?= translate('type_lang') ?>: </b> ' + item.type.name + '</p>';
+                    }
+                }
+                if (typeof item.color !== 'undefined') {
+                    if (item.color) {
+                        texto_tabla += '<p><b><?= translate('color_lang') ?>: </b> ' + item.color.name + '</p>';
+                    }
+                }
                 texto_tabla += '</td>';
-
                 texto_tabla += '<td>';
-
                 texto_tabla += '<a class="btn btn-danger" href="javascript:void(0);"   onclick=deleteVariety("' + encodeB64Utf8(JSON.stringify(item)) + '");> Eliminar</a>';
-
                 texto_tabla += '</td>';
                 texto_tabla += '</tr>';
             });
@@ -1327,7 +1339,7 @@
                 varietiesLoad = varieties;
             }
             varietiesLoad = JSON.stringify(varietiesLoad);
-           // return
+            // return
             setTimeout(function() {
                 $.ajax({
                     type: 'POST',

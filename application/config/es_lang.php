@@ -30,12 +30,12 @@ $config['manage_colors_lang'] = "Gestionar colores";
 $config['listar_colors_lang'] = "Listar colores";
 $config['add_color_lang'] = "Adicionar color";
 $config['update_color_lang'] = "Actualizar color";
-
+$config['color_lang'] = "Color";
 $config['manage_types_lang'] = "Gestionar tipos";
 $config['listar_types_lang'] = "Listar tipos";
 $config['add_type_lang'] = "Adicionar tipo";
 $config['update_type_lang'] = "Actualizar tipo";
-
+$config['type_lang'] = "Tipo";
 $config['manage_farms_lang'] = "Gestionar fincas";
 $config['listar_farms_lang'] = "Listar fincas";
 $config['add_farm_lang'] = "Adicionar finca";

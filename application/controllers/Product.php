@@ -31,14 +31,12 @@ class Product extends CI_Controller
         $this->load_view_admin_g("product/index", $data);
     }
 
-
     public function add_index()
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
             redirect('login/index');
         }
-
 
         $all_categorias = $this->categoria->get_all(['is_active' => 1]);
         $data['all_categorias'] = $all_categorias;
@@ -101,8 +99,7 @@ class Product extends CI_Controller
         }
     }
 
-
-    function update_index($producto_id = 0)
+    public  function update_index($producto_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
@@ -127,7 +124,7 @@ class Product extends CI_Controller
         }
     }
 
-    function update_foto_coleccion_index($foto_producto_id = 0)
+    public function update_foto_coleccion_index($foto_producto_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
@@ -144,7 +141,7 @@ class Product extends CI_Controller
         }
     }
 
-    function foto_coleccion($producto_id = 0)
+    public function foto_coleccion($producto_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
@@ -157,7 +154,7 @@ class Product extends CI_Controller
 
         $this->load_view_admin_g('product/foto_producto', $data);
     }
-    function foto_coleccion_add($producto_id = 0)
+    public function foto_coleccion_add($producto_id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
@@ -168,7 +165,6 @@ class Product extends CI_Controller
 
         $this->load_view_admin_g('product/add_foto', $data);
     }
-
 
     public function add_foto()
     {
@@ -238,6 +234,7 @@ class Product extends CI_Controller
                 if ($_FILES['archivo']['error'] == 4) {
                     $data = ['name' => $name, 'description' => $desc, 'type' => $obj_type, 'color' => $obj_color, 'categoria' => $obj_categoria];
                     $this->product->update($producto_id, $data);
+                    $this->product->update_product_farm($producto_id, $data);
                     $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                     redirect("product/index");
                 } else {
@@ -251,6 +248,7 @@ class Product extends CI_Controller
 
                             $data = ['name' => $name, 'main_photo' => $result[1], 'description' => $desc, 'type' => $obj_type, 'color' => $obj_color, 'categoria' => $obj_categoria];
                             $this->product->update($producto_id, $data);
+                            $this->product->update_product_farm($producto_id, $data);
                             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
                             redirect("product/index");
                         } else {

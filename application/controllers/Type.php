@@ -95,14 +95,8 @@ class Type extends CI_Controller
             $row =  $this->type->update($type_id, $data);
             $this->load->model('Product_model', 'product');
             if ($row) {
-                $products =  $this->product->gel_all(['type.type_id' => $type_id]);
-                $type_object = $this->type->get_by_id($type_id);
-                if ($products) {
-                    foreach ($products as $item) {
-                        $data_product = ['type' => $type_object];
-                        $this->product->update($item->product_id, $data_product);
-                    }
-                }
+                $this->product->update_product_type($type_id, $name);
+                $this->product->update_type_farm($type_id,$name);
             }
             $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
             redirect("type/index", "location", 301);

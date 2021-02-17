@@ -43,12 +43,12 @@
                                                 <?php } ?>
                                                 <?php if (isset($item->type)) { ?>
                                                     <?php if (($item->type)) { ?>
-                                                        <p><strong><?= "Tipo" ?> : </strong><?= $item->type->name ?></p>
+                                                        <p><strong><?= translate('type_lang') ?> : </strong><?= $item->type->name ?></p>
                                                     <?php } ?>
                                                 <?php } ?>
                                                 <?php if (isset($item->color)) { ?>
                                                     <?php if (($item->color)) { ?>
-                                                        <p><strong><?= "Color" ?> : </strong><?= $item->color->name ?></p>
+                                                        <p><strong><?= translate('color_lang') ?> : </strong><?= $item->color->name ?></p>
                                                     <?php } ?>
                                                 <?php } ?>
                                             </td>
