@@ -144,7 +144,7 @@ class Farm extends CI_Controller
         $this->form_validation->set_rules('name_commercial', translate('name_commercial_lang'), 'required');
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
-            redirect("farm/update_index_provider/".$farm_id);
+            redirect("farm/update_index_provider/" . $farm_id);
         } else {
             $data = [
                 'owner' => $owner,
@@ -158,7 +158,7 @@ class Farm extends CI_Controller
                 'observations' => $observations
             ];
             $this->farm->update_provider($farm_id, $data);
-            if(!$farms){
+            if (!$farms) {
 
                 $data_min = [
                     'owner' => $owner,
@@ -166,7 +166,7 @@ class Farm extends CI_Controller
                     'name_commercial' => $name_commercial
                 ];
 
-                $this->farm->update_farm_sons($farm_id,$data_min);
+                $this->farm->update_farm_sons($farm_id, $data_min);
             }
             $this->response->set_message(translate("data_update_ok"), ResponseMessage::SUCCESS);
             redirect("farm/index_provider", "location", 301);
@@ -447,7 +447,7 @@ class Farm extends CI_Controller
         ];
         $this->farm->update_provider($farm_id, $data);
         $farm = $this->farm->get_provider_by_id($farm_id);
-        echo json_encode(['status' => 200, 'msj' => 'correcto','data'=>$farm->varieties]);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $farm->varieties]);
         exit();
     }
     public function delete_variety()

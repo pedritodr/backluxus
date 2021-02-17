@@ -1327,7 +1327,6 @@
                 varietiesLoad = varieties;
             }
             varietiesLoad = JSON.stringify(varietiesLoad);
-            console.log(varietiesLoad);
            // return
             setTimeout(function() {
                 $.ajax({
@@ -1415,11 +1414,10 @@
                             })
                             setTimeout(function() {
                                 varietiesLoad = result.data;
-                                console.log(varietiesLoad);
-                                loadVarieties(farmId, result.data, '0');
+                                loadVarieties(variety.farmId, result.data, '0');
                                 productsLoad = null;
                                 $('#product').empty();
-                                $('#btnManageVariety').attr('onclick', 'loadVarieties("' + farmId + '","' + encodeB64Utf8(JSON.stringify(result.data)) + '","1")');
+                                $('#btnManageVariety').attr('onclick', 'loadVarieties("' + variety.farmId + '","' + encodeB64Utf8(JSON.stringify(result.data)) + '","1")');
                             }, 1000);
                         } else {
                             swal({
