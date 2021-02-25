@@ -111,24 +111,27 @@
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" href="<?= site_url('user/update_index_client/' . $item->user_id); ?>" class="btn btn-warning"><i class="fa fa-edit"></i> <?= translate("edit_lang"); ?></a>
                                                         <a class="dropdown-item" href="<?= site_url('user/change_status/' . $item->user_id); ?>" class="btn btn-warning"><i class="fa fa-edit"></i> <?= translate("change_lang"); ?></a>
+                                                        <?php $address = null; ?>
                                                         <?php if (isset($item->address)) { ?>
                                                             <?php if (!$item->address) { ?>
+                                                                <?php $address = $item->address; ?>
                                                                 <a style="cursor:pointer" onclick="addAdress('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("add_location_lang"); ?></a>
                                                             <?php } else { ?>
+                                                                <?php $address = $item->address; ?>
                                                                 <a style="cursor:pointer" onclick="editAdress('<?= base64_encode(json_encode($item->address)); ?>','<?= $item->user_id ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("edit_location_lang"); ?></a>
                                                             <?php } ?>
                                                         <?php } else { ?>
                                                             <a style="cursor:pointer" onclick="addAdress('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("add_location_lang"); ?></a>
                                                         <?php } ?>
-
+                                                        <?php $array = [] ?>
                                                         <?php if (isset($item->markings)) {
                                                             if (count($item->markings) > 0) { ?>
-                                                                <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->markings)) ?>','1');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
+                                                                <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>','<?= base64_encode(json_encode($item->markings)) ?>','1','<?= base64_encode(json_encode($address)) ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
                                                             <?php } else { ?>
-                                                                <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
+                                                                <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>','<?= base64_encode(json_encode($array)) ?>','1','<?= base64_encode(json_encode($address)) ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
                                                             <?php } ?>
                                                         <?php } else { ?>
-                                                            <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
+                                                            <a id="btnActionMarking" style="cursor:pointer" onclick="loadMarkings('<?= $item->user_id; ?>','<?= base64_encode(json_encode($array)) ?>','1','<?= base64_encode(json_encode($address)) ?>');" class="dropdown-item"><i class="fa fa-remove"></i> <?= translate("markings_lang"); ?></a>
                                                         <?php } ?>
                                                         <?php if (isset($item->managers)) {
                                                             if (count($item->managers) > 0) { ?>
@@ -269,20 +272,20 @@
                         </div>
                     </div>
                     <div class="col-lg-12">
-                        <label><?= translate("address_lang"); ?></label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
-                            <input required type="text" class="form-control input-sm" id="address" name="address" placeholder="<?= translate('address_lang'); ?>">
+                        <div class="form-group">
+                            <label class="control-label"><?= translate('comment_lang') ?></label>
+                            <div id="editor-container1" class="form-control"></div>
+                            <textarea style="display:none" name="comment" id="comment" cols="30" rows="10"></textarea>
                         </div>
                     </div>
                     <div class="col-lg-12">
                         <label><?= translate("countrys_lang"); ?></label>
                         <div class="input-group">
                             <select id="countryMarking" name="countryMarking" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
                                 <?php if ($countrys) { ?>
                                     <?php foreach ($countrys as $item) { ?>
-                                        <option itemId="<?= $item->country_id ?>" value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                        <option value="<?= $item->country_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
                                     <?php   } ?>
                                 <?php } ?>
                             </select>
@@ -325,10 +328,10 @@
                         </div>
                     </div>
                     <div class="col-lg-12">
-                        <label><?= translate("address_lang"); ?></label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
-                            <input required type="text" class="form-control input-sm" id="addressEdit" placeholder="<?= translate('address_lang'); ?>">
+                        <div class="form-group">
+                            <label class="control-label"><?= translate('comment_lang') ?></label>
+                            <div id="editor-container1Edit" class="form-control"></div>
+                            <textarea style="display:none" name="commentEdit" id="commentEdit" cols="30" rows="10"></textarea>
                         </div>
                     </div>
                     <div class="col-lg-12">
@@ -367,7 +370,7 @@
     </div>
 </div>
 <div class="modal fade" id="modalMarings" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel"><?= translate('markings_lang') ?></h5> <a id="btnAddMarking" onclick="" class="btn btn-primary"><i class="fa fa-plus-circle"></i> <?= translate('add_marking_lang'); ?>
@@ -594,14 +597,40 @@
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
+    let quill;
+    let quillEdit;
     $(() => {
-
+        quill = new Quill('#editor-container1', {
+            modules: {
+                toolbar: [
+                    [{
+                        header: [1, 2, false]
+                    }],
+                    ['bold', 'italic', 'underline'],
+                    ['image', 'code-block']
+                ]
+            },
+            placeholder: '<?= translate("comment_lang"); ?>...',
+            theme: 'snow' // or 'bubble'
+        });
+        quillEdit = new Quill('#editor-container1Edit', {
+            modules: {
+                toolbar: [
+                    [{
+                        header: [1, 2, false]
+                    }],
+                    ['bold', 'italic', 'underline'],
+                    ['image', 'code-block']
+                ]
+            },
+            placeholder: '<?= translate("comment_lang"); ?>...',
+            theme: 'snow' // or 'bubble'
+        });
         $("#example1").DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
             }
         });
-
     });
     $('[name=countryMarking]').change(() => {
         $('#citysMarking').prop('disabled', true);
@@ -892,13 +921,54 @@
             }, 1500)
         }
     }
-    const addMarking = (userId) => {
-        $('#citysMarking').prop('disabled', true);
+    const addMarking = (userId, address) => {
+        address = decodeB64Utf8(address);
+        address = JSON.parse(address);
+        if (address) {
+            $('#countryMarking').val(address.country_id);
+            let country = $('select[name=countryMarking] option').filter(':selected').attr('itemId');
+            if (country != 0) {
+                country = JSON.parse(decodeB64Utf8(country));
+                if (country.citys.length > 0) {
+                    let cadena = ' <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
+                    country.citys.forEach(item => {
+                        if (address.city.city_id == item.city_id) {
+                            cadena += '<option selected itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.city_id + '">' + item.name + '</option>'
+                        } else {
+                            cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.city_id + '">' + item.name + '</option>'
+                        }
+                    });
+                    $('#citysMarking').append(cadena);
+                    $('#citysMarking').prop('disabled', false);
+                } else {
+                    swal({
+                        title: '¡Error!',
+                        text: 'El país se encuentra sin ciudades',
+                        padding: '2em'
+                    });
+                }
+            } else {
+                const toast = swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    padding: '2em'
+                });
+                toast({
+                    type: 'error',
+                    title: 'Seleccione un país para continuar ',
+                    padding: '2em',
+                })
+            }
+        } else {
+            $('#citysMarking').prop('disabled', true);
+        }
         $('#clienteMarking').val(userId);
         $('#modalMarings').modal('hide');
         $('#modalAddMarking').modal({
             backdrop: false
-        })
+        });
     }
     const editMarking = (objectMarking) => {
 
@@ -906,7 +976,11 @@
         objectMarking = JSON.parse(objectMarking);
         $("#modalMarings").modal('hide');
         $('#clienteMarkingEdit').val(objectMarking.userId);
-        $('#addressEdit').val(objectMarking.address);
+        if (typeof objectMarking.comment !== 'undefined') {
+            if (objectMarking.comment != '') {
+                $('#editor-container1Edit').html(objectMarking.comment);
+            }
+        }
         $('#nameMarkingEdit').val(objectMarking.name_marking);
         $('#countryMarkingEdit').val(objectMarking.country.country_id);
         $('#markingId').val(objectMarking.marking_id);
@@ -951,11 +1025,11 @@
     }
     const submitAddMarking = () => {
         $('#btnCancelModalAddMarking').prop('disabled', true);
-        let country = $('select[name=countryMarking] option').filter(':selected').val();
-        let city = $('select[name=citysMarking] option').filter(':selected').val();
+        let country = $('select[name=countryMarking] option').filter(':selected').attr('itemId');;
+        let city = $('select[name=citysMarking] option').filter(':selected').attr('itemId');
         let userIdAdd = $('#clienteMarking').val();
         let nameMarking = $('#nameMarking').val();
-        let address = $('#address').val();
+        let comment = $('#editor-container1').text();
         if (nameMarking == '') {
             const toast = swal.mixin({
                 toast: true,
@@ -1017,7 +1091,7 @@
                         objectCountry,
                         userIdAdd,
                         nameMarking,
-                        address
+                        comment
                     },
                     success: function(result) {
                         result = JSON.parse(result);
@@ -1060,13 +1134,13 @@
             }, 1500)
         }
     }
-    const loadMarkings = (user_id, markings = [], type = 0) => {
+    const loadMarkings = (user_id, markings = [], type = 0, address = null) => {
         if (type == "1") {
             markings = decodeB64Utf8(markings);
             markings = JSON.parse(markings);
         }
         $("#modalMarings").modal('show');
-        $('#btnAddMarking').attr('onclick', 'addMarking("' + user_id + '")');
+        $('#btnAddMarking').attr('onclick', 'addMarking("' + user_id + '","' + address + '")');
         $("#bodyModalMarkings").empty();
         if (markings.length > 0) {
             let texto_tabla = '';
@@ -1074,6 +1148,7 @@
             texto_tabla += '<thead>';
             texto_tabla += '<tr>';
             texto_tabla += '<th>Marking</th>';
+            texto_tabla += '<th>Comentario</th>';
             texto_tabla += '<th>Acciones</th>';
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
@@ -1083,11 +1158,14 @@
                 texto_tabla += '<tr>';
                 texto_tabla += '<td>';
                 texto_tabla += '<p><b><?= translate('marking_lang') ?>: </b> ' + item.name_marking + '</p>';
-                texto_tabla += '<p><b><?= translate('address_lang') ?>: </b> ' + item.address + '</p>';
                 texto_tabla += '<p><b><?= translate('country_lang') ?>: </b> ' + item.country.name + '</p>';
                 texto_tabla += '<p><b><?= translate('ciudad_lang') ?>: </b> ' + item.country.city.name + '</p>';
                 texto_tabla += '</td>';
-
+                texto_tabla += '<td>';
+                if (typeof item.comment !== 'undefined') {
+                    texto_tabla += '<p>' + item.comment + '</p>';
+                }
+                texto_tabla += ' </td>'
                 texto_tabla += '<td>';
 
                 texto_tabla += '<a class="btn btn-primary" href="javascript:void(0);"  onclick=editMarking("' + encodeB64Utf8(JSON.stringify(item)) + '");> Editar</a>';
@@ -1097,7 +1175,6 @@
                 texto_tabla += '</tr>';
             });
             texto_tabla += '</tbody>';
-
             texto_tabla += '</table>'
             $("#bodyModalMarkings").html(texto_tabla);
             $("#datatablesMarkings").DataTable({
@@ -1125,13 +1202,14 @@
     $('[name=countryMarkingEdit]').change(() => {
         $('#citysMarkingEdit').prop('disabled', true);
         $('#citysMarkingEdit').empty();
-        let country = $('select[name=countryMarkingEdit] option').filter(':selected').val();
+        let country = $('select[name=countryMarkingEdit] option').filter(':selected').attr('itemId');
+        console.log(country);
         if (country != 0) {
             country = JSON.parse(decodeB64Utf8(country));
             if (country.citys.length > 0) {
-                let cadena = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                let cadena = ' <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
                 country.citys.forEach(item => {
-                    cadena += '<option value="' + encodeB64Utf8(JSON.stringify(item)) + '" itemId="' + item.city_id + '">' + item.name + '</option>'
+                    cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.city_id + '">' + item.name + '</option>'
                 });
                 $('#citysMarkingEdit').append(cadena);
                 $('#citysMarkingEdit').prop('disabled', false);
@@ -1161,10 +1239,10 @@
     const submitEditMarking = () => {
         $('#btnCancelModalEditMarking').prop('disabled', true);
         let country = $('select[name=countryMarkingEdit] option').filter(':selected').attr('itemId');
-        let city = $('select[name=citysMarkingEdit] option').filter(':selected').val();
+        let city = $('select[name=citysMarkingEdit] option').filter(':selected').attr('itemId');
         let userIdAdd = $('#clienteMarkingEdit').val();
         let nameMarking = $('#nameMarkingEdit').val();
-        let address = $('#addressEdit').val();
+        let comment = $('#editor-container1Edit').text();
         let markingId = $('#markingId').val();
         if (nameMarking == '') {
             const toast = swal.mixin({
@@ -1227,7 +1305,7 @@
                         objectCountry,
                         userIdAdd,
                         nameMarking,
-                        address,
+                        comment,
                         markingId
                     },
                     success: function(result) {

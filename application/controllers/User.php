@@ -234,7 +234,7 @@ class User extends CI_Controller
                 'is_active' => 1
             ];
             $this->user->update($user_id, $data_user);
-            if($role!=3){
+            if ($role != 3) {
                 $this->user->update_user_person($user_id, $data_user);
                 $this->load->model('Farm_model', 'farm');
                 $this->farm->update_user_person($user_id, $data_user);
@@ -438,9 +438,9 @@ class User extends CI_Controller
         $nameMarking = $this->input->post('nameMarking');
         $userIdAdd = $this->input->post('userIdAdd');
         $objectCountry = $this->input->post('objectCountry');
-        $address = $this->input->post('address');
+        $comment = $this->input->post('comment');
         $marking = 'mk_' . uniqid();
-        $data = ['marking_id' => $marking, 'name_marking' => $nameMarking, 'is_active' => 1, 'address' => $address, 'country' => $objectCountry];
+        $data = ['marking_id' => $marking, 'name_marking' => $nameMarking, 'is_active' => 1, 'comment' => $comment, 'country' => $objectCountry];
         $response = $this->user->create_marking($userIdAdd, $data);
         $user_object = $this->user->get_by_id($userIdAdd);
         if ($response) {
@@ -464,9 +464,9 @@ class User extends CI_Controller
         $nameMarking = $this->input->post('nameMarking');
         $userIdAdd = $this->input->post('userIdAdd');
         $objectCountry = $this->input->post('objectCountry');
-        $address = $this->input->post('address');
+        $comment = $this->input->post('comment');
         $marking =  $this->input->post('markingId');
-        $data = ['markings.$.name_marking' => $nameMarking, 'markings.$.address' => $address, 'markings.$.country' => $objectCountry];
+        $data = ['markings.$.name_marking' => $nameMarking, 'markings.$.comment' => $comment, 'markings.$.country' => $objectCountry];
         $response = $this->user->update_marking($marking, $data);
         $user_object = $this->user->get_by_id($userIdAdd);
         if ($response) {
