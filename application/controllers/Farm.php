@@ -23,8 +23,10 @@ class Farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
+        $this->load->model('role_model', 'rol');
         $this->load->model('User_model', 'user');
         $this->load->model('Country_model', 'country');
+        $roles = $this->rol->get_all(['is_active' => 1]);
         $all_providers = $this->farm->get_all_providers(['is_active' => 1]);
         foreach ($all_providers as $item) {
             if (!$item->farm_father) {
@@ -35,6 +37,7 @@ class Farm extends CI_Controller
         $data['countrys'] = $this->country->get_all_countrys_farms();
         $data['users_luxus'] = $users_luxus;
         $data['all_providers'] = $all_providers;
+        $data['roles'] = $roles;
         $this->load_view_admin_g("farm/index", $data);
     }
 
@@ -44,8 +47,12 @@ class Farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
+        $this->load->model('Country_model', 'country');
+        $country_id = 'country_5fe0e59bdfb97';
+        $citys = $this->country->get_all_citys($country_id);
         $all_providers = $this->farm->get_all_farm_father();
         $data['farms'] = $all_providers;
+        $data['citys'] = $citys;
         $this->load_view_admin_g('farm/add', $data);
     }
 
@@ -55,8 +62,8 @@ class Farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-
-        $owner = $this->input->post('owner');
+        $this->load->model('Country_model', 'country');
+        //  $owner = $this->input->post('owner');
         $days = $this->input->post('days');
         $name_legal = $this->input->post('name_legal');
         $name_commercial = $this->input->post('name_commercial');
@@ -64,16 +71,15 @@ class Farm extends CI_Controller
         $address_office = $this->input->post('address_office');
         $hectare = $this->input->post('hectare');
         $farm = $this->input->post('farms');
-
+        $city = $this->input->post('citys');
         $observations = $this->input->post('desc');
         $farms = false;
         if ($farm != '0') {
             $farms = $this->farm->get_min_farm_by_id($farm);
         }
-
-        $this->form_validation->set_rules('owner', translate('owner_lang'), 'required');
-        $this->form_validation->set_rules('days', translate('owner_lang'), 'required');
-        $this->form_validation->set_rules('name_legal', translate('name_legal_lang'), 'required');
+        if ($city != '0') {
+            $city = $this->country->get_citys_by_id($city);
+        }
         $this->form_validation->set_rules('name_commercial', translate('name_commercial_lang'), 'required');
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
@@ -82,7 +88,6 @@ class Farm extends CI_Controller
             $farm_id = 'farm_' . uniqid();
             $data = [
                 'farm_id' => $farm_id,
-                'owner' => $owner,
                 'days_credit' => $days,
                 'farm_father' => $farms,
                 'name_legal' => $name_legal,
@@ -92,6 +97,7 @@ class Farm extends CI_Controller
                 'address_office' => $address_office,
                 'hectare' => $hectare,
                 'observations' => $observations,
+                'city' => $city,
                 'is_active' => 1
             ];
             $this->farm->create_provider($data);
@@ -105,12 +111,15 @@ class Farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-
         $provider_obj = $this->farm->get_provider_by_id($provider_id);
         if ($provider_obj) {
+            $this->load->model('Country_model', 'country');
+            $country_id = 'country_5fe0e59bdfb97';
+            $citys = $this->country->get_all_citys($country_id);
             $all_providers = $this->farm->get_all_farm_father_edit($provider_id);
             $data['farms'] = $all_providers;
             $data['provider_obj'] = $provider_obj;
+            $data['citys'] = $citys;
             $this->load_view_admin_g('farm/update', $data);
         } else {
             show_404();
@@ -122,8 +131,8 @@ class Farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
+        $this->load->model('Country_model', 'country');
         $farm_id = $this->input->post('farm_id');
-        $owner = $this->input->post('owner');
         $days = $this->input->post('days');
         $name_legal = $this->input->post('name_legal');
         $name_commercial = $this->input->post('name_commercial');
@@ -131,23 +140,21 @@ class Farm extends CI_Controller
         $address_office = $this->input->post('address_office');
         $hectare = $this->input->post('hectare');
         $farm = $this->input->post('farms');
-
+        $city = $this->input->post('citys');
         $observations = $this->input->post('desc');
         $farms = false;
         if ($farm != '0') {
             $farms = $this->farm->get_min_farm_by_id($farm);
         }
-
-        $this->form_validation->set_rules('owner', translate('owner_lang'), 'required');
-        $this->form_validation->set_rules('days', translate('owner_lang'), 'required');
-        $this->form_validation->set_rules('name_legal', translate('name_legal_lang'), 'required');
+        if ($city != '0') {
+            $city = $this->country->get_citys_by_id($city);
+        }
         $this->form_validation->set_rules('name_commercial', translate('name_commercial_lang'), 'required');
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
             redirect("farm/update_index_provider/" . $farm_id);
         } else {
             $data = [
-                'owner' => $owner,
                 'days_credit' => $days,
                 'farm_father' => $farms,
                 'name_legal' => $name_legal,
@@ -155,17 +162,15 @@ class Farm extends CI_Controller
                 'address_farm' => $address_farm,
                 'address_office' => $address_office,
                 'hectare' => $hectare,
-                'observations' => $observations
+                'observations' => $observations,
+                'city' => $city,
             ];
             $this->farm->update_provider($farm_id, $data);
             if (!$farms) {
-
                 $data_min = [
-                    'owner' => $owner,
                     'name_legal' => $name_legal,
                     'name_commercial' => $name_commercial
                 ];
-
                 $this->farm->update_farm_sons($farm_id, $data_min);
             }
             $this->response->set_message(translate("data_update_ok"), ResponseMessage::SUCCESS);
@@ -314,13 +319,14 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
-
+        $this->load->model('Role_model', 'rol');
         $name = $this->input->post('name');
         $email = $this->input->post('email');
         $phone = $this->input->post('phone');
         $skype = $this->input->post('skype');
         $farm_id = $this->input->post('farmId');
         $function = $this->input->post('functions');
+        $objFuction = $this->rol->get_by_id($function);
         $person_id = 'person_' . uniqid();
         $data = [
             'person_id' => $person_id,
@@ -330,7 +336,7 @@ class Farm extends CI_Controller
             'phone' => $phone,
             'is_active' => 1,
             'farm_id' => $farm_id,
-            'function' => (int)$function
+            'function' => $objFuction
         ];
         $this->farm->create_person($farm_id, $data);
         $farm = $this->farm->get_provider_by_id($farm_id);
@@ -348,6 +354,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
+        $this->load->model('Role_model', 'rol');
         $name = $this->input->post('name');
         $phone = $this->input->post('phone');
         $skype = $this->input->post('skype');
@@ -355,13 +362,13 @@ class Farm extends CI_Controller
         $person_id = $this->input->post('personId');
         $farm_id = $this->input->post('farmId');
         $function = $this->input->post('functions');
-
+        $objFuction = $this->rol->get_by_id($function);
         $data = [
             'name' => $name,
             'skype' => $skype,
             'phone' => $phone,
             'email' => $email,
-            'function' => (int)$function
+            'function' => $objFuction
         ];
         $this->farm->update_person($person_id, $data);
         $farm = $this->farm->get_provider_by_id($farm_id);

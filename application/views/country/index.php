@@ -2,12 +2,15 @@
     .nav-margin-bottom {
         margin-bottom: 20px;
     }
+
     #modalAddCity {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
+
     #modalEditCity {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
+
     #modalCitys {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
@@ -128,7 +131,7 @@
     </div>
 </div>
 <div class="modal fade" id="modalCitys" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel"><?= translate('citys_lang') ?></h5>
@@ -164,7 +167,7 @@
             }
         })
     }
-    $(()=> {
+    $(() => {
         $("#example1").DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
@@ -224,7 +227,7 @@
                                     title: '¡Correcto!',
                                     padding: '2em',
                                 })
-                                loadCitys(result.citys,0);
+                                loadCitys(result.citys, 0);
                             } else {
                                 swal({
                                     title: '¡Error!',
@@ -286,7 +289,7 @@
                                 title: '¡Correcto!',
                                 padding: '2em',
                             })
-                            loadCitys(result.citys,0);
+                            loadCitys(result.citys, 0);
                         } else {
                             swal({
                                 title: '¡Error!',
@@ -302,10 +305,10 @@
             }, 1500)
         }
     }
-    const loadCitys = (citys=[],type=0) => {
-        if(type=="1"){
+    const loadCitys = (citys = [], type = 0) => {
+        if (type == "1") {
             citys = decodeB64Utf8(citys);
-        citys = JSON.parse(citys);
+            citys = JSON.parse(citys);
         }
         $("#modalCitys").modal('show');
         $("#bodyModalCitys").empty();
@@ -403,7 +406,7 @@
                                 title: '¡Correcto!',
                                 padding: '2em',
                             })
-                            loadCitys(result.citys,0);
+                            loadCitys(result.citys, 0);
                         } else {
                             swal({
                                 title: '¡Error!',

@@ -16,52 +16,6 @@
                     <?= form_open_multipart("farm/update_provider"); ?>
                     <div class="row">
                         <input type="hidden" name="farm_id" value="<?= $provider_obj->farm_id ?>">
-                        <div class="col-lg-3">
-                            <label><?= translate("owner_lang"); ?></label>
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm" id="owner" name="owner" value="<?= $provider_obj->owner ?>" required placeholder="<?= translate('owner_lang'); ?>">
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <label><?= translate("days_credit_lang"); ?></label>
-                            <div class="input-group">
-                                <input type="number" min="0" class="form-control input-sm" id="days" name="days" value="<?= $provider_obj->days_credit ?>" required placeholder="<?= translate('days_credit_lang'); ?>">
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <label><?= translate("hectare_lang"); ?></label>
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm" id="hectare" name="hectare" value="<?= $provider_obj->hectare ?>"  required placeholder="<?= translate('hectare_lang'); ?>">
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <label><?= translate("farms_lang"); ?></label>
-                            <div class="input-group">
-                                <select id="farms" name="farms" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                    <option value="0"><?= translate('not_group_lang') ?></option>
-                                    <?php if (isset($farms)) { ?>
-                                        <?php if ($farms) { ?>
-                                        <?php if($provider_obj->farm_father){?>
-                                            <?php foreach ($farms as $item) { ?>
-                                                <option itemId="<?= base64_encode(json_encode($item)) ?>" <?php if($provider_obj->farm_father->farm_id==$item->farm_id){?> selected <?php }?> value="<?= $item->farm_id ?>"><?= $item->name_legal . ' - ' . $item->name_commercial ?></option>
-                                            <?php } ?>
-                                        <?php }else {?>
-                                            <?php foreach ($farms as $item) { ?>
-                                                <option itemId="<?= base64_encode(json_encode($item)) ?>" value="<?= $item->farm_id ?>"><?= $item->name_legal . ' - ' . $item->name_commercial ?></option>
-                                            <?php } ?>
-                                        <?php } ?>
-
-                                        <?php } ?>
-                                    <?php } ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <label><?= translate("name_legal_lang"); ?></label>
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm" id="name_legal" name="name_legal" value="<?= $provider_obj->name_legal ?>" required placeholder="<?= translate('name_legal_lang'); ?>">
-                            </div>
-                        </div>
                         <div class="col-lg-6">
                             <label><?= translate("name_commercial_lang"); ?></label>
                             <div class="input-group">
@@ -69,17 +23,85 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
+                            <label><?= translate("name_legal_lang"); ?></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" id="name_legal" name="name_legal" value="<?= $provider_obj->name_legal ?>" placeholder="<?= translate('name_legal_lang'); ?>">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
                             <label><?= translate("address_farm_lang"); ?></label>
                             <div class="input-group">
-                                <input type="text" class="form-control input-sm" id="address_farm" name="address_farm" value="<?= $provider_obj->address_farm ?>" required placeholder="<?= translate('address_farm_lang'); ?>">
+                                <input type="text" class="form-control input-sm" id="address_farm" name="address_farm" value="<?= $provider_obj->address_farm ?>" placeholder="<?= translate('address_farm_lang'); ?>">
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <label><?= translate("address_oficce_lang"); ?></label>
                             <div class="input-group">
-                                <input type="text" class="form-control input-sm" id="address_office" name="address_office" value="<?= $provider_obj->address_office ?>" required placeholder="<?= translate('address_oficce_lang'); ?>">
+                                <input type="text" class="form-control input-sm" id="address_office" name="address_office" value="<?= $provider_obj->address_office ?>" placeholder="<?= translate('address_oficce_lang'); ?>">
                             </div>
                         </div>
+                        <div class="col-lg-3">
+                            <label><?= translate("citys_lang"); ?></label>
+                            <div class="input-group">
+                                <select id="citys" name="citys" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                    <option value="0"><?= translate('select_opction_lang') ?></option>
+                                    <?php if (isset($citys)) { ?>
+                                        <?php if ($citys) { ?>
+                                            <?php if (isset($provider_obj->city)) { ?>
+                                                <?php if ($provider_obj->city != '0') { ?>
+                                                    <?php foreach ($citys as $item) { ?>
+                                                        <option value="<?= $item->city_id ?>" <?php if ($item->city_id == $provider_obj->city->city_id) { ?> selected <?php } ?>><?= $item->name ?></option>
+                                                    <?php } ?>
+                                                <?php } else { ?>
+                                                    <?php foreach ($citys as $item) { ?>
+                                                        <option value="<?= $item->city_id ?>"><?= $item->name ?></option>
+                                                    <?php } ?>
+                                                <?php } ?>
+                                            <?php } else { ?>
+                                                <?php foreach ($citys as $item) { ?>
+                                                    <option value="<?= $item->city_id ?>"><?= $item->name ?></option>
+                                                <?php } ?>
+                                            <?php } ?>
+                                        <?php } ?>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label><?= translate("days_credit_lang"); ?></label>
+                            <div class="input-group">
+                                <input type="number" min="0" class="form-control input-sm" id="days" name="days" value="<?= $provider_obj->days_credit ?>" placeholder="<?= translate('days_credit_lang'); ?>">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label><?= translate("hectare_lang"); ?></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" id="hectare" name="hectare" value="<?= $provider_obj->hectare ?>" placeholder="<?= translate('hectare_lang'); ?>">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label><?= translate("farms_lang"); ?></label>
+                            <div class="input-group">
+                                <select id="farmsId" name="farms" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                    <option value="0"><?= translate('not_group_lang') ?></option>
+                                    <?php if (isset($farms)) { ?>
+                                        <?php if ($farms) { ?>
+                                            <?php if ($provider_obj->farm_father) { ?>
+                                                <?php foreach ($farms as $item) { ?>
+                                                    <option itemId="<?= base64_encode(json_encode($item)) ?>" <?php if ($provider_obj->farm_father->farm_id == $item->farm_id) { ?> selected <?php } ?> value="<?= $item->farm_id ?>"><?= $item->name_legal . ' - ' . $item->name_commercial ?></option>
+                                                <?php } ?>
+                                            <?php } else { ?>
+                                                <?php foreach ($farms as $item) { ?>
+                                                    <option itemId="<?= base64_encode(json_encode($item)) ?>" value="<?= $item->farm_id ?>"><?= $item->name_legal . ' - ' . $item->name_commercial ?></option>
+                                                <?php } ?>
+                                            <?php } ?>
+
+                                        <?php } ?>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="control-label"><?= translate('observations_lang') ?></label>
@@ -107,14 +129,27 @@
 
 </div><!-- /.content-wrapper -->
 <script>
-  const encodeB64Utf8 = (str) => {
+    const encodeB64Utf8 = (str) => {
         return btoa(unescape(encodeURIComponent(str)));
     }
+
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
+
     let quill;
+
     $(() => {
+        $("#citys").select2({
+            tags: true,
+            placeholder: '<?= translate('select_opction_lang') ?>',
+        });
+
+        $("#farmsId").select2({
+            tags: true,
+            placeholder: '<?= translate('not_group_lang') ?>',
+        });
+
         quill = new Quill('#editor-container1', {
             modules: {
                 toolbar: [
@@ -128,33 +163,31 @@
             theme: 'snow' // or 'bubble'
         });
     })
+
     let form = document.querySelector('form');
+
     form.onsubmit = function() {
         let contenido = $('#editor-container1').text();
         $('#desc').html(contenido);
     }
+
     $('[name=farms]').change(() => {
         let farms = $('select[name=farms] option').filter(':selected').attr('itemId');
         if (farms != 0) {
             farms = JSON.parse(decodeB64Utf8(farms));
-            $('#owner').val(farms.owner);
             $('#days').val(farms.days_credit);
             $('#hectare').val(farms.hectare);
             $('#name_legal').val();
             $('#name_commercial').val();
             $('#address_farm').val(farms.address_farm);
             $('#address_office').val(farms.address_office);
-            $('#editor-container1').text(farms.observations);
-        }else{
-            $('#owner').val("");
+        } else {
             $('#days').val("");
             $('#hectare').val("");
             $('#name_legal').val();
             $('#name_commercial').val();
             $('#address_farm').val("");
             $('#address_office').val("");
-            $('#editor-container1').text("");
-
         }
     })
 </script>

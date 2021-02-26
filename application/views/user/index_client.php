@@ -338,7 +338,7 @@
                         <label><?= translate("countrys_lang"); ?></label>
                         <div class="input-group">
                             <select id="countryMarkingEdit" name="countryMarkingEdit" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
                                 <?php if ($countrys) { ?>
                                     <?php foreach ($countrys as $item) { ?>
                                         <option value="<?= $item->country_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
@@ -351,7 +351,7 @@
                         <label><?= translate("citys_lang"); ?></label>
                         <div class="input-group">
                             <select id="citysMarkingEdit" name="citysMarkingEdit" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
                             </select>
                         </div>
                     </div>
@@ -555,6 +555,7 @@
             }
         })
     }
+
     const addAdress = (userId) => {
         $('#citys').prop('disabled', true);
         $('#userIdAdd').val(userId);
@@ -562,6 +563,7 @@
             backdrop: false
         })
     }
+
     const editAdress = (address, userId) => {
         address = JSON.parse(decodeB64Utf8(address));
         console.log(address)
@@ -591,14 +593,18 @@
             });
         }
     }
+
     const encodeB64Utf8 = (str) => {
         return btoa(unescape(encodeURIComponent(str)));
     }
+
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
+
     let quill;
     let quillEdit;
+
     $(() => {
         quill = new Quill('#editor-container1', {
             modules: {
@@ -632,6 +638,7 @@
             }
         });
     });
+
     $('[name=countryMarking]').change(() => {
         $('#citysMarking').prop('disabled', true);
         $('#citysMarking').empty();
@@ -668,6 +675,7 @@
         }
 
     })
+
     $('[name=countryEdit]').change(() => {
         $('#citys').prop('disabled', true);
         $('#citysEdit').empty();
@@ -704,6 +712,7 @@
         }
 
     })
+
     $('[name=country]').change(() => {
         $('#citys').prop('disabled', true);
         $('#citys').empty();
@@ -740,6 +749,7 @@
         }
 
     })
+
     const submitAddAddress = () => {
         $('#btnCancelModalAddAddress').prop('disabled', true);
         let country = $('select[name=country] option').filter(':selected').val();
@@ -831,6 +841,7 @@
             }, 1500)
         }
     }
+
     const submitEditAddress = () => {
         $('#btnCancelModalEditAddress').prop('disabled', true);
         let country = $('select[name=countryEdit] option').filter(':selected').attr('itemId');
@@ -921,6 +932,7 @@
             }, 1500)
         }
     }
+
     const addMarking = (userId, address) => {
         address = decodeB64Utf8(address);
         address = JSON.parse(address);
@@ -970,6 +982,12 @@
             backdrop: false
         });
     }
+
+    const initQuill = (html) => {
+        let delta = quillEdit.clipboard.convert(html);
+        quillEdit.setContents(delta, 'silent');
+    }
+
     const editMarking = (objectMarking) => {
 
         objectMarking = decodeB64Utf8(objectMarking);
@@ -978,7 +996,7 @@
         $('#clienteMarkingEdit').val(objectMarking.userId);
         if (typeof objectMarking.comment !== 'undefined') {
             if (objectMarking.comment != '') {
-                $('#editor-container1Edit').html(objectMarking.comment);
+                initQuill(objectMarking.comment);
             }
         }
         $('#nameMarkingEdit').val(objectMarking.name_marking);
@@ -991,9 +1009,9 @@
                 let cadena = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
                 country.citys.forEach(item => {
                     if (objectMarking.country.city.city_id == item.city_id) {
-                        cadena += '<option selected value="' + encodeB64Utf8(JSON.stringify(item)) + '" itemId="' + item.city_id + '">' + item.name + '</option>'
+                        cadena += '<option selected itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.city_id + '">' + item.name + '</option>'
                     } else {
-                        cadena += '<option value="' + encodeB64Utf8(JSON.stringify(item)) + '" itemId="' + item.city_id + '">' + item.name + '</option>'
+                        cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.city_id + '">' + item.name + '</option>'
                     }
                 });
                 $('#citysMarkingEdit').append(cadena);
@@ -1023,6 +1041,7 @@
             backdrop: false
         })
     }
+
     const submitAddMarking = () => {
         $('#btnCancelModalAddMarking').prop('disabled', true);
         let country = $('select[name=countryMarking] option').filter(':selected').attr('itemId');;
@@ -1134,6 +1153,7 @@
             }, 1500)
         }
     }
+
     const loadMarkings = (user_id, markings = [], type = 0, address = null) => {
         if (type == "1") {
             markings = decodeB64Utf8(markings);
@@ -1187,23 +1207,25 @@
         }
 
     }
+
     const cancelaAddMarking = () => {
         $("#modalAddMarking").modal('hide');
         $('#modalMarings').modal({
             backdrop: false
         })
     }
+
     const cancelEditMarking = () => {
         $("#modalEditMarking").modal('hide');
         $('#modalMarings').modal({
             backdrop: false
         })
     }
+
     $('[name=countryMarkingEdit]').change(() => {
         $('#citysMarkingEdit').prop('disabled', true);
         $('#citysMarkingEdit').empty();
         let country = $('select[name=countryMarkingEdit] option').filter(':selected').attr('itemId');
-        console.log(country);
         if (country != 0) {
             country = JSON.parse(decodeB64Utf8(country));
             if (country.citys.length > 0) {
@@ -1236,6 +1258,7 @@
         }
 
     })
+
     const submitEditMarking = () => {
         $('#btnCancelModalEditMarking').prop('disabled', true);
         let country = $('select[name=countryMarkingEdit] option').filter(':selected').attr('itemId');
@@ -1348,6 +1371,7 @@
             }, 1500)
         }
     }
+
     const deleteMarking = function(marking) {
         marking = decodeB64Utf8(marking);
         marking = JSON.parse(marking);
@@ -1400,6 +1424,7 @@
             }
         })
     }
+
     const addManager = (userId) => {
         $('#userIdManager').val(userId);
         $('#modalManagers').modal('hide');
@@ -1407,6 +1432,7 @@
             backdrop: false
         })
     }
+
     const submitAddManager = () => {
         $('#btnCancelModalAddManager').prop('disabled', true);
         let functions = $('select[name=functions] option').filter(':selected').val();
@@ -1522,6 +1548,7 @@
             }, 1500)
         }
     }
+
     const loadManagers = (user_id, managers = [], type = 0) => {
         if (type == "1") {
             managers = decodeB64Utf8(managers);
@@ -1578,6 +1605,7 @@
         }
 
     }
+
     const editManager = (objectManager) => {
 
         objectManager = decodeB64Utf8(objectManager);
@@ -1593,18 +1621,21 @@
             backdrop: false
         })
     }
+
     const cancelEditManager = () => {
         $("#modalEditManagers").modal('hide');
         $('#modalManagers').modal({
             backdrop: false
         })
     }
+
     const cancelAddManager = () => {
         $("#modalAddManagers").modal('hide');
         $('#modalManagers').modal({
             backdrop: false
         })
     }
+
     const submitEditManager = () => {
         $('#btnCancelModalEditManager').prop('disabled', true);
         let functions = $('select[name=functionsEdit] option').filter(':selected').val();
@@ -1722,6 +1753,7 @@
             }, 1500)
         }
     }
+
     const deleteManager = (manager) => {
         manager = decodeB64Utf8(manager);
         manager = JSON.parse(manager);
@@ -1774,6 +1806,7 @@
             }
         })
     }
+
     const loadPersonLuxus = (userId, object) => {
         $('#userIdPerson').val(userId);
         if (object) {
@@ -1786,6 +1819,7 @@
         })
 
     }
+
     const submitPersonLuxus = () => {
         $('#btnCancelModalPersonLuxus').prop('disabled', true);
         let personLuxus = $('select[name=userLuxus] option').filter(':selected').attr('itemId');

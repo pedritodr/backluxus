@@ -66,13 +66,20 @@ class Country_model extends CI_Model
     }
     function get_citys_by_id($id)
     {
-        $fields = [
+        /*     $fields = [
             'citys' => ['$filter'  => ['input' => '$citys', 'as' => 'city', 'cond' => ['$eq' => ['$$city.city_id', $id]]]],
-            '_id' => 1,
+            '_id' => 0,
         ];
         $conditions = [];
-        $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []);
-        return (count($query) > 0) ? (object) $query[0]->citys[0] : false;
+        $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []); */
+        $tuberia = [
+            ['$project' => ['citys' => 1, '_id' => 0]],
+            ['$unwind' => '$citys'],
+            ['$match' => ['citys.city_id' => $id]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('country', $tuberia);
+        return (count($query) > 0) ? (object) $query[0]->citys : false;
     }
     function get_all_citys($country_id)
     {
@@ -80,7 +87,7 @@ class Country_model extends CI_Model
             'citys' => ['$filter'  => ['input' => '$citys', 'as' => 'city', 'cond' => ['$eq' => ['$$city.is_active', 1]]]],
             '_id' => 1,
         ];
-        $conditions = ['is_active'=>1,'country_id'=>$country_id];
+        $conditions = ['is_active' => 1, 'country_id' => $country_id];
         $query      = $this->mongo_db->get_customize_fields('country', $fields, $conditions, false, []);
         $citys = [];
         foreach ($query as $item) {
@@ -120,7 +127,7 @@ class Country_model extends CI_Model
     function get_country_by_cliente($country_id)
     {
         $tuberia = [
-            ['$project' => ['user_id'=>1,'address'=>1]],
+            ['$project' => ['user_id' => 1, 'address' => 1]],
             ['$unwind' => '$address'],
             ['$match' => ['address.country_id' => $country_id]]
         ];

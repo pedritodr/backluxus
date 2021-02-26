@@ -555,6 +555,11 @@ $config['listar_clients_lang'] = "Listar clientes";
 $config['editar_client_lang'] = "Editar cliente";
 $config['add_client_lang'] = "Adicionar cliente";
 
+$config['manage_roles_lang'] = "Gestionar roles";
+$config['listar_roles_lang'] = "Listar roles";
+$config['editar_rol_lang'] = "Editar rol";
+$config['add_rol_lang'] = "Adicionar rol";
+
 $config['cod_lang'] = "Código";
 $config['cods_lang'] = "Códigos";
 $config['manage_cod_lang'] = "Gestionar Códigos";

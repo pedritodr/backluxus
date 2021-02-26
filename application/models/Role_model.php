@@ -1,96 +1,75 @@
 <?php
-
+require 'vendor/autoload.php';
 class Role_model extends CI_Model
 {
 
     function __construct()
     {
-
         parent::__construct();
-        $this->load->database();
+        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
     }
 
     function create($data)
     {
-
-        $this->db->insert('role', $data);
-        $id = $this->db->insert_id();
-        // $this->activelog($id,$data['name'],1);
-        return $id;
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->insert('role', $data);
+        return $newId;
     }
-
-
     function get_by_id($id)
     {
-        $this->db->where('role_id', $id);
-        $query = $this->db->get('role');
-
-        return $query->row();
+        $result = $this->mongo_db->where(['role_id' => $id])->get('role');
+        return (count($result) > 0) ? (object) $result[0] : false;
     }
-
-    function delete($id)
-    {
-        $this->db->where('role_id', $id);
-        $this->db->delete('role');
-        $afec = $this->db->affected_rows();
-
-
-        return $afec;
-    }
-
     function get_all($conditions = [], $get_as_row = FALSE)
     {
-        $this->db->where('role_id !=', 1);
-        foreach ($conditions as $key => $value) {
-            $this->db->where($key, $value);
+        if (count($conditions) > 0) {
+            $result = $this->mongo_db->where($conditions)->get('role');
+        } else {
+            $result = $this->mongo_db->get('role');
         }
-        $query = $this->db->get('role');
-
-        return ($get_as_row) ? $query->row() : $query->result();
+        if ($get_as_row) {
+            if (count($result) > 0) {
+                return (object) $result[0];
+            } else {
+                return false;
+            }
+        } else {
+            return $result;
+        }
     }
-
-
-
     function update($id, $data)
     {
-        $old = $this->get_by_id($id);
-        $this->db->where('role_id', $id);
-        foreach ($data as $key => $value) {
-            $this->db->set($key, $value);
-        }
-        $this->db->update('role');
-        $afec = $this->db->affected_rows();
-
-        if ($afec > 0) {
-            $new = $this->get_by_id($id);
-            // $this->activelog($id, null, 2, $new, $old);
-        }
-
-        return $afec;
+        $result = $this->mongo_db->where('role_id', $id)->set($data)->update('role');
+        return $result;
     }
-
-
-
-
-
-
-
-    public function activelog($id, $field, $action, $new = null, $old = null)
+    function delete($id)
     {
-        $model = 'banner';
-        $this->load->model('Activelog_model', 'activelog');
-        $log = new Activelog_model();
-        $log->model = $model;
-        $log->idModel = $id;
-        $log->field = $field;
-        if ($action == 1)
-            $log->afterSave($log);
-        else if ($action == 2)
-            $log->afterUpdate($log, $new, $old);
-        else if ($action == 3)
-            $log->afterDelete($log);
+        $result = $this->mongo_db->where(['role_id' => $id])->delete('role');
+        return $result;
     }
-
-
+    function update_rol_farm_personal($rol_id, $data)
+    {
+        $query = $this->mongo_db->where('personal.function.role_id', $rol_id)->get('providers');
+        $update = false;
+        foreach ($query as $item) {
+            if (isset($item->personal)) {
+                foreach ($item->personal as $person) {
+                    $result = $this->mongodb->luxus->providers->updateOne(
+                        ['farm_id' => ['$eq' => $item->farm_id]],
+                        ['$set' => [
+                            'personal.$[per].function' => $data,
+                        ]],
+                        ['arrayFilters' => [
+                            ['per.function.role_id' => ['$eq' => $rol_id]],
+                        ]]
+                    );
+                    if ($result) {
+                        $update = true;
+                    }
+                }
+            }
+        }
+        return $update;
+    }
     //------------------------------------------------------------------------------------------------------------------------------------------
 }
