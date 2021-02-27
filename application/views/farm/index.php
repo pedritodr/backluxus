@@ -836,7 +836,6 @@
             $('#functionsEdit').val(0);
             $('#functionsEdit').trigger('change');
         }
-
         $('#personId').val(objectPerson.person_id);
         $('#farmIdEditPerson').val(objectPerson.farmId);
         $('#skypeEditPerson').val(objectPerson.skype)

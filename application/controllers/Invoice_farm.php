@@ -34,6 +34,16 @@ class Invoice_farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
+        $ip = $_SERVER['REMOTE_ADDR'];
+        //$ip = '78.107.156.105';
+        $dataSolicitud = null;
+        try {
+            $informacionSolicitud = file_get_contents("http://www.geoplugin.net/json.gp?ip=" . $ip);
+            $dataSolicitud = json_decode($informacionSolicitud);
+            $dataSolicitud = $dataSolicitud->geoplugin_countryCode;
+        } catch (\Throwable $th) {
+            $dataSolicitud = null;
+        }
         $this->load->model('Farm_model', 'farm');
         $this->load->model('Product_model', 'product');
         $this->load->model('Box_model', 'box');
@@ -41,6 +51,7 @@ class Invoice_farm extends CI_Controller
         $this->load->model('Country_model', 'country');
         $this->load->model('Categoria_model', 'categoria');
         $this->load->model('User_model', 'user');
+        $data['request_server'] = $dataSolicitud;
         $data['categories']  = $this->categoria->get_all(['is_active' => 1]);
         $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
         $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);;
@@ -91,15 +102,15 @@ class Invoice_farm extends CI_Controller
                     foreach ($arrayRequest as $rq) {
                         $encontro = false;
                         foreach ($obj_farm->varieties as $item) {
-                            if($item->product_id == $rq->products->product_id){
-                                $encontro= true;
+                            if ($item->product_id == $rq->products->product_id) {
+                                $encontro = true;
                             }
                         }
-                        if(!$encontro){
-                            $arrayTemp[]=$rq->products;
+                        if (!$encontro) {
+                            $arrayTemp[] = $rq->products;
                         }
                     }
-                    if(count($obj_farm->varieties)!=count($arrayTemp)){
+                    if (count($obj_farm->varieties) != count($arrayTemp)) {
                         $data = [
                             'varieties' => $arrayTemp,
                         ];

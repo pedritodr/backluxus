@@ -417,10 +417,15 @@
                     <div class="col-lg-12">
                         <label><?= translate("functions_lang"); ?></label>
                         <div class="input-group">
-                            <select id="functions" name="functions" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                            <select id="functions" name="functions" class="form-control input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                 <option value="0"><?= translate('select_opction_lang') ?></option>
-                                <option value="1"><?= translate('sales_lang') ?></option>
-                                <option value="2"><?= translate('logistics_lang') ?></option>
+                                <?php if (isset($roles)) { ?>
+                                    <?php if ($roles) { ?>
+                                        <?php foreach ($roles as $rol) { ?>
+                                            <option value="<?= $rol->role_id ?>"><?= $rol->name ?></option>
+                                        <?php } ?>
+                                    <?php } ?>
+                                <?php } ?>
                             </select>
                         </div>
                     </div>
@@ -486,8 +491,13 @@
                         <div class="input-group">
                             <select id="functionsEdit" name="functionsEdit" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                 <option value="0"><?= translate('select_opction_lang') ?></option>
-                                <option value="1"><?= translate('sales_lang') ?></option>
-                                <option value="2"><?= translate('logistics_lang') ?></option>
+                                <?php if (isset($roles)) { ?>
+                                    <?php if ($roles) { ?>
+                                        <?php foreach ($roles as $rol) { ?>
+                                            <option value="<?= $rol->role_id ?>"><?= $rol->name ?></option>
+                                        <?php } ?>
+                                    <?php } ?>
+                                <?php } ?>
                             </select>
                         </div>
                     </div>
@@ -606,6 +616,21 @@
     let quillEdit;
 
     $(() => {
+
+        $("#functions").select2({
+            tags: true,
+            dropdownParent: $("#modalAddManagers"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: true,
+        });
+
+        $("#functionsEdit").select2({
+            tags: true,
+            dropdownParent: $("#modalEditManagers"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: true,
+        });
+
         quill = new Quill('#editor-container1', {
             modules: {
                 toolbar: [
@@ -619,6 +644,7 @@
             placeholder: '<?= translate("comment_lang"); ?>...',
             theme: 'snow' // or 'bubble'
         });
+
         quillEdit = new Quill('#editor-container1Edit', {
             modules: {
                 toolbar: [
@@ -632,6 +658,7 @@
             placeholder: '<?= translate("comment_lang"); ?>...',
             theme: 'snow' // or 'bubble'
         });
+
         $("#example1").DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
@@ -1430,7 +1457,12 @@
         $('#modalManagers').modal('hide');
         $('#modalAddManagers').modal({
             backdrop: false
-        })
+        });
+        $('#nameManager').val('');
+        $('#emailManager').val('');
+        $('#phoneManager').val('');
+        $('#functions').val(0);
+        $('#functions').trigger('change');
     }
 
     const submitAddManager = () => {
@@ -1574,12 +1606,10 @@
                 texto_tabla += '<p><b><?= translate('nombre_lang') ?>: </b> ' + item.name + '</p>';
                 texto_tabla += '<p><b><?= translate('email_lang') ?>: </b> ' + item.email + '</p>';
                 texto_tabla += '<p><b><?= translate('phone_lang') ?>: </b> ' + item.phone + '</p>';
-                if (item.function == 1) {
-                    let funcitonManager = '<?= translate('sales_lang') ?>';
-                    texto_tabla += '<p><b><?= translate('function_lang') ?>: </b> ' + funcitonManager + '</p>';
-                } else {
-                    let funcitonManager = '<?= translate('logistics_lang') ?>';
-                    texto_tabla += '<p><b><?= translate('function_lang') ?>: </b> ' + funcitonManager + '</p>';
+                if (typeof item.function !== 'undefined') {
+                    if (typeof item.function.name !== 'undefined') {
+                        texto_tabla += '<p><b><?= translate('function_lang') ?>: </b> ' + item.function.name + '</p>';
+                    }
                 }
                 texto_tabla += '</td>';
 
@@ -1614,7 +1644,18 @@
         $('#nameEditManager').val(objectManager.name);
         $('#phoneEditManager').val(objectManager.phone);
         $('#emailEditManager').val(objectManager.email);
-        $('#functionsEdit').val(objectManager.function);
+        if (typeof objectManager.function !== 'undefined') {
+            if (typeof objectManager.function.name !== 'undefined') {
+                $('#functionsEdit').val(objectManager.function.role_id);
+                $('#functionsEdit').trigger('change');
+            } else {
+                $('#functionsEdit').val(0);
+                $('#functionsEdit').trigger('change');
+            }
+        } else {
+            $('#functionsEdit').val(0);
+            $('#functionsEdit').trigger('change');
+        }
         $('#managerId').val(objectManager.manager_id);
         $('#userIdEditManager').val(objectManager.userId);
         $('#modalEditManagers').modal({

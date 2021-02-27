@@ -34,11 +34,14 @@ class User extends CI_Controller
             redirect('login/index');
         }
         $this->load->model('Country_model', 'country');
+        $this->load->model('role_model', 'rol');
+        $roles = $this->rol->get_all(['is_active' => 1]);
         $all_users = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
         $users_luxus = $this->user->get_all(['role_id' => 1, 'is_delete' => 0]);
         $data['countrys'] = $this->country->get_all_countrys();
         $data['all_users'] = $all_users;
         $data['users_luxus'] = $users_luxus;
+        $data['roles'] = $roles;
         $this->load_view_admin_g("user/index_client", $data);
     }
     public function add_index()
@@ -55,7 +58,10 @@ class User extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-        $this->load_view_admin_g('user/add_client');
+        $this->load->model('role_model', 'rol');
+        $roles = $this->rol->get_all(['is_active' => 1]);
+        $data['roles'] = $roles;
+        $this->load_view_admin_g('user/add_client', $data);
     }
     public function add()
     {
@@ -509,13 +515,15 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
+        $this->load->model('Role_model', 'rol');
         $name = $this->input->post('name');
         $userId = $this->input->post('userId');
         $email = $this->input->post('email');
         $phone = $this->input->post('phone');
         $function = $this->input->post('functions');
+        $objFuction = $this->rol->get_by_id($function);
         $manager_id = 'mg_' . uniqid();
-        $data = ['manager_id' => $manager_id, 'name' => $name, 'is_active' => 1, 'phone' => $phone, 'email' => $email, 'function' => $function];
+        $data = ['manager_id' => $manager_id, 'name' => $name, 'is_active' => 1, 'phone' => $phone, 'email' => $email, 'function' => $objFuction];
         $response = $this->user->create_manager($userId, $data);
         $user_object = $this->user->get_by_id($userId);
         if ($response) {
@@ -536,13 +544,15 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
+        $this->load->model('Role_model', 'rol');
         $name = $this->input->post('name');
         $userId = $this->input->post('userId');
         $email = $this->input->post('email');
         $phone = $this->input->post('phone');
         $function = $this->input->post('functions');
+        $objFuction = $this->rol->get_by_id($function);
         $managerId =  $this->input->post('managerId');
-        $data = ['managers.$.name' => $name, 'managers.$.email' => $email, 'managers.$.phone' => $phone, 'managers.$.function' => $function];
+        $data = ['managers.$.name' => $name, 'managers.$.email' => $email, 'managers.$.phone' => $phone, 'managers.$.function' => $objFuction];
 
         $response = $this->user->update_manager($managerId, $data);
         $user_object = $this->user->get_by_id($userId);

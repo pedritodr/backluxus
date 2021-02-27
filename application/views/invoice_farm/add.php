@@ -1,6 +1,7 @@
 <link rel="stylesheet" type="text/css" href="<?= base_url() ?>admin_template/plugins/jquery-step/jquery.steps.css">
 <link href="<?= base_url() ?>admin_template/assets/css/elements/search.css" rel="stylesheet" type="text/css" />
 <link href="<?= base_url() ?>admin_template/assets/css/apps/invoice.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" />
 <style>
     #grad1 {
@@ -187,7 +188,7 @@
                                             <div class="col-lg-8">
                                                 <label><?= translate("farms_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <select id="farms" name="farms" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                                    <select id="selectFarms" name="farms" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                                         <option value="0"><?= translate('select_opction_lang') ?></option>
                                                         <?php if ($farms) { ?>
                                                             <?php foreach ($farms as $item) { ?>
@@ -202,27 +203,21 @@
                                         <div class="row">
                                             <div class="col-lg-2"></div>
                                             <div class="col-lg-8">
-                                                <label><?= translate("clientes_lang"); ?></label>
-                                                <div class="input-group">
-                                                    <select id="clients" name="clients" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                                        <option value="0"><?= translate('select_opction_lang') ?></option>
-                                                        <?php if ($clients) { ?>
-                                                            <?php foreach ($clients as $item) { ?>
-                                                                <option value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name_company . ' | ' . $item->name_commercial ?></option>
-                                                            <?php   } ?>
-                                                        <?php } ?>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-2"></div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-2"></div>
-                                            <div class="col-lg-8">
                                                 <label><?= translate("markings_lang"); ?></label>
                                                 <div class="input-group">
                                                     <select id="markings" name="markings" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                                         <option value="0"><?= translate('select_opction_lang') ?></option>
+                                                        <?php if ($clients) { ?>
+                                                            <?php foreach ($clients as $item) { ?>
+                                                                <?php if (isset($item->markings)) { ?>
+                                                                    <?php if (count($item->markings) > 0) { ?>
+                                                                        <?php foreach ($item->markings as $marking) { ?>
+                                                                            <option value="<?= base64_encode(json_encode($marking)) ?>"><?= $marking->name_marking . ' | ' . $item->name_commercial ?></option>
+                                                                        <?php } ?>
+                                                                    <?php } ?>
+                                                                <?php } ?>
+                                                            <?php   } ?>
+                                                        <?php } ?>
                                                     </select>
                                                 </div>
                                             </div>
@@ -244,7 +239,7 @@
                                             <div class="col-lg-4">
                                                 <label><?= translate("dispatch_day_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <input type="date" class="form-control input-sm" name="dispatchDay" id="dispatchDay" placeholder="<?= translate('dispatch_day_lang'); ?>">
+                                                    <input type="text" class="form-control input-sm" name="dispatchDay" id="dispatchDay" placeholder="<?= translate('dispatch_day_lang'); ?>">
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
@@ -302,7 +297,7 @@
                                             <div style="display:none" class="col-lg-3">
                                                 <label><?= translate("due_date_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <input type="date" class="form-control input-sm" id="dueDate" name="due_date" placeholder="<?= translate('due_date_lang'); ?>">
+                                                    <input type="text" class="form-control input-sm" id="dueDate" name="due_date" placeholder="<?= translate('due_date_lang'); ?>">
                                                 </div>
                                             </div>
 
@@ -365,9 +360,29 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-lg-12">
+                        <label><?= translate("type_box_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="typeBox" name="typeBox" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
+                                <?php if ($boxs_type) { ?>
+                                    <?php foreach ($boxs_type as $item) { ?>
+                                        <option itemId="<?= base64_encode(json_encode($item)) ?>" value="<?= $item->box_id ?>"><?= $item->name ?></option>
+                                    <?php   } ?>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("box_number_lang"); ?></label>
+                        <div class="input-group">
+                            <input type="number" min="1" id="boxNumber" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('box_number_lang'); ?>" value="1">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="col-lg-12">
                         <label><?= translate("categorias_lang"); ?></label>
                         <div class="input-group">
-                            <select id="categories" name="categories" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                            <select id="categories" name="categories" class="form-control input-sm" onchange="selectedCategories()" data-placeholder="Seleccione una opción" style="width: 100%">
                                 <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
                                 <?php if ($categories) { ?>
                                     <?php foreach ($categories as $item) { ?>
@@ -377,15 +392,17 @@
                             </select>
                         </div>
                     </div>
+                    <br>
                     <div class="col-lg-12">
                         <label><?= translate("productos_lang"); ?></label>
                         <div class="input-group">
-                            <select id="product" disabled name="product" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                            <select id="product" disabled name="product" class="form-control input-sm" onchange="selectedProduct()" data-placeholder="Seleccione una opción" style="width: 100%">
                                 <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
 
                             </select>
                         </div>
                     </div>
+                    <br>
                     <div class="col-lg-12">
                         <label><?= translate("measure_lang"); ?></label>
                         <div class="input-group">
@@ -400,60 +417,42 @@
                         </div>
                     </div>
                     <div class="col-lg-12">
-                        <label><?= translate("type_box_lang"); ?></label>
-                        <div class="input-group">
-                            <select id="typeBox" name="typeBox" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
-                                <?php if ($boxs_type) { ?>
-                                    <?php foreach ($boxs_type as $item) { ?>
-                                        <option itemId="<?= base64_encode(json_encode($item)) ?>" value="<?= $item->box_id ?>"><?= $item->name ?></option>
-                                    <?php   } ?>
-                                <?php } ?>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-12">
                         <label><?= translate("stems_bunch_lang"); ?></label>
                         <div class="input-group">
                             <input type="number" min="0" id="stems" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('stems_bunch_lang'); ?>" value="1">
                         </div>
                     </div>
                     <div class="col-lg-12">
-                        <label><?= translate("box_number_lang"); ?></label>
+                        <label><?= translate("bunches_lang"); ?></label>
                         <div class="input-group">
-                            <input type="number" min="0" id="boxNumber" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('box_number_lang'); ?>" value="1">
+                            <input type="number" min="1" id="bunches" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('bunches_lang'); ?>" value="1">
                         </div>
                     </div>
-                    <div class="col-lg-12">
-                        <label><?= translate("bouquest_lang"); ?></label>
-                        <div class="input-group">
-                            <input type="number" min="0" id="bouquets" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('bouquest_lang'); ?>" value="1">
-                        </div>
-                    </div>
-
                     <div class="col-lg-12">
                         <label><?= translate("price2_lang"); ?></label>
                         <div class="input-group">
                             <input type="number" step="any" id="price" class="form-control input-sm" placeholder="<?= translate('price2_lang'); ?>">
                         </div>
                     </div>
-                    <!--  <div class="col-lg-12">
-                        <label><?= translate("bx_lang"); ?></label>
-                        <div class="input-group">
-                            <input type="number" min="0" pattern="^[1-9]+" id="bx" class="form-control input-sm" placeholder="<?= translate('bx_lang'); ?>" value="1">
-                        </div>
-                    </div> -->
                     <div class="col-lg-12">
-                        <br>
-                        <label><?= translate("total_stm_lang"); ?>: <span id="totalStm">0</span></label>
-                        <br>
-                        <label><?= translate("total_lang"); ?>: <span id="total">0</span></label>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <br>
+                                <label><?= translate("total_stm_lang"); ?>: <span id="totalStm">0</span></label>
+                                <br>
+                                <label><?= translate("total_lang"); ?>: <span id="total">0</span></label>
+                            </div>
+                            <div class="col-lg-6 text-right">
+                                <br>
+                                <button id="btnAddVarietyBox" onclick="addVarietyBox()" class="btn btn-primary"><?= translate('add_producto_lang') ?></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
-                <button id="btnModalVarieties" onclick="addVarietiesInvoice()" class="btn btn-success"><?= translate('add_producto_lang') ?></button>
+                <button id="btnModalVarieties" onclick="addVarietiesInvoice()" class="btn btn-success"><?= translate('end_boxlang') ?></button>
             </div>
         </div>
     </div>
@@ -461,7 +460,57 @@
 <script src="<?= base_url() ?>admin_template/plugins/jquery-step/jquery.steps.min.js"></script>
 
 <script>
+    const calcularDate = () => {
+        let dateToday = new Date();
+        dateToday.setDate(dateToday.getDate() - 1);
+        return dateToday.getFullYear() + '-' + (dateToday.getMonth() + 1) + '-' + dateToday.getDate();
+    }
+
     $(document).ready(function() {
+
+        $("#selectFarms").select2({
+            tags: true,
+            /*   dropdownParent: $("#modalAddManagers"), */
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: false,
+        });
+
+        $("#markings").select2({
+            tags: true,
+            /*   dropdownParent: $("#modalAddManagers"), */
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: false,
+        });
+
+        $("#categories").select2({
+            tags: true,
+            dropdownParent: $("#modalAddVarieties"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: false,
+        });
+
+        $("#measures").select2({
+            tags: true,
+            dropdownParent: $("#modalAddVarieties"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: false,
+        });
+
+        $("#typeBox").select2({
+            tags: true,
+            dropdownParent: $("#modalAddVarieties"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: false,
+        });
+
+        let ipServer = '<?= $request_server ?>';
+        let dateRu = 'today';
+        if (ipServer == 'RU') {
+            dateRu = calcularDate();
+        }
+        let dateDispatch = flatpickr(document.getElementById('dispatchDay'), {
+            defaultDate: dateRu
+        });
 
         let current_fs, next_fs, previous_fs; //fieldsets
         let opacity;
@@ -546,20 +595,22 @@
                         title: `El campo <?= translate('dispatch_day_lang'); ?> es requerido`,
                         padding: '3em',
                     })
-                } else if (awb == "") {
-                    const toast = swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        padding: '2em'
-                    });
-                    toast({
-                        type: 'error',
-                        title: `El campo <?= translate('awb_lang'); ?> es requerido`,
-                        padding: '3em',
-                    })
-                } else {
+                }
+                /*  else if (awb == "") {
+                                    const toast = swal.mixin({
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        padding: '2em'
+                                    });
+                                    toast({
+                                        type: 'error',
+                                        title: `El campo <?= translate('awb_lang'); ?> es requerido`,
+                                        padding: '3em',
+                                    })
+                                } */
+                else {
                     validNext = true;
                 }
 
@@ -568,12 +619,12 @@
                 if (arrayRequest.varieties.length > 0) {
                     $('#spinnerFinalize').show();
                     $('#spanFinalize').text('Creando invoice...');
-                   $('#btnPrevius').prop('disabled',true);
+                    $('#btnPrevius').prop('disabled', true);
                     //crear invoice
                     let farms = $('select[name=farms] option').filter(':selected').val();
                     let markings = $('select[name=markings] option').filter(':selected').attr('itemId');
-                    let client = $('select[name=clients] option').filter(':selected').val();
-                    client = JSON.parse(decodeB64Utf8(client));
+                    //let client = $('select[name=clients] option').filter(':selected').val();
+                    //client = JSON.parse(decodeB64Utf8(client));
                     markings = JSON.parse(decodeB64Utf8(markings));
                     farms = JSON.parse(decodeB64Utf8(farms));
                     delete farms.personal;
@@ -587,8 +638,7 @@
                         invoceNumber,
                         awb,
                         arrayRequest,
-                        markings,
-                        client
+                        markings
                     }
                     setTimeout(function() {
                         $.ajax({
@@ -611,7 +661,7 @@
                                         padding: '2em',
                                     })
                                     setTimeout(function() {
-                                        $('#btnPrevius').prop('disabled',false);
+                                        $('#btnPrevius').prop('disabled', false);
                                         $('#spinnerFinalize').hide();
                                         $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
                                         window.location = '<?= site_url('invoice_farm/index') ?>';
@@ -622,7 +672,7 @@
                                         text: result.msj,
                                         padding: '2em'
                                     });
-                                    $('#btnPrevius').prop('disabled',false);
+                                    $('#btnPrevius').prop('disabled', false);
                                     $('#spinnerFinalize').hide();
                                     $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
                                 }
@@ -705,14 +755,18 @@
             });
         });
     });
+
     let arrayRequest = [];
     arrayRequest.varieties = []
+
     const encodeB64Utf8 = (str) => {
         return btoa(unescape(encodeURIComponent(str)));
     }
+
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
+
     $('[name=clients]').change(() => {
         $('#markings').prop('disabled', true);
         $('#markings').empty();
@@ -736,11 +790,12 @@
         }
 
     })
+
     const addVarieties = (object) => {
 
         if (!object) {
             $('#btnModalVarieties').attr('onclick', 'addVarietiesInvoice()');
-            $('#btnModalVarieties').text('<?= translate('add_producto_lang') ?>');
+            $('#btnModalVarieties').text('<?= translate('end_boxlang') ?>');
             $('#product').prop('disabled', true);
             $('#product').empty();
             $('[name=categories]').val('0');
@@ -808,12 +863,12 @@
             backdrop: false
         })
     }
-    $('[name=categories]').change(() => {
+
+    const selectedCategories = () => {
         $('#product').prop('disabled', true);
         $('#product').empty();
         let categorie = $('select[name=categories] option').filter(':selected').val();
         if (categorie != 0) {
-            // categorie = JSON.parse(decodeB64Utf8(categorie));
             $.ajax({
                 type: 'POST',
                 url: "<?= site_url('invoice_farm/search_products') ?>",
@@ -824,7 +879,7 @@
                     result = JSON.parse(result);
                     if (result.status == 200) {
                         if (result.products.length > 0) {
-                            let cadenaProducts = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                            let cadenaProducts = ' <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
                             result.products.forEach(item => {
                                 cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
                             });
@@ -837,6 +892,12 @@
                                 padding: '2em'
                             });
                         }
+                        $("#product").select2({
+                            tags: true,
+                            dropdownParent: $("#modalAddVarieties"),
+                            placeholder: '<?= translate('select_opction_lang') ?>',
+                            allowClear: false,
+                        });
                     } else {
                         swal({
                             title: '¡Error!',
@@ -851,8 +912,9 @@
             });
         }
 
-    })
-    $('[name=product]').change(() => {
+    }
+
+    const selectedProduct = () => {
         let products = $('select[name=product] option').filter(':selected').attr('itemId');
         if (products != 0) {
             products = JSON.parse(decodeB64Utf8(products));
@@ -879,15 +941,16 @@
             $('#totalStm').text('0');
             $('#total').text('0');
         }
-    })
+    }
+
     $('#stems').change(() => {
         let stems = $('#stems').val().trim();
         if (stems > 0) {
-            let bouquets = $('#bouquets').val().trim();
+            let bunches = $('#bunches').val().trim();
             let price = $('#price').val().trim();
             let boxNumber = $('#boxNumber').val().trim();
-            if (bouquets > 0 && price > 0 && boxNumber > 0) {
-                let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
+            if (bunches > 0 && price > 0 && boxNumber > 0) {
+                let totalTSM = parseInt(bunches) * parseInt(stems) * parseInt(boxNumber);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
                 $('#total').text(totalPrice.toFixed(2));
@@ -912,14 +975,15 @@
             })
         }
     })
+
     $('#price').change(() => {
         let price = $('#price').val().trim();
         if (price > 0) {
-            let bouquets = $('#bouquets').val().trim();
+            let bunches = $('#bunches').val().trim();
             let stems = $('#stems').val().trim();
             let boxNumber = $('#boxNumber').val().trim();
-            if (bouquets > 0 && stems > 0 && boxNumber > 0) {
-                let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
+            if (bunches > 0 && stems > 0 && boxNumber > 0) {
+                let totalTSM = parseInt(bunches) * parseInt(stems) * parseInt(boxNumber);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
                 $('#total').text(totalPrice.toFixed(2));
@@ -944,14 +1008,15 @@
             })
         }
     })
-    $('#bouquets').change(() => {
-        let bouquets = $('#bouquets').val().trim();
-        if (bouquets > 0) {
+
+    $('#bunches').change(() => {
+        let bunches = $('#bunches').val().trim();
+        if (bunches > 0) {
             let price = $('#price').val().trim();
             let stems = $('#stems').val().trim();
             let boxNumber = $('#boxNumber').val().trim();
             if (price > 0 && stems > 0 && boxNumber > 0) {
-                let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
+                let totalTSM = parseInt(bunches) * parseInt(stems) * parseInt(boxNumber);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
                 $('#total').text(totalPrice.toFixed(2));
@@ -976,12 +1041,13 @@
             })
         }
     })
+
     $('#boxNumber').change(() => {
         let boxNumber = $('#boxNumber').val().trim();
         if (boxNumber > 0) {
             let price = $('#price').val().trim();
             let stems = $('#stems').val().trim();
-            let bouquets = $('#bouquets').val().trim();
+            let bunches = $('#bunches').val().trim();
             if (price > 0 && stems > 0 && boxNumber > 0) {
                 let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
                 let totalPrice = totalTSM * parseFloat(price);
@@ -1009,12 +1075,14 @@
         }
     })
 
-    const addVarietiesInvoice = () => {
+    let tempObject = null;
+
+    const addVarietyBox = () => {
         let products = $('select[name=product] option').filter(':selected').attr('itemId');
         let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
         let measures = $('select[name=measures] option').filter(':selected').attr('itemId');
         let categorie = $('select[name=categories] option').filter(':selected').val();
-        let bouquets = $('#bouquets').val().trim();
+        let bunches = $('#bunches').val().trim();
         let price = $('#price').val().trim();
         let stems = $('#stems').val().trim();
         let boxNumber = $('#boxNumber').val().trim();
@@ -1083,7 +1151,7 @@
                 title: 'El campo Nro de cajas no puede ser 0',
                 padding: '3em',
             })
-        } else if (bouquets <= 0) {
+        } else if (bunches <= 0) {
             const toast = swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -1093,7 +1161,179 @@
             });
             toast({
                 type: 'error',
-                title: 'El campo bouquets no puede ser 0',
+                title: 'El campo bunches no puede ser 0',
+                padding: '3em',
+            })
+        } else if (price <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo precio no puede ser 0',
+                padding: '3em',
+            })
+        } else {
+            products = JSON.parse(decodeB64Utf8(products));
+            typeBoxs = JSON.parse(decodeB64Utf8(typeBoxs));
+            measures = JSON.parse(decodeB64Utf8(measures));
+            let objTemp = {
+                products,
+                measures,
+                price,
+                bunches,
+                stems,
+                categorie
+            };
+            addTempObject(typeBoxs, boxNumber, objTemp)
+        }
+    }
+
+    const addTempObject = (typeBoxs, boxNumber, object) => {
+        if (!tempObject) {
+            tempObject = {
+                typeBoxs,
+                boxNumber
+            };
+            tempObject.varieties = []
+            tempObject.varieties.push(object);
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '3em'
+            });
+            toast({
+                type: 'success',
+                title: 'Variedad agregada correctamente',
+                padding: '3em',
+            })
+        } else {
+            let result = tempObject.varieties.filter(item => {
+                return item.products.product_id === object.products.product_id && item.measures.measure_id === object.measures.measure_id
+            });
+            if (result.length == 0) {
+                tempObject.varieties.push(object);
+                const toast = swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    padding: '3em'
+                });
+                toast({
+                    type: 'success',
+                    title: 'Variedad agregada correctamente',
+                    padding: '3em',
+                })
+            } else {
+                const toast = swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    padding: '3em'
+                });
+                toast({
+                    type: 'error',
+                    title: 'Ya se encuentra una variedad agregada con esas especificaciones',
+                    padding: '3em',
+                })
+            }
+        }
+        console.log(tempObject);
+    }
+
+    const addVarietiesInvoice = () => {
+        let products = $('select[name=product] option').filter(':selected').attr('itemId');
+        let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
+        let measures = $('select[name=measures] option').filter(':selected').attr('itemId');
+        let categorie = $('select[name=categories] option').filter(':selected').val();
+        let bunches = $('#bunches').val().trim();
+        let price = $('#price').val().trim();
+        let stems = $('#stems').val().trim();
+        let boxNumber = $('#boxNumber').val().trim();
+        if (products == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una variedad',
+                padding: '3em',
+            })
+        } else if (measures == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una medida',
+                padding: '3em',
+            })
+        } else if (typeBoxs == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '3em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione un Type box',
+                padding: '3em',
+            })
+        } else if (stems <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo stems no puede ser 0',
+                padding: '3em',
+            })
+        } else if (boxNumber <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo Nro de cajas no puede ser 0',
+                padding: '3em',
+            })
+        } else if (bunches <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo bunches no puede ser 0',
                 padding: '3em',
             })
         } else if (price <= 0) {

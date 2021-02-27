@@ -19,6 +19,7 @@ $config['add_box_lang'] = "Adicionar tipo de caja";
 $config['update_box_lang'] = "Actualizar Tipo de caja";
 $config['type_box_lang'] = "Type box";
 $config['bnc_box_lang'] = "BNC/BOX";
+$config['end_boxlang'] = "Cerrar caja";
 
 $config['manage_measures_lang'] = "Gestionar medidas y pesos";
 $config['listar_measures_lang'] = "Listar medidas y pesos";
@@ -71,10 +72,10 @@ $config['listar_managers_lang'] = "Listar del encargados";
 $config['add_manager_lang'] = "Adicionar encargado";
 $config['edit_manager_lang'] = "Editar encargado";
 
-$config['manage_bouquets_lang'] = "Gestionar bouquets";
-$config['listar_bouquests_lang'] = "Listar bouquets";
-$config['add_bouquest_lang'] = "Adicionar bouquets";
-$config['update_bouquest_lang'] = "Actualizar bouquets";
+$config['manage_bouquets_lang'] = "Gestionar bunches";
+$config['listar_bouquests_lang'] = "Listar bunches";
+$config['add_bouquest_lang'] = "Adicionar bunches";
+$config['update_bouquest_lang'] = "Actualizar bunches";
 $config['bouquest_lang'] = "Bouquets";
 $config['default_lang'] = "Default";
 $config['countrys_lang'] = "Paises";
@@ -84,6 +85,7 @@ $config['listar_countrys_lang'] = "Listar paises de entrega";
 $config['add_country_lang'] = "Adicionar país de entrega";
 $config['update_country_lang'] = "Actualizar país de entrega";
 
+$config['bunches_lang'] = "Bunches";
 $config['stems_bunch_lang'] = "Stems bunch";
 $config['total_stm_lang'] = "Total STM";
 $config['total_lang'] = "Total";
