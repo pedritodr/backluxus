@@ -576,7 +576,6 @@
 
     const editAdress = (address, userId) => {
         address = JSON.parse(decodeB64Utf8(address));
-        console.log(address)
         $('#userIdEdit').val(userId);
         $('#modalEditAddress').modal({
             backdrop: false

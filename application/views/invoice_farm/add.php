@@ -51,12 +51,9 @@
         cursor: pointer;
     }
 
-
-
     #msform .action-button-previous {
         cursor: pointer;
     }
-
 
     select.list-dt {
         border: none;
@@ -153,6 +150,10 @@
     }
 
     #modalAddVarieties {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+    #modalItems {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
 </style>
@@ -351,15 +352,24 @@
         </div>
     </div><!-- /.row -->
 </div><!-- /.content-wrapper -->
-<div class="modal fade" id="modalAddVarieties" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
+<div class="modal fadeInDown" id="modalAddVarieties" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel"><?= translate('add_producto_lang') ?></h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('add_producto_lang') ?> <span>
+                        <button onclick="loadItems()" type="button" class="btn btn-outline-dark mb-2 position-relative mt-3 mb-3 ml-2">
+                            <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-bag">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg> Items</span>
+                            <span class="badge badge-danger counter">0</span>
+                        </button>
+                    </span></h5>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <label><?= translate("type_box_lang"); ?></label>
                         <div class="input-group">
                             <select id="typeBox" name="typeBox" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
@@ -372,14 +382,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <label><?= translate("box_number_lang"); ?></label>
                         <div class="input-group">
                             <input type="number" min="1" id="boxNumber" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('box_number_lang'); ?>" value="1">
                         </div>
                     </div>
-                    <br>
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <label><?= translate("categorias_lang"); ?></label>
                         <div class="input-group">
                             <select id="categories" name="categories" class="form-control input-sm" onchange="selectedCategories()" data-placeholder="Seleccione una opción" style="width: 100%">
@@ -392,8 +401,7 @@
                             </select>
                         </div>
                     </div>
-                    <br>
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <label><?= translate("productos_lang"); ?></label>
                         <div class="input-group">
                             <select id="product" disabled name="product" class="form-control input-sm" onchange="selectedProduct()" data-placeholder="Seleccione una opción" style="width: 100%">
@@ -402,8 +410,7 @@
                             </select>
                         </div>
                     </div>
-                    <br>
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <label><?= translate("measure_lang"); ?></label>
                         <div class="input-group">
                             <select id="measures" name="measures" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
@@ -416,19 +423,19 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <label><?= translate("stems_bunch_lang"); ?></label>
                         <div class="input-group">
                             <input type="number" min="0" id="stems" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('stems_bunch_lang'); ?>" value="1">
                         </div>
                     </div>
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <label><?= translate("bunches_lang"); ?></label>
                         <div class="input-group">
                             <input type="number" min="1" id="bunches" pattern="^[1-9]+" class="form-control input-sm" placeholder="<?= translate('bunches_lang'); ?>" value="1">
                         </div>
                     </div>
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <label><?= translate("price2_lang"); ?></label>
                         <div class="input-group">
                             <input type="number" step="any" id="price" class="form-control input-sm" placeholder="<?= translate('price2_lang'); ?>">
@@ -444,7 +451,9 @@
                             </div>
                             <div class="col-lg-6 text-right">
                                 <br>
+                                <input id="indiceTempObj" style="display:none">
                                 <button id="btnAddVarietyBox" onclick="addVarietyBox()" class="btn btn-primary"><?= translate('add_producto_lang') ?></button>
+                                <button id="btnCancelEdit" style="display:none" onclick="cancelUpdateItem()" class="btn btn-default"><?= translate('cancel_lang') ?></button>
                             </div>
                         </div>
                     </div>
@@ -457,9 +466,27 @@
         </div>
     </div>
 </div>
+<div class="modal fadeInDown" id="modalItems" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Items</h5>
+            </div>
+            <div class="modal-body" id="bodyModalItems">
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="<?= base_url() ?>admin_template/plugins/jquery-step/jquery.steps.min.js"></script>
 
 <script>
+    let textEditItem = '<?= translate('update_item_lang') ?>';
+    let textAddItem = '<?= translate('add_producto_lang') ?>';
+
     const calcularDate = () => {
         let dateToday = new Date();
         dateToday.setDate(dateToday.getDate() - 1);
@@ -766,30 +793,6 @@
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
-
-    $('[name=clients]').change(() => {
-        $('#markings').prop('disabled', true);
-        $('#markings').empty();
-        let clients = $('select[name=clients] option').filter(':selected').val();
-        if (clients != 0) {
-            clients = JSON.parse(decodeB64Utf8(clients));
-            if (clients.markings.length > 0) {
-                let cadenaMarkings = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
-                clients.markings.forEach(item => {
-                    cadenaMarkings += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.marking_id + '">' + item.name_marking + '</option>'
-                });
-                $('#markings').append(cadenaMarkings);
-                $('#markings').prop('disabled', false);
-            } else {
-                swal({
-                    title: '¡Error!',
-                    text: 'El cliente no tiene marcaciones creadas',
-                    padding: '2em'
-                });
-            }
-        }
-
-    })
 
     const addVarieties = (object) => {
 
@@ -1213,7 +1216,11 @@
                 title: 'Variedad agregada correctamente',
                 padding: '3em',
             })
+
+            $('.counter').text(tempObject.varieties.length);
         } else {
+            tempObject.typeBoxs = typeBoxs;
+            tempObject.boxNumber = boxNumber;
             let result = tempObject.varieties.filter(item => {
                 return item.products.product_id === object.products.product_id && item.measures.measure_id === object.measures.measure_id
             });
@@ -1245,8 +1252,9 @@
                     padding: '3em',
                 })
             }
+            $('.counter').text(tempObject.varieties.length);
         }
-        console.log(tempObject);
+        cancelAddItem();
     }
 
     const addVarietiesInvoice = () => {
@@ -1378,6 +1386,7 @@
             })
         }
     }
+
     const cargarDetails = () => {
         $('#tableVarieties').empty();
         let qtyBox = 0;
@@ -1519,6 +1528,7 @@
         }
 
     }
+
     const addArrayRequest = (object) => {
         let encontrado = false;
         if (arrayRequest.varieties.length > 0) {
@@ -1535,6 +1545,7 @@
             arrayRequest.varieties.push(object);
         }
     }
+
     const updateVarietiesInvoice = (indice) => {
         let products = $('select[name=product] option').filter(':selected').attr('itemId');
         let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
@@ -1669,6 +1680,7 @@
         arrayRequest.varieties[indice] = object;
 
     }
+
     const deleteVarieties = (indice) => {
         swal({
             title: '¿ Estás seguro de realizar esta operación ?',
@@ -1683,5 +1695,308 @@
                 cargarDetails();
             }
         })
+    }
+
+    const loadItems = () => {
+        $('#bodyModalItems').empty();
+        let acumTotal = 0;
+        if (tempObject) {
+            let textTypoBox = '<?= translate("type_box_lang") ?> :';
+            let textNumberBox = '<?= translate("box_number_lang") ?> :';
+            let texto_tabla = '<p>' + textTypoBox + tempObject.typeBoxs.name + '</p>';
+            texto_tabla += '<p>' + textNumberBox + tempObject.boxNumber + '</p>';
+            if (tempObject.varieties.length > 0) {
+                texto_tabla += '<table id="datatablesItems" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
+                texto_tabla += '<thead>';
+                texto_tabla += '<tr>';
+                texto_tabla += '<th>VARIETIES</th>';
+                texto_tabla += '<th>CM</th>';
+                texto_tabla += '<th>STEMS</th>';
+                texto_tabla += '<th>BUNCHES</th>';
+                texto_tabla += '<th>TOTAL STM</th>';
+                texto_tabla += '<th>PRICE</th>';
+                texto_tabla += '<th>TOTAL</th>';
+                texto_tabla += '<th>Acciones</th>';
+                texto_tabla += '</tr>';
+                texto_tabla += '</thead>';
+                texto_tabla += '<tbody>';
+                tempObject.varieties.forEach((item, indice, array) => {
+                    item.indice = indice;
+                    texto_tabla += '<tr>';
+
+                    texto_tabla += '<td>';
+                    texto_tabla += item.products.name;
+                    texto_tabla += '</td>';
+
+                    texto_tabla += '<td>';
+                    texto_tabla += item.measures.name;
+                    texto_tabla += '</td>';
+
+                    texto_tabla += '<td>';
+                    texto_tabla += item.stems;
+                    texto_tabla += '</td>';
+
+                    texto_tabla += '<td>';
+                    texto_tabla += item.bunches;
+                    texto_tabla += '</td>';
+
+                    texto_tabla += '<td>';
+                    texto_tabla += parseInt(item.stems) * parseInt(item.bunches);
+                    texto_tabla += '</td>';
+
+                    texto_tabla += '<td>';
+                    texto_tabla += parseFloat(item.price).toFixed(2);
+                    texto_tabla += '</td>';
+
+                    texto_tabla += '<td>';
+                    let totalTable = parseFloat(item.price) * (parseInt(item.stems) * parseInt(item.bunches));
+                    acumTotal += totalTable;
+                    texto_tabla += totalTable.toFixed(2);
+                    texto_tabla += '</td>';
+                    texto_tabla += '<td>';
+                    texto_tabla += '<button class="btn btn-info mb-2 mr-2 rounded-circle" onclick=editItemBox("' + encodeB64Utf8(JSON.stringify(item)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>';
+                    texto_tabla += '<button class="btn btn-danger mb-2 mr-2 rounded-circle" onclick=deleteItemBox("' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>';
+                    texto_tabla += '</td>';
+                    texto_tabla += '</tr>';
+                });
+                texto_tabla += '</tbody>';
+                texto_tabla += '</table>'
+                $("#bodyModalItems").html(texto_tabla);
+                $("#datatablesItems").DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                    }
+                });
+            } else {
+                $('#bodyModalItems').append('<div class="alert alert-info">Se encuentra vacio</div>');
+            }
+        } else {
+            $('#bodyModalItems').append('<div class="alert alert-info">Se encuentra vacio</div>');
+        }
+        $('#modalItems').modal('show');
+    }
+
+    const editItemBox = (obj) => {
+        obj = decodeB64Utf8(obj);
+        obj = JSON.parse(obj);
+        console.log(obj);
+        /*       $('#categories').val(obj.categorie);
+              $('#categories').trigger('change');
+              $('#product').val(obj.products.product_id);
+              $('#product').trigger('change');
+              $('#product').prop('disabled', false);
+              $('#measures').val(obj.measures.measure_id);
+              $('#measures').trigger('change');
+              $('#bunches').val(obj.bunches);
+              $('#price').val(obj.price);
+              $('#stems').val(obj.stems);
+              $('#boxNumber').val(tempObject.boxNumber);
+              $('#typeBox').val(tempObject.typeBoxs.box_id);
+              $('#btnAddVarietyBox').attr('onclick', 'updateItemBox()')
+              $('#btnAddVarietyBox').text(textEditItem);
+              $('#indiceTempObj').val(obj.indice);
+              let totalTSM = parseInt(obj.bunches) * parseInt(obj.stems) * parseInt(obj.boxNumber);
+              let totalPrice = totalTSM * parseFloat(obj.price);
+              $('#totalStm').text(totalTSM);
+              $('#total').text(totalPrice.toFixed(2));
+              $('#modalItems').modal('hide');
+              $('#modalAddVarieties').modal('show');
+              $('#btnCancelEdit').show(); */
+    }
+
+    const deleteItemBox = (indice) => {
+        swal({
+            title: '¿ Estás seguro de realizar esta operación ?',
+            text: "Usted no podrá revertir este cambio !!!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                tempObject.varieties.splice(indice, 1);
+                loadItems();
+                $('.counter').text(tempObject.varieties.length);
+                if (tempObject.varieties.length == 0) {
+                    tempObject = null;
+                }
+            }
+        })
+    }
+
+    const updateItemBox = () => {
+        let products = $('select[name=product] option').filter(':selected').attr('itemId');
+        let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
+        let measures = $('select[name=measures] option').filter(':selected').attr('itemId');
+        let categorie = $('select[name=categories] option').filter(':selected').val();
+        let bunches = $('#bunches').val().trim();
+        let price = $('#price').val().trim();
+        let stems = $('#stems').val().trim();
+        let boxNumber = $('#boxNumber').val().trim();
+        let indice = $('#indiceTempObj').val();
+        if (products == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una variedad',
+                padding: '3em',
+            })
+        } else if (measures == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una medida',
+                padding: '3em',
+            })
+        } else if (typeBoxs == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '3em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione un Type box',
+                padding: '3em',
+            })
+        } else if (stems <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo stems no puede ser 0',
+                padding: '3em',
+            })
+        } else if (boxNumber <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo Nro de cajas no puede ser 0',
+                padding: '3em',
+            })
+        } else if (bunches <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo bunches no puede ser 0',
+                padding: '3em',
+            })
+        } else if (price <= 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo precio no puede ser 0',
+                padding: '3em',
+            })
+        } else {
+            products = JSON.parse(decodeB64Utf8(products));
+            typeBoxs = JSON.parse(decodeB64Utf8(typeBoxs));
+            measures = JSON.parse(decodeB64Utf8(measures));
+            let objTemp = {
+                products,
+                measures,
+                price,
+                bunches,
+                stems,
+                categorie
+            };
+            updateTempObject(typeBoxs, boxNumber, objTemp, indice)
+        }
+
+    }
+
+    const updateTempObject = (typeBoxs, boxNumber, objTemp, indice) => {
+        tempObject.varieties[indice].products = objTemp.products;
+        tempObject.varieties[indice].measures = objTemp.measures;
+        tempObject.varieties[indice].categorie = objTemp.categorie;
+        tempObject.varieties[indice].price = objTemp.price;
+        tempObject.varieties[indice].bunches = objTemp.bunches;
+        tempObject.varieties[indice].stems = objTemp.stems;
+        tempObject.typeBoxs = typeBoxs;
+        tempObject.boxNumber = boxNumber;
+        const toast = swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            padding: '3em'
+        });
+        toast({
+            type: 'success',
+            title: 'Variedad actualizada correctamente',
+            padding: '3em',
+        })
+        loadItems();
+        cancelUpdateItem();
+    }
+
+    const cancelUpdateItem = () => {
+        $('#categories').val(0);
+        $('#categories').trigger('change');
+        $('#product').val(0);
+        $('#product').trigger('change');
+        $('#product').prop('disabled', true);
+        $('#measures').val(0);
+        $('#measures').trigger('change');
+        $('#bunches').val('');
+        $('#price').val('');
+        $('#stems').val('');
+        $('#btnAddVarietyBox').attr('onclick', 'addVarietyBox()')
+        $('#btnAddVarietyBox').text(textAddItem);
+        $('#indiceTempObj').val('');
+        $('#totalStm').text(0);
+        $('#total').text(0);
+        $('#btnCancelEdit').hide();
+    }
+
+    const cancelAddItem = () => {
+        $('#bunches').val('');
+        $('#price').val('');
+        $('#stems').val('');
+        $('#measures').val(0);
+        $('#measures').trigger('change');
+        $('#btnAddVarietyBox').attr('onclick', 'addVarietyBox()')
+        $('#btnAddVarietyBox').text(textAddItem);
+        $('#indiceTempObj').val('');
+        $('#totalStm').text(0);
+        $('#total').text(0);
+        $('#btnCancelEdit').hide();
     }
 </script>

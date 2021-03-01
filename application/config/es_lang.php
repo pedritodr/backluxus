@@ -20,6 +20,8 @@ $config['update_box_lang'] = "Actualizar Tipo de caja";
 $config['type_box_lang'] = "Type box";
 $config['bnc_box_lang'] = "BNC/BOX";
 $config['end_boxlang'] = "Cerrar caja";
+$config['cancel_lang'] = "Cancelar";
+
 
 $config['manage_measures_lang'] = "Gestionar medidas y pesos";
 $config['listar_measures_lang'] = "Listar medidas y pesos";
@@ -628,6 +630,7 @@ $config['producto_lang'] = "Variedad";
 $config['add_producto_lang'] = "Adicionar variedad";
 $config['edit_producto_lang'] = "Actualizar variedad";
 $config['update_producto_lang'] = "Editar variedad";
+$config['update_item_lang'] = "Actualizar item";
 
 $config['manage_noticias_lang'] = "Gestionar noticias";
 $config['listar_noticias_lang'] = "Listar noticias";
