@@ -784,7 +784,6 @@
     });
 
     let arrayRequest = [];
-    arrayRequest.varieties = []
 
     const encodeB64Utf8 = (str) => {
         return btoa(unescape(encodeURIComponent(str)));
@@ -802,9 +801,12 @@
             $('#product').prop('disabled', true);
             $('#product').empty();
             $('[name=categories]').val('0');
+            $('#categories').trigger('change');
             $('[name=measures]').val('0');
+            $('#measures').trigger('change');
             $('[name=typeBox]').val('0');
-            $('#bouquets').val('1');
+            $('#typeBox').trigger('change');
+            $('#bunches').val('1');
             $('#price').val('');
             $('#boxNumber').val('1');
             $('#stems').val('1');
@@ -857,7 +859,7 @@
             });
             $('[name=measures]').val(object.measures.measure_id);
             $('[name=typeBox]').val(object.typeBoxs.box_id);
-            $('#bouquets').val(object.bouquets);
+            $('#bunches').val(object.bunches);
             $('#price').val(object.price);
             $('#boxNumber').val(object.boxNumber);
             $('#stems').val(object.stems);
@@ -1258,15 +1260,8 @@
     }
 
     const addVarietiesInvoice = () => {
-        let products = $('select[name=product] option').filter(':selected').attr('itemId');
-        let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
-        let measures = $('select[name=measures] option').filter(':selected').attr('itemId');
-        let categorie = $('select[name=categories] option').filter(':selected').val();
-        let bunches = $('#bunches').val().trim();
-        let price = $('#price').val().trim();
-        let stems = $('#stems').val().trim();
-        let boxNumber = $('#boxNumber').val().trim();
-        if (products == 0) {
+
+        if (!tempObject) {
             const toast = swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -1276,109 +1271,22 @@
             });
             toast({
                 type: 'error',
-                title: 'Seleccione una variedad',
-                padding: '3em',
-            })
-        } else if (measures == 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'Seleccione una medida',
-                padding: '3em',
-            })
-        } else if (typeBoxs == 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '3em'
-            });
-            toast({
-                type: 'error',
-                title: 'Seleccione un Type box',
-                padding: '3em',
-            })
-        } else if (stems <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo stems no puede ser 0',
-                padding: '3em',
-            })
-        } else if (boxNumber <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo Nro de cajas no puede ser 0',
-                padding: '3em',
-            })
-        } else if (bunches <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo bunches no puede ser 0',
-                padding: '3em',
-            })
-        } else if (price <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo precio no puede ser 0',
+                title: 'La caja se encuentra sin items',
                 padding: '3em',
             })
         } else {
-            products = JSON.parse(decodeB64Utf8(products));
-            typeBoxs = JSON.parse(decodeB64Utf8(typeBoxs));
-            measures = JSON.parse(decodeB64Utf8(measures));
-            let object = {
-                products,
-                typeBoxs,
-                measures,
-                price,
-                boxNumber,
-                bouquets,
-                stems,
-                categorie
-            };
-            addArrayRequest(object);
+
+            addArrayRequest(tempObject);
             $('#modalAddVarieties').modal('hide');
             setTimeout(() => {
+                cancelAddItem();
+                tempObject = null;
                 cargarDetails();
+                $('.counter').text(0);
             }, 2000);
             swal({
                 title: '¡Perfecto!',
-                text: "Variedad agregada correctamente",
+                text: "Caja agregada correctamente",
                 type: 'success',
                 timer: 2000,
                 showConfirmButton: false,
@@ -1395,7 +1303,7 @@
         let acumTotalStm = 0;
         let acumPrice = 0;
         let acumTotal = 0;
-        if (arrayRequest.varieties.length > 0) {
+        if (arrayRequest.length > 0) {
             let texto_tabla = '';
             texto_tabla += '<table id="datatablesVarieties" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
             texto_tabla += '<thead>';
@@ -1412,112 +1320,154 @@
             texto_tabla += '<th>Acciones</th>';
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
-            texto_tabla += '<tbody>';
-            arrayRequest.varieties.forEach((item, indice, array) => {
-                item.indice = indice;
-                texto_tabla += '<tr>';
-                texto_tabla += '<td>';
-                texto_tabla += item.boxNumber;
-                qtyBox += parseInt(item.boxNumber);
-                texto_tabla += '</td>';
+            texto_tabla += '<tbody id="bodyTableDetails>';
 
-                texto_tabla += '<td>';
-                texto_tabla += item.typeBoxs.name;
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                texto_tabla += item.products.name;
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                texto_tabla += item.measures.name;
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                texto_tabla += item.stems;
-                qtyStems += parseInt(item.stems);
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                texto_tabla += item.bouquets;
-                qtyBouquets += parseInt(item.bouquets);
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                texto_tabla += parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets);
-                acumTotalStm += parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets);
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                texto_tabla += parseFloat(item.price).toFixed(2);
-                acumPrice += parseFloat(item.price);
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-                let totalTable = parseFloat(item.price) * (parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets));
-                acumTotal += totalTable;
-                texto_tabla += totalTable.toFixed(2);
-                texto_tabla += '</td>';
-
-                texto_tabla += '<td>';
-
-                texto_tabla += '<div class="btn-group mb-4 mr-2" role="group">';
-                texto_tabla += '<button id="btnOutline" type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Acciónes <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">';
-                texto_tabla += '<polyline points="6 9 12 15 18 9"></polyline>';
-                texto_tabla += '</svg>';
-                texto_tabla += '</button>';
-                texto_tabla += '<div class="dropdown-menu" aria-labelledby="btnOutline" style="will-change: transform;">';
-                texto_tabla += '<a class="dropdown-item" href="javascript:void(0);"  onclick=addVarieties("' + encodeB64Utf8(JSON.stringify(item)) + '");> Editar</a>';
-                texto_tabla += '<a class="dropdown-item" href="javascript:void(0);"  onclick=deleteVarieties("' + indice + '");> Eliminar</a>';
-                texto_tabla += '</div>';
-                texto_tabla += '</div>';
-                texto_tabla += '</td>';
-                texto_tabla += '</tr>';
-            });
             texto_tabla += '</tbody>';
-            texto_tabla += '<tfoot>';
-            texto_tabla += '<tr>';
-
-            texto_tabla += '<td>';
-            texto_tabla += qtyBox;
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += qtyStems;
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += qtyBouquets;
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += acumTotalStm;
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += acumPrice.toFixed(2);
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += acumTotal.toFixed(2);
-            texto_tabla += '</td>';
-
-            texto_tabla += '<td>';
-            texto_tabla += '</td>';
-
-            texto_tabla += '</tr>';
-            texto_tabla += '</tfoot>'
-            texto_tabla += '</table>'
+            texto_tabla += '</table>';
             $("#tableVarieties").html(texto_tabla);
+
+            arrayRequest.forEach((item, indice, array) => {
+                item.indice = indice;
+                let textBox = '<tr>';
+                textBox += '<td>';
+                textBox += item.boxNumber;
+                qtyBox += parseInt(item.boxNumber);
+                textBox += '</td>';
+
+                textBox += '<td>';
+                textBox += item.typeBoxs.name;
+                textBox += '</td>';
+
+                textBox += '<td>';
+                textBox += '</td>';
+
+                textBox += '<td>';
+                textBox += '</td>';
+
+                textBox += '<td>';
+                textBox += '</td>';
+
+                textBox += '<td>';
+                textBox += '</td>';
+
+                textBox += '<td>';
+                textBox += '</td>';
+
+                textBox += '<td>';
+                textBox += '</td>';
+
+                textBox += '<td>';
+                textBox += '</td>';
+
+                textBox += '<td>';
+
+                textBox += '<div class="btn-group mb-4 mr-2" role="group">';
+                textBox += '<button id="btnOutline" type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Acciónes <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">';
+                textBox += '<polyline points="6 9 12 15 18 9"></polyline>';
+                textBox += '</svg>';
+                textBox += '</button>';
+                textBox += '<div class="dropdown-menu" aria-labelledby="btnOutline" style="will-change: transform;">';
+                textBox += '<a class="dropdown-item" href="javascript:void(0);"  onclick=addVarieties("' + encodeB64Utf8(JSON.stringify(item)) + '");> Editar</a>';
+                textBox += '<a class="dropdown-item" href="javascript:void(0);"  onclick=deleteVarieties("' + indice + '");> Eliminar</a>';
+                textBox += '</div>';
+                textBox += '</div>';
+                textBox += '</td>';
+                textBox += '</tr>';
+                $('#bodyTableDetails').append(textBox);
+
+                if (item.varieties.length > 0) {
+                    item.varieties.forEach(element => {
+                        let textVariety = '<tr>';
+                        textVariety += '<td>';
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += element.products.name;
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += element.measures.name;
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += element.stems;
+                        qtyStems += parseInt(element.stems);
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += element.bunches;
+                        qtyBouquets += parseInt(element.bunches);
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches);
+                        acumTotalStm += parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches);
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += parseFloat(element.price).toFixed(2);
+                        acumPrice += parseFloat(element.price);
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        let totalTable = parseFloat(element.price) * (parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches));
+                        acumTotal += totalTable;
+                        textVariety += totalTable.toFixed(2);
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+
+                        textVariety += '</td>';
+                        textVariety += '</tr>';
+                        $('#bodyTableDetails').append(textVariety);
+                    });
+                }
+            });
+            let textFooter = '<tfoot>';
+            textFooter += '<tr>';
+
+            textFooter += '<td>';
+            textFooter += qtyBox;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += qtyStems;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += qtyBouquets;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumTotalStm;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumPrice.toFixed(2);
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumTotal.toFixed(2);
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '</tr>';
+            textFooter += '</tfoot>';
+            $('#bodyTableDetails').after(textFooter);
             $("#datatablesVarieties").DataTable({
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
@@ -1530,20 +1480,7 @@
     }
 
     const addArrayRequest = (object) => {
-        let encontrado = false;
-        if (arrayRequest.varieties.length > 0) {
-            arrayRequest.varieties.forEach((item, indice, array) => {
-                if (item.products.product_id == object.products.product_id && item.typeBoxs.box_id == object.typeBoxs.box_id && item.measures.measure_id == object.measures.measure_id && item.precio == object.precio && item.bx == object.bx && item.stems == object.stems) {
-                    item.bncBox = parseInt(item.bncBox) + parseInt(object.bncBox);
-                    encontrado = true;
-                }
-            });
-            if (!encontrado) {
-                arrayRequest.varieties.push(object);
-            }
-        } else {
-            arrayRequest.varieties.push(object);
-        }
+        arrayRequest.push(object);
     }
 
     const updateVarietiesInvoice = (indice) => {
@@ -1779,29 +1716,71 @@
     const editItemBox = (obj) => {
         obj = decodeB64Utf8(obj);
         obj = JSON.parse(obj);
-        console.log(obj);
-        /*       $('#categories').val(obj.categorie);
-              $('#categories').trigger('change');
-              $('#product').val(obj.products.product_id);
-              $('#product').trigger('change');
-              $('#product').prop('disabled', false);
-              $('#measures').val(obj.measures.measure_id);
-              $('#measures').trigger('change');
-              $('#bunches').val(obj.bunches);
-              $('#price').val(obj.price);
-              $('#stems').val(obj.stems);
-              $('#boxNumber').val(tempObject.boxNumber);
-              $('#typeBox').val(tempObject.typeBoxs.box_id);
-              $('#btnAddVarietyBox').attr('onclick', 'updateItemBox()')
-              $('#btnAddVarietyBox').text(textEditItem);
-              $('#indiceTempObj').val(obj.indice);
-              let totalTSM = parseInt(obj.bunches) * parseInt(obj.stems) * parseInt(obj.boxNumber);
-              let totalPrice = totalTSM * parseFloat(obj.price);
-              $('#totalStm').text(totalTSM);
-              $('#total').text(totalPrice.toFixed(2));
-              $('#modalItems').modal('hide');
-              $('#modalAddVarieties').modal('show');
-              $('#btnCancelEdit').show(); */
+        $('#product').empty();
+        $('#product').prop('disabled', true);
+        let categorie = obj.categorie;
+        $.ajax({
+            type: 'POST',
+            url: "<?= site_url('invoice_farm/search_products') ?>",
+            data: {
+                categorie
+            },
+            success: function(result) {
+                result = JSON.parse(result);
+                if (result.status == 200) {
+                    if (result.products.length > 0) {
+                        let cadenaProducts = ' <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
+                        result.products.forEach(item => {
+                            if (obj.products.product_id == item.product_id) {
+                                cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" selected value="' + item.product_id + '">' + item.name + '</option>'
+                            } else {
+                                cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
+                            }
+                        });
+                        $('#product').append(cadenaProducts);
+                        $('#product').prop('disabled', false);
+                    } else {
+                        swal({
+                            title: '¡Error!',
+                            text: 'La categoria se encuentra sin productos',
+                            padding: '2em'
+                        });
+                    }
+                    $("#product").select2({
+                        tags: true,
+                        dropdownParent: $("#modalAddVarieties"),
+                        placeholder: '<?= translate('select_opction_lang') ?>',
+                        allowClear: false,
+                    });
+                } else {
+                    swal({
+                        title: '¡Error!',
+                        text: result.msj,
+                        padding: '2em'
+                    });
+                }
+
+            }
+        });
+        $('#categories').val(obj.categorie);
+        $('#categories').trigger('change');
+        $('#measures').val(obj.measures.measure_id);
+        $('#measures').trigger('change');
+        $('#bunches').val(obj.bunches);
+        $('#price').val(obj.price);
+        $('#stems').val(obj.stems);
+        $('#boxNumber').val(tempObject.boxNumber);
+        $('#typeBox').val(tempObject.typeBoxs.box_id);
+        $('#btnAddVarietyBox').attr('onclick', 'updateItemBox()')
+        $('#btnAddVarietyBox').text(textEditItem);
+        $('#indiceTempObj').val(obj.indice);
+        let totalTSM = parseInt(obj.bunches) * parseInt(obj.stems) * parseInt(tempObject.boxNumber);
+        let totalPrice = totalTSM * parseFloat(obj.price);
+        $('#totalStm').text(totalTSM);
+        $('#total').text(totalPrice.toFixed(2));
+        $('#modalItems').modal('hide');
+        $('#modalAddVarieties').modal('show');
+        $('#btnCancelEdit').show();
     }
 
     const deleteItemBox = (indice) => {
@@ -1970,8 +1949,6 @@
     const cancelUpdateItem = () => {
         $('#categories').val(0);
         $('#categories').trigger('change');
-        $('#product').val(0);
-        $('#product').trigger('change');
         $('#product').prop('disabled', true);
         $('#measures').val(0);
         $('#measures').trigger('change');
