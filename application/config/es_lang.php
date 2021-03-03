@@ -20,6 +20,8 @@ $config['update_box_lang'] = "Actualizar Tipo de caja";
 $config['type_box_lang'] = "Type box";
 $config['bnc_box_lang'] = "BNC/BOX";
 $config['end_boxlang'] = "Cerrar caja";
+$config['edit_boxlang'] = "Actualizar caja";
+$config['add_boxlang'] = "Adicionar caja";
 $config['cancel_lang'] = "Cancelar";
 
 

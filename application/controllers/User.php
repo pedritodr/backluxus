@@ -37,7 +37,7 @@ class User extends CI_Controller
         $this->load->model('role_model', 'rol');
         $roles = $this->rol->get_all(['is_active' => 1]);
         $all_users = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
-        $users_luxus = $this->user->get_all(['role_id' => 1, 'is_delete' => 0]);
+        $users_luxus = $this->user->get_all(['role_id' => 2, 'is_delete' => 0]);
         $data['countrys'] = $this->country->get_all_countrys();
         $data['all_users'] = $all_users;
         $data['users_luxus'] = $users_luxus;
@@ -81,7 +81,7 @@ class User extends CI_Controller
         $validaEmail = $this->user->get_by_email($email);
         if ($validaEmail) {
             $this->response->set_message(translate('email_already_exist_lang'), ResponseMessage::ERROR);
-            redirect("user/add_index_client");
+            redirect("user/add_index");
         }
         if ($password != $repeat_password) {
             $this->response->set_message("El campo contraseña no coincide con el repetir contraseña", ResponseMessage::ERROR);
@@ -108,7 +108,8 @@ class User extends CI_Controller
                 'phone' => $phone,
                 'surname' => $surname,
                 'is_active' => 1,
-                'date_create' => $fecha_create
+                'date_create' => $fecha_create,
+                'is_delete' => 0
             ];
             $this->user->create($data_user);
             $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
@@ -237,7 +238,8 @@ class User extends CI_Controller
                 'role_id' => (int)$role,
                 'address' => $address,
                 'phone' => $phone,
-                'is_active' => 1
+                'is_active' => 1,
+                'is_delete' => 0
             ];
             $this->user->update($user_id, $data_user);
             if ($role != 3) {

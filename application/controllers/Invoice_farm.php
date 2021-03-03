@@ -75,7 +75,6 @@ class Invoice_farm extends CI_Controller
         $dispatchDay = trim(($this->input->post('dispatchDay')));
         $farms = (object)($_POST['farms']);
         $markings = ($_POST['markings']);
-        $client = ($_POST['client']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $invoice_farm = 'invoice_farm' . uniqid();
         $date_create = date("Y-m-d H:i:s");
@@ -84,7 +83,6 @@ class Invoice_farm extends CI_Controller
             'invoice_number' => $invoceNumber,
             'dispatch_day' => $dispatchDay,
             'awb' => $awb,
-            'client' => $client,
             'markings' => $markings,
             'farms' => $farms,
             'details' => $arrayRequest,

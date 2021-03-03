@@ -2,6 +2,7 @@
     .nav-margin-bottom {
         margin-bottom: 20px;
     }
+
     #modalDetails {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
@@ -39,8 +40,8 @@
                                     <?php foreach ($all_invoice_farm as $item) { ?>
                                         <tr>
                                             <td>
-                                            <p><?= $item->client->name_company.' | '. $item->client->name_commercial?></p>
-                                            <p><b><?= translate("marking_lang"); ?>: <?= $item->markings->name_marking?></b></p>
+                                                <p><?= $item->markings->name_company . ' | ' . $item->markings->name_commercial ?></p>
+                                                <p><b><?= translate("marking_lang"); ?>: <?= $item->markings->name_marking ?></b></p>
                                             </td>
                                             <td>
                                                 <p><strong><?= translate("invoice_number_lang"); ?> : </strong><?= $item->invoice_number; ?></p>
@@ -117,7 +118,6 @@
     const verDetails = (details) => {
         details = decodeB64Utf8(details);
         details = JSON.parse(details);
-        console.log(details)
         $("#modalDetails").modal('show');
         $("#bodyModalDetails").empty();
         let qtyBox = 0;
@@ -142,102 +142,177 @@
             texto_tabla += '<th>TOTAL</th>';
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
-            texto_tabla += '<tbody>';
+            texto_tabla += '<tbody id="bodyTableDetails">';
+
+            texto_tabla += '</tbody>';
+            texto_tabla += '</table>';
+            $("#bodyModalDetails").html(texto_tabla);
+
             details.forEach((item, indice, array) => {
                 item.indice = indice;
-                texto_tabla += '<tr>';
-                texto_tabla += '<td>';
-                texto_tabla += item.boxNumber;
+                let textBox = '<tr>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += item.boxNumber;
                 qtyBox += parseInt(item.boxNumber);
-                texto_tabla += '</td>';
+                textBox += '</td>';
 
-                texto_tabla += '<td>';
-                texto_tabla += item.typeBoxs.name;
-                texto_tabla += '</td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += item.typeBoxs.name;
+                textBox += '</td>';
 
-                texto_tabla += '<td>';
-                texto_tabla += item.products.name;
-                texto_tabla += '</td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
 
-                texto_tabla += '<td>';
-                texto_tabla += item.measures.name;
-                texto_tabla += '</td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
 
-                texto_tabla += '<td>';
-                texto_tabla += item.stems;
-                qtyStems += parseInt(item.stems);
-                texto_tabla += '</td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
 
-                texto_tabla += '<td>';
-                texto_tabla += item.bouquets;
-                qtyBouquets += parseInt(item.bouquets);
-                texto_tabla += '</td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
 
-                texto_tabla += '<td>';
-                texto_tabla += parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets);
-                acumTotalStm += parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets);
-                texto_tabla += '</td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
 
-                texto_tabla += '<td>';
-                texto_tabla += parseFloat(item.price).toFixed(2);
-                acumPrice += parseFloat(item.price);
-                texto_tabla += '</td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
 
-                texto_tabla += '<td>';
-                let totalTable = parseFloat(item.price) * (parseInt(item.stems) * parseInt(item.boxNumber) * parseInt(item.bouquets));
-                acumTotal += totalTable;
-                texto_tabla += totalTable.toFixed(2);
-                texto_tabla += '</td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
 
+                textBox += '</tr>';
+                let acumBoxStems = 0;
+                let acumBoxBunches = 0;
+                let acumTotalBox = 0;
+                let acumBoxTotalStems = 0;
+                $('#bodyTableDetails').append(textBox);
+                if (item.varieties.length > 0) {
+                    item.varieties.forEach(element => {
+                        let textVariety = '<tr>';
+                        textVariety += '<td>';
+                        textVariety += '</td>';
 
-                texto_tabla += '</tr>';
-            });
-            texto_tabla += '</tbody>';
-            texto_tabla += '<tfoot>';
-            texto_tabla += '<tr>';
+                        textVariety += '<td>';
+                        textVariety += '</td>';
 
-            texto_tabla += '<td>';
-            texto_tabla += qtyBox;
-            texto_tabla += '</td>';
+                        textVariety += '<td>';
+                        textVariety += element.products.name;
+                        textVariety += '</td>';
 
-            texto_tabla += '<td>';
-            texto_tabla += '</td>';
+                        textVariety += '<td>';
+                        textVariety += element.measures.name;
+                        textVariety += '</td>';
 
-            texto_tabla += '<td>';
-            texto_tabla += '</td>';
+                        textVariety += '<td>';
+                        textVariety += element.stems;
+                        acumBoxStems += parseInt(element.stems) * parseInt(item.boxNumber);
+                        qtyStems += parseInt(element.stems) * parseInt(item.boxNumber);
 
-            texto_tabla += '<td>';
-            texto_tabla += '</td>';
+                        textVariety += '</td>';
 
-            texto_tabla += '<td>';
-            texto_tabla += qtyStems;
-            texto_tabla += '</td>';
+                        textVariety += '<td>';
+                        textVariety += element.bunches;
+                        acumBoxBunches += parseInt(element.bunches) * parseInt(item.boxNumber);
+                        qtyBouquets += parseInt(element.bunches) * parseInt(item.boxNumber);
+                        textVariety += '</td>';
 
-            texto_tabla += '<td>';
-            texto_tabla += qtyBouquets;
-            texto_tabla += '</td>';
+                        textVariety += '<td>';
+                        textVariety += parseInt(element.stems) * parseInt(element.bunches);
+                        acumTotalStm += parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches);
+                        acumBoxTotalStems += parseInt(element.stems) * parseInt(element.bunches) * parseInt(item.boxNumber);
+                        textVariety += '</td>';
 
-            texto_tabla += '<td>';
-            texto_tabla += acumTotalStm;
-            texto_tabla += '</td>';
+                        textVariety += '<td>';
+                        textVariety += parseFloat(element.price).toFixed(2);
+                        textVariety += '</td>';
 
-            texto_tabla += '<td>';
-            texto_tabla += acumPrice.toFixed(2);
-            texto_tabla += '</td>';
+                        textVariety += '<td>';
+                        let totalBoxItem = parseFloat(element.price) * (parseInt(element.stems) * parseInt(element.bunches));
+                        let totalTable = parseFloat(element.price) * (parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches));
+                        acumTotal += totalTable;
+                        acumTotalBox += totalTable
+                        textVariety += totalBoxItem.toFixed(2);
+                        textVariety += '</td>';
 
-            texto_tabla += '<td>';
-            texto_tabla += acumTotal.toFixed(2);
-            texto_tabla += '</td>';
-
-            texto_tabla += '</tr>';
-            texto_tabla += '</tfoot>'
-            texto_tabla += '</table>'
-            $("#bodyModalDetails").html(texto_tabla);
-            $("#datatablesVarieties").DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                        textVariety += '</tr>';
+                        $('#bodyTableDetails').append(textVariety);
+                    });
                 }
+                let textFooterBox = '<tr>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumBoxStems;
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumBoxBunches;
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumBoxTotalStems;
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumTotalBox.toFixed(2);
+                textFooterBox += '</td>';
+
+                textFooterBox += '</tr>';
+                $('#bodyTableDetails').append(textFooterBox);
             });
+            let textFooter = '<tfoot>';
+            textFooter += '<tr>';
+
+            textFooter += '<td>';
+            textFooter += qtyBox;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += qtyStems;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += qtyBouquets;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumTotalStm;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumTotal.toFixed(2);
+            textFooter += '</td>';
+
+            textFooter += '</tr>';
+            textFooter += '</tfoot>';
+            $('#bodyTableDetails').after(textFooter);
         } else {
             $('#bodyModalDetails').append('<div class="alert alert-info">Se encuentra vacio</div>');
         }

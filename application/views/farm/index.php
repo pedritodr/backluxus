@@ -199,7 +199,7 @@
                                 <option value="0"><?= translate('select_opction_lang') ?></option>
                                 <?php if ($users_luxus) { ?>
                                     <?php foreach ($users_luxus as $item) { ?>
-                                        <option value="<?= $item->user_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                        <option value="<?= $item->user_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name . ' ' . $item->surname ?></option>
                                     <?php   } ?>
                                 <?php } ?>
                             </select>

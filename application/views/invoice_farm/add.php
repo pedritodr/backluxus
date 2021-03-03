@@ -213,6 +213,9 @@
                                                                 <?php if (isset($item->markings)) { ?>
                                                                     <?php if (count($item->markings) > 0) { ?>
                                                                         <?php foreach ($item->markings as $marking) { ?>
+                                                                            <?php $marking->name_commercial = $item->name_commercial;
+                                                                            $marking->name_company = $item->name_company;
+                                                                            ?>
                                                                             <option value="<?= base64_encode(json_encode($marking)) ?>"><?= $marking->name_marking . ' | ' . $item->name_commercial ?></option>
                                                                         <?php } ?>
                                                                     <?php } ?>
@@ -331,7 +334,7 @@
                                 </fieldset>
                                 <fieldset>
                                     <div class="form-card">
-                                        <h2 class="text-center"> <input onclick="addVarieties(false)" type="button" class="btn btn-success" value="<?= translate('add_producto_lang') ?>" /> </h2>
+                                        <h2 class="text-center"> <input onclick="addVarieties(false)" type="button" class="btn btn-success" value="<?= translate('add_boxlang') ?>" /> </h2>
                                         <br>
                                         <div class="table-responsive" id="tableVarieties">
                                             <div class="alert alert-info">Se encuentra vacio</div>
@@ -451,7 +454,8 @@
                             </div>
                             <div class="col-lg-6 text-right">
                                 <br>
-                                <input id="indiceTempObj" style="display:none">
+                                <input id="indiceRequest" type="hidden">
+                                <input id="indiceTempObj" type="hidden">
                                 <button id="btnAddVarietyBox" onclick="addVarietyBox()" class="btn btn-primary"><?= translate('add_producto_lang') ?></button>
                                 <button id="btnCancelEdit" style="display:none" onclick="cancelUpdateItem()" class="btn btn-default"><?= translate('cancel_lang') ?></button>
                             </div>
@@ -462,6 +466,7 @@
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> <?= translate('cerrar_lang') ?></button>
                 <button id="btnModalVarieties" onclick="addVarietiesInvoice()" class="btn btn-success"><?= translate('end_boxlang') ?></button>
+                <button id="btnCancelEditRequest" style="display:none" onclick="cancelUpdateRequest()" class="btn btn-default"><?= translate('cancel_lang') ?></button>
             </div>
         </div>
     </div>
@@ -643,13 +648,13 @@
 
             } else if ($("fieldset").index(current_fs) == 2) {
                 validNext = false;
-                if (arrayRequest.varieties.length > 0) {
+                if (arrayRequest.length > 0) {
                     $('#spinnerFinalize').show();
                     $('#spanFinalize').text('Creando invoice...');
                     $('#btnPrevius').prop('disabled', true);
                     //crear invoice
                     let farms = $('select[name=farms] option').filter(':selected').val();
-                    let markings = $('select[name=markings] option').filter(':selected').attr('itemId');
+                    let markings = $('select[name=markings] option').filter(':selected').val();
                     //let client = $('select[name=clients] option').filter(':selected').val();
                     //client = JSON.parse(decodeB64Utf8(client));
                     markings = JSON.parse(decodeB64Utf8(markings));
@@ -658,7 +663,7 @@
                     let awb = $('#awb').val().trim();
                     let invoceNumber = $('#invoceNumber').val().trim();
                     let dispatchDay = $('#dispatchDay').val().trim();
-                    arrayRequest = JSON.stringify(arrayRequest.varieties);
+                    arrayRequest = JSON.stringify(arrayRequest);
                     let data = {
                         farms,
                         dispatchDay,
@@ -793,7 +798,7 @@
         return decodeURIComponent(escape(atob(str)));
     }
 
-    const addVarieties = (object) => {
+    const addVarieties = (object = null, editBox = false) => {
 
         if (!object) {
             $('#btnModalVarieties').attr('onclick', 'addVarietiesInvoice()');
@@ -810,59 +815,81 @@
             $('#price').val('');
             $('#boxNumber').val('1');
             $('#stems').val('1');
+            $('#btnCancelEditRequest').hide();
+            $('#btnCancelEdit').hide();
         } else {
-            object = JSON.parse(decodeB64Utf8(object));
-            $('#btnModalVarieties').attr('onclick', 'updateVarietiesInvoice("' + object.indice + '")');
-            $('#btnModalVarieties').text('<?= translate('edit_producto_lang') ?>');
-            $('#product').prop('disabled', true);
-            $('#product').empty();
-            $('select[name=categories]').val(object.categorie);
-            $.ajax({
-                type: 'POST',
-                url: "<?= site_url('invoice_farm/search_products') ?>",
-                data: {
-                    categorie: object.categorie
-                },
-                success: function(result) {
-                    result = JSON.parse(result);
-                    if (result.status == 200) {
-                        if (result.products.length > 0) {
-                            let cadenaProducts = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
-                            result.products.forEach(item => {
-                                if (object.products.product_id == item.product_id) {
-                                    cadenaProducts += '<option selected itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
-                                } else {
-                                    cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
-                                }
+            if (!editBox) {
+                object = JSON.parse(decodeB64Utf8(object));
+                $('#btnModalVarieties').attr('onclick', 'updateVarietiesInvoice("' + object.indice + '")');
+                $('#btnModalVarieties').text('<?= translate('edit_boxlang') ?>');
+                $('#product').prop('disabled', true);
+                $('#product').empty();
+                $('select[name=categories]').val(object.categorie);
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('invoice_farm/search_products') ?>",
+                    data: {
+                        categorie: object.categorie
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            if (result.products.length > 0) {
+                                let cadenaProducts = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                                result.products.forEach(item => {
+                                    if (object.products.product_id == item.product_id) {
+                                        cadenaProducts += '<option selected itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
+                                    } else {
+                                        cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
+                                    }
 
-                            });
-                            $('#product').append(cadenaProducts);
-                            $('#product').prop('disabled', false);
+                                });
+                                $('#product').append(cadenaProducts);
+                                $('#product').prop('disabled', false);
+                            } else {
+                                swal({
+                                    title: '¡Error!',
+                                    text: 'La categoria se encuentra sin productos',
+                                    padding: '2em'
+                                });
+                            }
                         } else {
                             swal({
                                 title: '¡Error!',
-                                text: 'La categoria se encuentra sin productos',
+                                text: result.msj,
                                 padding: '2em'
                             });
+                            $('#spinnerFinalize').hide();
+                            $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
                         }
-                    } else {
-                        swal({
-                            title: '¡Error!',
-                            text: result.msj,
-                            padding: '2em'
-                        });
-                        $('#spinnerFinalize').hide();
-                        $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
-                    }
 
-                }
-            });
-            $('[name=measures]').val(object.measures.measure_id);
-            $('[name=typeBox]').val(object.typeBoxs.box_id);
-            $('#bunches').val(object.bunches);
-            $('#price').val(object.price);
-            $('#boxNumber').val(object.boxNumber);
-            $('#stems').val(object.stems);
+                    }
+                });
+                $('[name=measures]').val(object.measures.measure_id);
+                $('[name=typeBox]').val(object.typeBoxs.box_id);
+                $('#bunches').val(object.bunches);
+                $('#price').val(object.price);
+                $('#boxNumber').val(object.boxNumber);
+                $('#stems').val(object.stems);
+                $('#btnCancelEditRequest').hide();
+            } else {
+                object = JSON.parse(decodeB64Utf8(object));
+                tempObject = object;
+                $('#btnModalVarieties').attr('onclick', 'updateVarietiesInvoice("' + object.indice + '")');
+                $('#btnModalVarieties').text('<?= translate('edit_boxlang') ?>');
+                $('#btnCancelEdit').hide();
+                $('#btnCancelEditRequest').show();
+                $('.counter').text(tempObject.varieties.length);
+                $('[name=categories]').val('0');
+                $('#categories').trigger('change');
+                $('#product').prop('disabled', true);
+                $('#product').empty();
+                $('#boxNumber').val(object.boxNumber);
+                $('[name=typeBox]').val(object.typeBoxs.box_id);
+                $('#typeBox').trigger('change');
+                loadItems();
+            }
+
         }
         $('#modalAddVarieties').modal({
             backdrop: false
@@ -1320,7 +1347,7 @@
             texto_tabla += '<th>Acciones</th>';
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
-            texto_tabla += '<tbody id="bodyTableDetails>';
+            texto_tabla += '<tbody id="bodyTableDetails">';
 
             texto_tabla += '</tbody>';
             texto_tabla += '</table>';
@@ -1329,37 +1356,37 @@
             arrayRequest.forEach((item, indice, array) => {
                 item.indice = indice;
                 let textBox = '<tr>';
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += item.boxNumber;
                 qtyBox += parseInt(item.boxNumber);
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += item.typeBoxs.name;
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += '</td>';
 
-                textBox += '<td>';
+                textBox += '<td bgcolor= "#f1f2f3">';
 
                 textBox += '<div class="btn-group mb-4 mr-2" role="group">';
                 textBox += '<button id="btnOutline" type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Acciónes <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">';
@@ -1367,14 +1394,17 @@
                 textBox += '</svg>';
                 textBox += '</button>';
                 textBox += '<div class="dropdown-menu" aria-labelledby="btnOutline" style="will-change: transform;">';
-                textBox += '<a class="dropdown-item" href="javascript:void(0);"  onclick=addVarieties("' + encodeB64Utf8(JSON.stringify(item)) + '");> Editar</a>';
+                textBox += '<a class="dropdown-item" href="javascript:void(0);"  onclick=addVarieties("' + encodeB64Utf8(JSON.stringify(item)) + '","' + true + '");> Editar</a>';
                 textBox += '<a class="dropdown-item" href="javascript:void(0);"  onclick=deleteVarieties("' + indice + '");> Eliminar</a>';
                 textBox += '</div>';
                 textBox += '</div>';
                 textBox += '</td>';
                 textBox += '</tr>';
+                let acumBoxStems = 0;
+                let acumBoxBunches = 0;
+                let acumTotalBox = 0;
+                let acumBoxTotalStems = 0;
                 $('#bodyTableDetails').append(textBox);
-
                 if (item.varieties.length > 0) {
                     item.varieties.forEach(element => {
                         let textVariety = '<tr>';
@@ -1394,37 +1424,79 @@
 
                         textVariety += '<td>';
                         textVariety += element.stems;
-                        qtyStems += parseInt(element.stems);
+                        acumBoxStems += parseInt(element.stems) * parseInt(item.boxNumber);
+                        qtyStems += parseInt(element.stems) * parseInt(item.boxNumber);
+
                         textVariety += '</td>';
 
                         textVariety += '<td>';
                         textVariety += element.bunches;
-                        qtyBouquets += parseInt(element.bunches);
+                        acumBoxBunches += parseInt(element.bunches) * parseInt(item.boxNumber);
+                        qtyBouquets += parseInt(element.bunches) * parseInt(item.boxNumber);
                         textVariety += '</td>';
 
                         textVariety += '<td>';
-                        textVariety += parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches);
+                        textVariety += parseInt(element.stems) * parseInt(element.bunches);
                         acumTotalStm += parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches);
+                        acumBoxTotalStems += parseInt(element.stems) * parseInt(element.bunches) * parseInt(item.boxNumber);
                         textVariety += '</td>';
 
                         textVariety += '<td>';
                         textVariety += parseFloat(element.price).toFixed(2);
-                        acumPrice += parseFloat(element.price);
                         textVariety += '</td>';
 
                         textVariety += '<td>';
+                        let totalBoxItem = parseFloat(element.price) * (parseInt(element.stems) * parseInt(element.bunches));
                         let totalTable = parseFloat(element.price) * (parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches));
                         acumTotal += totalTable;
-                        textVariety += totalTable.toFixed(2);
+                        acumTotalBox += totalTable
+                        textVariety += totalBoxItem.toFixed(2);
                         textVariety += '</td>';
 
                         textVariety += '<td>';
-
                         textVariety += '</td>';
                         textVariety += '</tr>';
                         $('#bodyTableDetails').append(textVariety);
                     });
                 }
+                let textFooterBox = '<tr>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumBoxStems;
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumBoxBunches;
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumBoxTotalStems;
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumTotalBox.toFixed(2);
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '</tr>';
+                $('#bodyTableDetails').append(textFooterBox);
             });
             let textFooter = '<tfoot>';
             textFooter += '<tr>';
@@ -1455,7 +1527,6 @@
             textFooter += '</td>';
 
             textFooter += '<td>';
-            textFooter += acumPrice.toFixed(2);
             textFooter += '</td>';
 
             textFooter += '<td>';
@@ -1468,11 +1539,11 @@
             textFooter += '</tr>';
             textFooter += '</tfoot>';
             $('#bodyTableDetails').after(textFooter);
-            $("#datatablesVarieties").DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-                }
-            });
+            /*     $("#datatablesVarieties").DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                    }
+                }); */
         } else {
             $('#tableVarieties').append('<div class="alert alert-info">Se encuentra vacio</div>');
         }
@@ -1484,40 +1555,25 @@
     }
 
     const updateVarietiesInvoice = (indice) => {
-        let products = $('select[name=product] option').filter(':selected').attr('itemId');
         let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
-        let measures = $('select[name=measures] option').filter(':selected').attr('itemId');
-        let categorie = $('select[name=categories] option').filter(':selected').val();
-        let bouquets = $('#bouquets').val().trim();
-        let price = $('#price').val().trim();
-        let stems = $('#stems').val().trim();
         let boxNumber = $('#boxNumber').val().trim();
-        if (products == 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
+        if (!tempObject || tempObject.length == 0) {
+            arrayRequest.splice(indice, 1);
+            swal({
+                title: '¡Perfecto!',
+                text: "Caja fue actualizada correctamente",
+                type: 'success',
+                timer: 2000,
                 showConfirmButton: false,
-                timer: 3000,
                 padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'Seleccione una variedad',
-                padding: '3em',
             })
-        } else if (measures == 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'Seleccione una medida',
-                padding: '3em',
-            })
+            $('#modalAddVarieties').modal('hide');
+            setTimeout(() => {
+                cancelUpdateRequest();
+                tempObject = null;
+                cargarDetails();
+                $('.counter').text(0);
+            }, 2000);
         } else if (typeBoxs == 0) {
             const toast = swal.mixin({
                 toast: true,
@@ -1531,86 +1587,28 @@
                 title: 'Seleccione un Type box',
                 padding: '3em',
             })
-        } else if (stems <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo stems no puede ser 0',
-                padding: '3em',
-            })
-        } else if (boxNumber <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo Nro de cajas no puede ser 0',
-                padding: '3em',
-            })
-        } else if (bouquets <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo bouquets no puede ser 0',
-                padding: '3em',
-            })
-        } else if (price <= 0) {
-            const toast = swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                padding: '2em'
-            });
-            toast({
-                type: 'error',
-                title: 'El campo precio no puede ser 0',
-                padding: '3em',
-            })
         } else {
-            products = JSON.parse(decodeB64Utf8(products));
             typeBoxs = JSON.parse(decodeB64Utf8(typeBoxs));
-            measures = JSON.parse(decodeB64Utf8(measures));
-            let object = {
-                products,
-                typeBoxs,
-                measures,
-                price,
-                boxNumber,
-                bouquets,
-                stems,
-                categorie
-            };
-            updateArrayRequest(object, indice);
+            tempObject.typeBoxs = typeBoxs;
+            tempObject.boxNumber = boxNumber;
+            arrayRequest[indice] = tempObject;
             $('#modalAddVarieties').modal('hide');
             setTimeout(() => {
+                cancelUpdateRequest();
+                tempObject = null;
                 cargarDetails();
+                $('.counter').text(0);
             }, 2000);
             swal({
                 title: '¡Perfecto!',
-                text: "Variedad agregada correctamente",
+                text: "Caja fue actualizada correctamente",
                 type: 'success',
                 timer: 2000,
                 showConfirmButton: false,
                 padding: '2em'
             })
         }
+
     }
 
     const updateArrayRequest = (object, indice) => {
@@ -1628,7 +1626,7 @@
             padding: '2em'
         }).then(function(result) {
             if (result.value) {
-                arrayRequest.varieties.splice(indice, 1);
+                arrayRequest.splice(indice, 1);
                 cargarDetails();
             }
         })
@@ -1964,6 +1962,20 @@
     }
 
     const cancelAddItem = () => {
+        // $('#bunches').val('');
+        // $('#price').val('');
+        //$('#stems').val('');
+        $('#measures').val(0);
+        $('#measures').trigger('change');
+        $('#btnAddVarietyBox').attr('onclick', 'addVarietyBox()')
+        $('#btnAddVarietyBox').text(textAddItem);
+        $('#indiceTempObj').val('');
+        $('#totalStm').text(0);
+        $('#total').text(0);
+        $('#btnCancelEdit').hide();
+    }
+
+    const cancelUpdateRequest = () => {
         $('#bunches').val('');
         $('#price').val('');
         $('#stems').val('');
@@ -1974,6 +1986,12 @@
         $('#indiceTempObj').val('');
         $('#totalStm').text(0);
         $('#total').text(0);
+        $('#indiceRequest').val('')
         $('#btnCancelEdit').hide();
+        $('#btnCancelEditRequest').hide();
+        $('#btnModalVarieties').attr('onclick', 'addVarietiesInvoice()');
+        $('#btnModalVarieties').text('<?= translate('end_boxlang') ?>');
+        tempObject = null;
+        $('.counter').text(0);
     }
 </script>

@@ -33,7 +33,7 @@ class Farm extends CI_Controller
                 $item->farms_sons = $this->farm->get_all_farm_sons($item->farm_id);
             }
         }
-        $users_luxus = $this->user->get_all(['role_id' => 1, 'is_delete' => 0]);
+        $users_luxus = $this->user->get_all(['role_id' => 2, 'is_delete' => 0]);
         $data['countrys'] = $this->country->get_all_countrys_farms();
         $data['users_luxus'] = $users_luxus;
         $data['all_providers'] = $all_providers;
