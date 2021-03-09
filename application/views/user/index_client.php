@@ -668,7 +668,7 @@
     $('[name=countryMarking]').change(() => {
         $('#citysMarking').prop('disabled', true);
         $('#citysMarking').empty();
-        let country = $('select[name=countryMarking] option').filter(':selected').val();
+        let country = $('select[name=countryMarking] option').filter(':selected').attr('itemId');
         if (country != 0) {
             country = JSON.parse(decodeB64Utf8(country));
             if (country.citys.length > 0) {
