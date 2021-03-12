@@ -4,7 +4,7 @@
     "license": "MIT",
     "require": {
         "php": ">=5.2.4",
-        "mongodb/mongodb": "^1.7"
+        "mongodb/mongodb": "^1.8"
     },
     "require-dev": {
 

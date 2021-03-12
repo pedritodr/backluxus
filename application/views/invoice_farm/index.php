@@ -88,7 +88,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel"><?= translate('details_lang') ?></h5>
             </div>
-            <div class="modal-body" id="bodyModalDetails">
+            <div class="modal-body table-responsive" id="bodyModalDetails">
 
             </div>
             <div class="modal-footer">
@@ -126,6 +126,9 @@
         let acumTotalStm = 0;
         let acumPrice = 0;
         let acumTotal = 0;
+        let acumHb = 0;
+        let acumQb = 0;
+        let acumEb = 0;
         if (details.length > 0) {
             let texto_tabla = '';
             texto_tabla += '<table id="datatablesVarieties" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
@@ -149,6 +152,15 @@
             $("#bodyModalDetails").html(texto_tabla);
 
             details.forEach((item, indice, array) => {
+
+                if (item.typeBoxs.name.toUpperCase().trim() === "HB") {
+                    acumHb += parseInt(item.boxNumber);
+                } else if (item.typeBoxs.name.toUpperCase().trim() === "QB") {
+                    acumQb += parseInt(item.boxNumber);
+                } else {
+                    acumEb += parseInt(item.boxNumber);
+                }
+
                 item.indice = indice;
                 let textBox = '<tr>';
                 textBox += '<td bgcolor= "#f1f2f3">';
@@ -274,6 +286,7 @@
 
                 textFooterBox += '</tr>';
                 $('#bodyTableDetails').append(textFooterBox);
+
             });
             let textFooter = '<tfoot>';
             textFooter += '<tr>';
@@ -313,6 +326,21 @@
             textFooter += '</tr>';
             textFooter += '</tfoot>';
             $('#bodyTableDetails').after(textFooter);
+            let fulles = (acumHb * 0.50) + (acumQb * 0.25) + (acumEb * 0.125);
+            if (acumEb > 0) {
+                fulles = fulles.toFixed(3);
+            } else {
+                fulles = fulles.toFixed(2);
+            }
+            let textResumen = '<div class="row">';
+            textResumen += '<div class="col-3" style="background:#f9f9c6">';
+            textResumen += '<p class="text-left"><b>FULLES= </b> <span id="spanFulles" style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + fulles + '</span></p>';
+            textResumen += '<p class="text-left"><b>PIEZAS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + qtyBox + '</span></p>';
+            textResumen += '<p class="text-left"><b>TALLOS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + acumTotalStm + '</span></p>';
+            textResumen += '<p class="text-left"><b>TOTAL= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">$ ' + acumTotal.toFixed(2) + '</span></p>';
+            textResumen += '</div>';
+            textResumen += '</div>';
+            $('#datatablesVarieties').after(textResumen);
         } else {
             $('#bodyModalDetails').append('<div class="alert alert-info">Se encuentra vacio</div>');
         }

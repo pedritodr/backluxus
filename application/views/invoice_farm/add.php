@@ -156,7 +156,45 @@
     #modalItems {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
+
+    .fulles {
+        border: 1px solid #000;
+        border-radius: 5px;
+        background: #f9f9c6;
+        color: #fff;
+        cursor: pointer;
+        display: none;
+        font-size: 14px;
+        padding: 6px 15px;
+        position: fixed;
+        top: 15%;
+        right: 1%;
+        z-index: 100000
+    }
+
+    .swal2-container {
+        display: flex;
+        position: fixed;
+        z-index: 160000000000;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        padding: .625em;
+        overflow-x: hidden;
+        transition: background-color .1s;
+        -webkit-overflow-scrolling: touch;
+    }
 </style>
+<div class="fulles">
+    <p class="text-left"><b>FULLES= </b> <span id="spanFulles" style="color: #fd6a6a;font-size: 16px;font-weight: bold;"></span></p>
+    <p class="text-left"><b>PIEZAS= </b> <span id="spanPiezas" style="color: #fd6a6a;font-size: 16px;font-weight: bold;"></span></p>
+    <p class="text-left"><b>TALLOS= </b> <span id="spanTallos" style="color: #fd6a6a;font-size: 16px;font-weight: bold;"></span></p>
+    <p class="text-left"><b>TOTAL= </b> <span id="spanTotal" style="color: #fd6a6a;font-size: 16px;font-weight: bold;">$</span></p>
+</div>
 <div class="main-container" id="container">
     <div class="layout-px-spacing" style="width:100%">
         <h3>
@@ -477,7 +515,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Items</h5>
             </div>
-            <div class="modal-body" id="bodyModalItems">
+            <div class="modal-body table-responsive" id="bodyModalItems">
 
             </div>
             <div class="modal-footer">
@@ -491,6 +529,10 @@
 <script>
     let textEditItem = '<?= translate('update_item_lang') ?>';
     let textAddItem = '<?= translate('add_producto_lang') ?>';
+    let acumTotal = 0;
+    let acumTotalStm = 0;
+    let fulles = 0;
+    let qtyBox = 0;
 
     const calcularDate = () => {
         let dateToday = new Date();
@@ -552,6 +594,7 @@
             current_fs = $(this).parent();
             next_fs = $(this).parent().next();
             if ($("fieldset").index(current_fs) == 0) {
+                $('.fulles').hide();
                 validNext = false;
                 let farms = $('select[name=farms] option').filter(':selected').val();
                 let markings = $('select[name=markings] option').filter(':selected').val();
@@ -585,6 +628,11 @@
                     validNext = true;
                 }
             } else if ($("fieldset").index(current_fs) == 1) {
+                $('.fulles').show();
+                $('#spanFulles').text(fulles);
+                $('#spanPiezas').text(qtyBox);
+                $('#spanTallos').text(acumTotalStm);
+                $('#spanTotal').text(acumTotal);
                 validNext = false;
                 // let date = $('#date').val().trim();
                 //  let country = $('select[name=country] option').filter(':selected').val();
@@ -647,6 +695,7 @@
                 }
 
             } else if ($("fieldset").index(current_fs) == 2) {
+                $('.fulles').show();
                 validNext = false;
                 if (arrayRequest.length > 0) {
                     $('#spinnerFinalize').show();
@@ -1324,12 +1373,16 @@
 
     const cargarDetails = () => {
         $('#tableVarieties').empty();
-        let qtyBox = 0;
+        qtyBox = 0;
         let qtyStems = 0;
         let qtyBouquets = 0;
-        let acumTotalStm = 0;
+        acumTotalStm = 0;
         let acumPrice = 0;
-        let acumTotal = 0;
+        acumTotal = 0;
+        let acumHb = 0;
+        let acumQb = 0;
+        let acumEb = 0;
+        fulles = 0;
         if (arrayRequest.length > 0) {
             let texto_tabla = '';
             texto_tabla += '<table id="datatablesVarieties" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
@@ -1340,7 +1393,7 @@
             texto_tabla += '<th>VARIETIES</th>';
             texto_tabla += '<th>CM</th>';
             texto_tabla += '<th>STEMS</th>';
-            texto_tabla += '<th>BOUQUETS</th>';
+            texto_tabla += '<th>BUNCHES</th>';
             texto_tabla += '<th>TOTAL STM</th>';
             texto_tabla += '<th>PRICE</th>';
             texto_tabla += '<th>TOTAL</th>';
@@ -1354,7 +1407,17 @@
             $("#tableVarieties").html(texto_tabla);
 
             arrayRequest.forEach((item, indice, array) => {
+
                 item.indice = indice;
+
+                if (item.typeBoxs.name.toUpperCase().trim() === "HB") {
+                    acumHb += parseInt(item.boxNumber);
+                } else if (item.typeBoxs.name.toUpperCase().trim() === "QB") {
+                    acumQb += parseInt(item.boxNumber);
+                } else {
+                    acumEb += parseInt(item.boxNumber);
+                }
+
                 let textBox = '<tr>';
                 textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += item.boxNumber;
@@ -1539,6 +1602,25 @@
             textFooter += '</tr>';
             textFooter += '</tfoot>';
             $('#bodyTableDetails').after(textFooter);
+            fulles = (acumHb * 0.50) + (acumQb * 0.25) + (acumEb * 0.125);
+            if (acumEb > 0) {
+                fulles = fulles.toFixed(3);
+            } else {
+                fulles = fulles.toFixed(2);
+            }
+            $('#spanFulles').text(fulles);
+            $('#spanPiezas').text(qtyBox);
+            $('#spanTallos').text(acumTotalStm);
+            $('#spanTotal').text('$ ' + acumTotal.toFixed(2));
+            /*   let textResumen = '<div class="row">';
+              textResumen += '<div class="col-3" style="background:#f9f9c6">';
+              textResumen += '<p class="text-left"><b>FULLES= </b> <span id="spanFulles" style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + fulles + '</span></p>';
+              textResumen += '<p class="text-left"><b>PIEZAS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + qtyBox + '</span></p>';
+              textResumen += '<p class="text-left"><b>TALLOS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + acumTotalStm + '</span></p>';
+              textResumen += '<p class="text-left"><b>TOTAL= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">$ ' + acumTotal.toFixed(2) + '</span></p>';
+              textResumen += '</div>';
+              textResumen += '</div>';
+              $('#datatablesVarieties').after(textResumen); */
             /*     $("#datatablesVarieties").DataTable({
                     "language": {
                         "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
@@ -1635,11 +1717,28 @@
     const loadItems = () => {
         $('#bodyModalItems').empty();
         let acumTotal = 0;
+        let acumStemsItems = 0;
+        let fullesItems = 0;
+
         if (tempObject) {
             let textTypoBox = '<?= translate("type_box_lang") ?> :';
             let textNumberBox = '<?= translate("box_number_lang") ?> :';
-            let texto_tabla = '<p>' + textTypoBox + tempObject.typeBoxs.name + '</p>';
-            texto_tabla += '<p>' + textNumberBox + tempObject.boxNumber + '</p>';
+            let texto_tabla = '<b><p>' + textTypoBox + tempObject.typeBoxs.name + '</p></b>';
+            texto_tabla += '<b><p>' + textNumberBox + tempObject.boxNumber + '</p></b>';
+            if (tempObject.typeBoxs.name.toUpperCase().trim() === "HB") {
+                fullesItems = 0.50 * parseInt(tempObject.boxNumber);
+                fullesItems = fullesItems.toFixed(2);
+            } else if (tempObject.typeBoxs.name.toUpperCase().trim() === "QB") {
+                fullesItems = 0.25 * parseInt(tempObject.boxNumber);
+                fullesItems = fullesItems.toFixed(2);
+            } else {
+                fullesItems = 0.125 * parseInt(tempObject.boxNumber);
+                fullesItems = fullesItems.toFixed(3);
+            }
+
+            texto_tabla += '<b><p>Fulles: ' + fullesItems + '</p></b>';
+            texto_tabla += '<b><p id="bunchesItems">Tallos: ' + (acumStemsItems * parseInt(tempObject.boxNumber)) + '</p></b>';
+            texto_tabla += '<b><p id="totalItems">Total: ' + (acumTotal * parseInt(tempObject.boxNumber)) + '</p></b>';
             if (tempObject.varieties.length > 0) {
                 texto_tabla += '<table id="datatablesItems" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
                 texto_tabla += '<thead>';
@@ -1677,6 +1776,7 @@
 
                     texto_tabla += '<td>';
                     texto_tabla += parseInt(item.stems) * parseInt(item.bunches);
+                    acumStemsItems += parseInt(item.stems) * parseInt(item.bunches);
                     texto_tabla += '</td>';
 
                     texto_tabla += '<td>';
@@ -1697,6 +1797,8 @@
                 texto_tabla += '</tbody>';
                 texto_tabla += '</table>'
                 $("#bodyModalItems").html(texto_tabla);
+                $('#totalItems').text('Total:$ ' + (acumTotal * parseInt(tempObject.boxNumber)).toFixed(2));
+                $('#bunchesItems').text('Tallos: ' + (acumStemsItems * parseInt(tempObject.boxNumber)));
                 $("#datatablesItems").DataTable({
                     "language": {
                         "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"

@@ -6,10 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
-    'PhpOffice\\PhpSpreadsheet\\' => array($vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet'),
+    'Symfony\\Polyfill\\Php80\\' => array($vendorDir . '/symfony/polyfill-php80'),
+    'PackageVersions\\' => array($vendorDir . '/composer/package-versions-deprecated/src/PackageVersions'),
     'MongoDB\\' => array($vendorDir . '/mongodb/mongodb/src'),
-    'Matrix\\' => array($vendorDir . '/markbaker/matrix/classes/src'),
-    'Composer\\Installers\\' => array($vendorDir . '/composer/installers/src/Composer/Installers'),
-    'Complex\\' => array($vendorDir . '/markbaker/complex/classes/src'),
+    'Jean85\\' => array($vendorDir . '/jean85/pretty-package-versions/src'),
 );
