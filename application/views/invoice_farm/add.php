@@ -157,6 +157,10 @@
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
 
+    #modalDetailsInvoice {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
     .fulles {
         border: 1px solid #000;
         border-radius: 5px;
@@ -275,7 +279,7 @@
                                             <div class="col-lg-4">
                                                 <label><?= translate("invoice_number_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control input-sm" name="invoceNumber" id="invoceNumber" placeholder="<?= translate('invoice_number_lang'); ?>">
+                                                    <input type="number" class="form-control input-sm" onchange="validInvoice()" name="invoceNumber" id="invoceNumber" placeholder="<?= translate('invoice_number_lang'); ?>">
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
@@ -524,6 +528,30 @@
         </div>
     </div>
 </div>
+<div class="modal fadeInDown" id="modalDetailsInvoice" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="numberInvoiceDetail"></h5>
+            </div>
+            <div class="modal-body">
+                <div class="roww">
+                    <div class="col-lg-12" id="bodyInfoInvoice">
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 table-responsive" id="bodyDetailsInvoice">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModalDetailsInvoice()"><i class="flaticon-cancel-12"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="<?= base_url() ?>admin_template/plugins/jquery-step/jquery.steps.min.js"></script>
 
 <script>
@@ -543,35 +571,34 @@
     $(document).ready(function() {
 
         $("#selectFarms").select2({
-            tags: true,
-            /*   dropdownParent: $("#modalAddManagers"), */
+            tags: false,
             placeholder: '<?= translate('select_opction_lang') ?>',
             allowClear: false,
         });
+        $("#selectFarms").select2('open');
 
         $("#markings").select2({
-            tags: true,
-            /*   dropdownParent: $("#modalAddManagers"), */
+            tags: false,
             placeholder: '<?= translate('select_opction_lang') ?>',
             allowClear: false,
         });
 
         $("#categories").select2({
-            tags: true,
+            tags: false,
             dropdownParent: $("#modalAddVarieties"),
             placeholder: '<?= translate('select_opction_lang') ?>',
             allowClear: false,
         });
 
         $("#measures").select2({
-            tags: true,
+            tags: false,
             dropdownParent: $("#modalAddVarieties"),
             placeholder: '<?= translate('select_opction_lang') ?>',
             allowClear: false,
         });
 
         $("#typeBox").select2({
-            tags: true,
+            tags: false,
             dropdownParent: $("#modalAddVarieties"),
             placeholder: '<?= translate('select_opction_lang') ?>',
             allowClear: false,
@@ -847,6 +874,81 @@
         return decodeURIComponent(escape(atob(str)));
     }
 
+    const validInvoice = () => {
+        let invoiceNumber = $('#invoceNumber').val().trim();
+        if (invoiceNumber.length > 4) {
+            swal({
+                title: '¡Información!',
+                text: "Número de invoice no cumple con la cantidad de caracteres",
+                type: 'info',
+                showConfirmButton: true,
+                padding: '2em'
+            })
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: "<?= site_url('invoice_farm/search_number_invoice') ?>",
+                data: {
+                    invoiceNumber
+                },
+                success: function(result) {
+                    result = JSON.parse(result);
+                    if (result.status == 200) {
+                        if (result.invoice) {
+                            swal({
+                                title: '¡Información!',
+                                text: "El número de invoice ya se encuentra registrado",
+                                type: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ver invoice',
+                                cancelButtonText: 'Continuar'
+                            }).then((response) => {
+                                if (response.value) {
+                                    loadDetailsInvoice(result.invoice);
+                                } else if (response.dismiss === Swal.DismissReason.cancel) {
+                                    $('#invoceNumber').val('');
+                                }
+                            })
+                        } else {
+                            if (invoiceNumber.length < 4) {
+                                let numberInvoiceComplet = zFill(invoiceNumber, 4);
+                                $('#invoceNumber').val(numberInvoiceComplet);
+                            }
+                        }
+                    } else {
+                        swal({
+                            title: '¡Error!',
+                            text: result.msj,
+                            padding: '2em'
+                        });
+                    }
+
+                }
+            });
+        }
+    }
+
+    const zFill = (number, width) => {
+        let numberOutput = Math.abs(number); /* Valor absoluto del número */
+        let length = number.toString().length; /* Largo del número */
+        let zero = "0"; /* String de cero */
+
+        if (width <= length) {
+            if (number < 0) {
+                return ("-" + numberOutput.toString());
+            } else {
+                return numberOutput.toString();
+            }
+        } else {
+            if (number < 0) {
+                return ("-" + (zero.repeat(width - length)) + numberOutput.toString());
+            } else {
+                return ((zero.repeat(width - length)) + numberOutput.toString());
+            }
+        }
+    }
+
     const addVarieties = (object = null, editBox = false) => {
 
         if (!object) {
@@ -854,16 +956,56 @@
             $('#btnModalVarieties').text('<?= translate('end_boxlang') ?>');
             $('#product').prop('disabled', true);
             $('#product').empty();
-            $('[name=categories]').val('0');
+            $('[name=categories]').val('category_5fea02c2aff96');
             $('#categories').trigger('change');
+            $.ajax({
+                type: 'POST',
+                url: "<?= site_url('invoice_farm/search_products') ?>",
+                data: {
+                    categorie: 'category_5fea02c2aff96'
+                },
+                success: function(result) {
+                    result = JSON.parse(result);
+                    if (result.status == 200) {
+                        if (result.products.length > 0) {
+                            let cadenaProducts = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                            result.products.forEach(item => {
+                                if (object.products.product_id == item.product_id) {
+                                    cadenaProducts += '<option selected itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
+                                } else {
+                                    cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
+                                }
+
+                            });
+                            $('#product').append(cadenaProducts);
+                            $('#product').prop('disabled', false);
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: 'La categoria se encuentra sin productos',
+                                padding: '2em'
+                            });
+                        }
+                    } else {
+                        swal({
+                            title: '¡Error!',
+                            text: result.msj,
+                            padding: '2em'
+                        });
+                        $('#spinnerFinalize').hide();
+                        $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
+                    }
+
+                }
+            });
             $('[name=measures]').val('0');
             $('#measures').trigger('change');
-            $('[name=typeBox]').val('0');
+            $('[name=typeBox]').val('box_60246ea43a311');
             $('#typeBox').trigger('change');
             $('#bunches').val('1');
             $('#price').val('');
             $('#boxNumber').val('1');
-            $('#stems').val('1');
+            $('#stems').val('25');
             $('#btnCancelEditRequest').hide();
             $('#btnCancelEdit').hide();
         } else {
@@ -945,6 +1087,20 @@
         })
     }
 
+    const loadDetailsInvoice = (objInvoice) => {
+        $('#bodyInfoInvoice').html('<p>' + objInvoice.markings.name_marking + '<b>/</b> ' + objInvoice.farms.name_commercial.toUpperCase() + ' (' + objInvoice.farms.name_legal + ') <b>/ </b> ' + objInvoice.invoice_number + ' <b> /</b> ' + objInvoice.dispatch_day + '<b> /</b> AWB ' + objInvoice.awb + '</p><br>');
+        $('#numberInvoiceDetail').text('Detalle del Invoice');
+        cargarDetailsInvoice(objInvoice.details);
+        $('#modalDetailsInvoice').modal({
+            backdrop: false
+        })
+    }
+
+    const closeModalDetailsInvoice = () => {
+        $('#modalDetailsInvoice').modal('hide');
+        $('#invoceNumber').val('');
+    }
+
     const selectedCategories = () => {
         $('#product').prop('disabled', true);
         $('#product').empty();
@@ -974,7 +1130,7 @@
                             });
                         }
                         $("#product").select2({
-                            tags: true,
+                            tags: false,
                             dropdownParent: $("#modalAddVarieties"),
                             placeholder: '<?= translate('select_opction_lang') ?>',
                             allowClear: false,
@@ -1004,7 +1160,9 @@
             }
             let bouquets = $('#bouquets').val();
             let price = $('#price').val();
-            $('#stems').val(products.stems_bunch);
+            if (products.stems_bunch !== undefined) {
+                $('#stems').val(products.stems_bunch !== '' ? products.stems_bunch : 25);
+            }
             let stems = $('#stems').val();
             if (bouquets > 0 && price > 0 && stems > 0) {
                 let totalTSM = parseInt(bouquets) * parseInt(stems);
@@ -1537,7 +1695,6 @@
                 textFooterBox += '</td>';
 
                 textFooterBox += '<td bgcolor= "#b9e0f1">';
-                textFooterBox += acumBoxStems;
                 textFooterBox += '</td>';
 
                 textFooterBox += '<td bgcolor= "#b9e0f1">';
@@ -1578,7 +1735,6 @@
             textFooter += '</td>';
 
             textFooter += '<td>';
-            textFooter += qtyStems;
             textFooter += '</td>';
 
             textFooter += '<td>';
@@ -1628,6 +1784,228 @@
                 }); */
         } else {
             $('#tableVarieties').append('<div class="alert alert-info">Se encuentra vacio</div>');
+        }
+
+    }
+
+    const cargarDetailsInvoice = (details) => {
+        let qtyBoxDetails = 0;
+        let qtyStems = 0;
+        let qtyBouquets = 0;
+        let acumPrice = 0;
+        let acumHb = 0;
+        let acumQb = 0;
+        let acumEb = 0;
+        let acumTotalDetails = 0;
+        let acumStemsDetails = 0;
+        if (details.length > 0) {
+            let texto_tabla = '';
+            texto_tabla += '<table id="datatablesDetailsInvoice" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
+            texto_tabla += '<thead>';
+            texto_tabla += '<tr>';
+            texto_tabla += '<th>NRO BOX</th>';
+            texto_tabla += '<th>BOX TYPE</th>';
+            texto_tabla += '<th>VARIETIES</th>';
+            texto_tabla += '<th>CM</th>';
+            texto_tabla += '<th>STEMS</th>';
+            texto_tabla += '<th>BUNCHES</th>';
+            texto_tabla += '<th>TOTAL STM</th>';
+            texto_tabla += '<th>PRICE</th>';
+            texto_tabla += '<th>TOTAL</th>';
+            texto_tabla += '</tr>';
+            texto_tabla += '</thead>';
+            texto_tabla += '<tbody id="bodyTableDetailsInvoice">';
+
+            texto_tabla += '</tbody>';
+            texto_tabla += '</table>';
+            $("#bodyDetailsInvoice").html(texto_tabla);
+
+            details.forEach((item, indice, array) => {
+
+                if (item.typeBoxs.name.toUpperCase().trim() === "HB") {
+                    acumHb += parseInt(item.boxNumber);
+                } else if (item.typeBoxs.name.toUpperCase().trim() === "QB") {
+                    acumQb += parseInt(item.boxNumber);
+                } else {
+                    acumEb += parseInt(item.boxNumber);
+                }
+
+                let textBox = '<tr>';
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += item.boxNumber;
+                qtyBoxDetails += parseInt(item.boxNumber);
+                textBox += '</td>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += item.typeBoxs.name;
+                textBox += '</td>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += '</td>';
+
+                textBox += '</tr>';
+                let acumBoxStems = 0;
+                let acumBoxBunches = 0;
+                let acumTotalBox = 0;
+                let acumBoxTotalStems = 0;
+                $('#bodyTableDetailsInvoice').append(textBox);
+                if (item.varieties.length > 0) {
+                    item.varieties.forEach(element => {
+                        let textVariety = '<tr>';
+                        textVariety += '<td>';
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += element.products.name;
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += element.measures.name;
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += element.stems;
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += element.bunches;
+                        acumBoxBunches += parseInt(element.bunches) * parseInt(item.boxNumber);
+                        qtyBouquets += parseInt(element.bunches) * parseInt(item.boxNumber);
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += parseInt(element.stems) * parseInt(element.bunches);
+                        acumStemsDetails += parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches);
+                        acumBoxTotalStems += parseInt(element.stems) * parseInt(element.bunches) * parseInt(item.boxNumber);
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        textVariety += parseFloat(element.price).toFixed(2);
+                        textVariety += '</td>';
+
+                        textVariety += '<td>';
+                        let totalBoxItem = parseFloat(element.price) * (parseInt(element.stems) * parseInt(element.bunches));
+                        let totalTable = parseFloat(element.price) * (parseInt(element.stems) * parseInt(item.boxNumber) * parseInt(element.bunches));
+                        acumTotalDetails += totalTable;
+                        acumTotalBox += totalTable
+                        textVariety += totalBoxItem.toFixed(2);
+                        textVariety += '</td>';
+                        textVariety += '</tr>';
+                        $('#bodyTableDetailsInvoice').append(textVariety);
+                    });
+                }
+                let textFooterBox = '<tr>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumBoxBunches;
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumBoxTotalStems;
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += acumTotalBox.toFixed(2);
+                textFooterBox += '</td>';
+
+                textFooterBox += '</tr>';
+                $('#bodyTableDetailsInvoice').append(textFooterBox);
+            });
+            let textFooter = '<tfoot>';
+            textFooter += '<tr>';
+
+            textFooter += '<td>';
+            textFooter += qtyBoxDetails;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += qtyBouquets;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumStemsDetails;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumTotalDetails.toFixed(2);
+            textFooter += '</td>';
+
+            textFooter += '</tr>';
+            textFooter += '</tfoot>';
+            $('#bodyTableDetailsInvoice').after(textFooter);
+            let fullesDetails = (acumHb * 0.50) + (acumQb * 0.25) + (acumEb * 0.125);
+            if (acumEb > 0) {
+                fullesDetails = fullesDetails.toFixed(3);
+            } else {
+                fullesDetails = fullesDetails.toFixed(2);
+            }
+            let textResumen = '<div class="row">';
+            textResumen += '<div class="col-3" style="background:#f9f9c6">';
+            textResumen += '<p class="text-left"><b>FULLES= </b> <span id="spanFulles" style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + fullesDetails + '</span></p>';
+            textResumen += '<p class="text-left"><b>PIEZAS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + qtyBoxDetails + '</span></p>';
+            textResumen += '<p class="text-left"><b>TALLOS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' + acumStemsDetails + '</span></p>';
+            textResumen += '<p class="text-left"><b>TOTAL= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">$ ' + acumTotalDetails.toFixed(2) + '</span></p>';
+            textResumen += '</div>';
+            textResumen += '</div>';
+            $('#datatablesDetailsInvoice').after(textResumen);
+
+
+        } else {
+            $('#bodyDetailsInvoice').append('<div class="alert alert-info">Se encuentra vacio</div>');
         }
 
     }
@@ -1847,7 +2225,7 @@
                         });
                     }
                     $("#product").select2({
-                        tags: true,
+                        tags: false,
                         dropdownParent: $("#modalAddVarieties"),
                         placeholder: '<?= translate('select_opction_lang') ?>',
                         allowClear: false,

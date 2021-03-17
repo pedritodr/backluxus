@@ -200,4 +200,20 @@ class Invoice_farm extends CI_Controller
             show_404();
         }
     }
+
+    public function search_number_invoice()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $invoiceNumber = $this->input->post('invoiceNumber');
+        $invoice =  $this->invoice_farm->get_by_number_invoice($invoiceNumber);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'invoice' => $invoice]);
+        exit();
+    }
 }

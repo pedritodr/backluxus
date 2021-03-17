@@ -266,7 +266,6 @@
                 textFooterBox += '</td>';
 
                 textFooterBox += '<td bgcolor= "#b9e0f1">';
-                textFooterBox += acumBoxStems;
                 textFooterBox += '</td>';
 
                 textFooterBox += '<td bgcolor= "#b9e0f1">';
@@ -305,7 +304,6 @@
             textFooter += '</td>';
 
             textFooter += '<td>';
-            textFooter += qtyStems;
             textFooter += '</td>';
 
             textFooter += '<td>';

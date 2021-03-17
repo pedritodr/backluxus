@@ -19,6 +19,11 @@ class Invoice_farm_model extends CI_Model
         $result = $this->mongo_db->where(['invoice_farm_id' => $id])->get('invoice_farm');
         return (count($result) > 0) ? (object) $result[0] : false;
     }
+    function get_by_number_invoice($id)
+    {
+        $result = $this->mongo_db->where(['invoice_number' => $id])->get('invoice_farm');
+        return (count($result) > 0) ? (object) $result[0] : false;
+    }
     function get_all($conditions = [], $get_as_row = FALSE)
     {
         if (count($conditions) > 0) {
