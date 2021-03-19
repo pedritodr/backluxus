@@ -216,4 +216,16 @@ class Invoice_farm extends CI_Controller
         echo json_encode(['status' => 200, 'msj' => 'correcto', 'invoice' => $invoice]);
         exit();
     }
+    public function index_wait()
+    {
+
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $all_invoice_farm = $this->invoice_farm->get_all(['status'=>0]);
+        $data['all_invoice_farm'] = $all_invoice_farm;
+        $this->load_view_admin_g("invoice_farm/index_wait", $data);
+    }
 }

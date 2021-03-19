@@ -104,7 +104,8 @@ $config['add_marking_lang'] = "Adicionar marcación";
 $config['edit_marking_lang'] = "Editar marcación";
 $config['delete_marking_lang'] = "Eliminar marcación";
 $config['marking_lang'] = "Marcación";
-
+$config['manage_invoice_wait_lang'] = "Gestionar factura en espera";
+$config['listar_invoice_wait_lang'] = "Listar facturas en espera";
 $config['manage_invoice_farms_lang'] = "Gestionar factura de fincas";
 $config['listar_invoice_farms_lang'] = "Listar facturas de fincas";
 $config['add_invoice_farm_lang'] = "Adicionar factura finca";
