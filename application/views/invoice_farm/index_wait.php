@@ -17,14 +17,19 @@
         <div class="col-xs-12">
             <div class="statbox widget box box-shadow">
                 <div class="widget-header">
-                    <h3 class="text-simple"><?= translate('listar_invoice_wait_lang'); ?></h3>
+                    <h3 class="text-simple"><?= translate('listar_invoice_wait_lang'); ?> <span><button
+                                class="btn btn-info" onclick="changeVisualization()" type="button">Cambiar
+                                visualización</button></span><span><button class="btn btn-success"
+                                onclick="loadingInvoice()" type="button">Generar invoice
+                            </button></span></h3>
                 </div><!-- /.box-header -->
                 <div class="widget-content widget-content-area">
                     <?= get_message_from_operation(); ?>
 
-                    <div class="table-responsive">
-                        <table id="example" class="table table-striped table-no-bordered table-hover" cellspacing="0"
-                            width="100%" style="width:100%">
+                    <div class="table-responsive" id="mode1">
+                        <table id="example"
+                            class="table table-striped table-no-bordered table-hover non-hover dataTable"
+                            cellspacing="0" width="100%" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>Fecha</th>
@@ -37,6 +42,7 @@
                                     <th>Total tallos</th>
                                     <th>Precio</th>
                                     <th>total</th>
+                                    <th style="width:10%"></th>
                                 </tr>
                             </thead>
 
@@ -52,55 +58,149 @@
                                     <th>Total tallos</th>
                                     <th>Precio</th>
                                     <th>total</th>
+                                    <th style="width:10%"></th>
                                 </tr>
                             </tfoot>
 
                             <tbody>
-                                <?php foreach ($all_invoice_farm as $item) {?>
-                                <?php foreach ($item->details as $detail) {?>
+                                <?php foreach ($all_invoice_farm as $item) { ?>
+                                <?php foreach ($item->details as $detail) { ?>
                                 <tr>
-                                    <td><?= $item->dispatch_day?></td>
-                                    <td><?=$item->markings->name_marking ?></td>
-                                    <td><?= $detail->boxNumber. $detail->typeBoxs->name ?></td>
-                                    <td><?= $item->invoice_number?></td>
-                                    <td><?= $item->farms->name_commercial?></td>
+                                    <td><?= $item->dispatch_day ?></td>
+                                    <td><?= $item->markings->name_marking ?></td>
+                                    <td><?= $detail->boxNumber . $detail->typeBoxs->name ?></td>
+                                    <td><?= $item->invoice_number ?></td>
+                                    <td><?= $item->farms->name_commercial ?></td>
                                     <?php
-                                    $varieties="";
-                                    $totalStringStems="";
-                                    $totalStems=0;
-                                    $priceString="";
-                                    $size="";
-                                    $i=0;
-                                    $priceAcum= 0;
-                                    foreach ($detail->varieties as $variety) {
-                                        if($i==0){
-                                            $varieties=$variety->products->name;
-                                            $totalStringStems = $variety->bunches * $variety->stems;
-                                            $priceString = number_format($variety->price,2);
-                                            $size = $variety->measures->name;
-                                        }else{
-                                            $varieties.='/'.$variety->products->name;
-                                            $totalStringStems .='/'. $variety->bunches * $variety->stems;
-                                            $priceString .= '/'.number_format($variety->price,2);
-                                            $size .='/'. $variety->measures->name;
-                                        }
-                                        $totalStems+= $variety->bunches * $variety->stems;
-                                        $priceAcum +=$variety->price;
-                                     $i++;
-                                    }
-                                    $total =$totalStems*$priceAcum;
-                                    ?>
-                                    <td><?=$varieties ?></td>
-                                    <td><?=$size ?></td>
-                                    <td><?= $totalStringStems?></td>
-                                    <td><?= $priceString?></td>
-                                    <td><?= number_format($total,2) ?></td>
+                                            $varieties = "";
+                                            $totalStringStems = "";
+                                            $totalStems = 0;
+                                            $priceString = "";
+                                            $size = "";
+                                            $i = 0;
+                                            $priceAcum = 0;
+                                            foreach ($detail->varieties as $variety) {
+                                                if ($i == 0) {
+                                                    $varieties = $variety->products->name;
+                                                    $totalStringStems = $variety->bunches * $variety->stems;
+                                                    $priceString = number_format($variety->price, 2);
+                                                    $size = $variety->measures->name;
+                                                } else {
+                                                    $varieties .= '/' . $variety->products->name;
+                                                    $totalStringStems .= '/' . $variety->bunches * $variety->stems;
+                                                    $priceString .= '/' . number_format($variety->price, 2);
+                                                    $size .= '/' . $variety->measures->name;
+                                                }
+                                                $totalStems += $variety->bunches * $variety->stems;
+                                                $priceAcum += $variety->price;
+                                                $i++;
+                                            }
+                                            $total = $totalStems * $priceAcum;
+                                            ?>
+                                    <td><?= $varieties ?></td>
+                                    <td><?= $size ?></td>
+                                    <td><?= $totalStringStems ?></td>
+                                    <td><?= $priceString ?></td>
+                                    <td><?= number_format($total, 2) ?></td>
+                                    <td class="text-center" style="width:10%">
+                                        <div class="dropdown custom-dropdown">
+                                            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink1"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-more-horizontal">
+                                                    <circle cx="12" cy="12" r="1"></circle>
+                                                    <circle cx="19" cy="12" r="1"></circle>
+                                                    <circle cx="5" cy="12" r="1"></circle>
+                                                </svg>
+                                            </a>
+
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
+                                                <a class="dropdown-item" href="javascript:void(0);">View</a>
+                                                <a class="dropdown-item" href="javascript:void(0);">Edit</a>
+                                                <a class="dropdown-item" href="javascript:void(0);">View Response</a>
+                                                <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <?php } ?>
                                 <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-responsive" id="mode2">
+                        <table id="example2"
+                            class="table table-striped table-no-bordered table-hover non-hover dataTable"
+                            cellspacing="0" width="100%" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Marcación / Finca (nombre comercial y jurídico) / No de factura / Dia de
+                                        despacho / Total fulles / Total piezas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
 
+                            <tfoot>
+                                <tr>
+                                    <th>Marcación / Finca (nombre comercial y jurídico) / No de factura / Dia de
+                                        despacho / Total fulles / Total piezas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </tfoot>
 
+                            <tbody>
+                                <?php foreach ($all_invoice_farm as $item) { ?>
+                                <?php foreach ($item->details as $detail) { ?>
+                                <tr>
+                                    <?php
+                                            $acumQB = 0;
+                                            $acumHB = 0;
+                                            $acumEB = 0;
+                                            $piezas = 0;
+                                            if ($detail->typeBoxs->name == 'QB') {
+                                                $acumQB += (int)$detail->boxNumber;
+                                            } elseif ($detail->typeBoxs->name == 'HB') {
+                                                $acumHB += (int)$detail->boxNumber;
+                                            } else {
+                                                $acumEB += (int)$detail->boxNumber;
+                                            }
+                                            $piezas += (int)$detail->boxNumber;
+                                            $fulles = ($acumHB * 0.50) + ($acumQB * 0.25) + ($acumEB * 0.125);
+                                            if ($acumEB > 0) {
+                                                $fulles = number_format($fulles, 3);
+                                            } else {
+                                                $fulles = number_format($fulles, 2);
+                                            }
+                                            ?>
+                                    <td><?= $item->markings->name_marking . '<b>/</b>' . $item->farms->name_commercial . '(' . $item->farms->name_legal . ')<b>/</b>' . $item->invoice_number . '<b>/</b>' . $item->dispatch_day . '<b>/</b>' . $fulles . '<b>/</b>' . $piezas . '<b>/</b>' . $item->awb ?>
+                                    </td>
+                                    <td class="text-center" style="width:10%">
+                                        <div class="dropdown custom-dropdown">
+                                            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink1"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-more-horizontal">
+                                                    <circle cx="12" cy="12" r="1"></circle>
+                                                    <circle cx="19" cy="12" r="1"></circle>
+                                                    <circle cx="5" cy="12" r="1"></circle>
+                                                </svg>
+                                            </a>
 
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
+                                                <a class="dropdown-item" href="javascript:void(0);">View</a>
+                                                <a class="dropdown-item" href="javascript:void(0);">Edit</a>
+                                                <a class="dropdown-item" href="javascript:void(0);">View Response</a>
+                                                <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php } ?>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>
@@ -128,25 +228,29 @@
 </div>
 
 <script>
-$(function() {
-
-
+$(() => {
+    if (change == 0) {
+        $('#mode2').hide();
+    }
     let table = $('#example').DataTable({
         "order": [
             [1, "desc"]
         ],
-
     });
-
+    let table2 = $('#example2').DataTable({
+        "order": [
+            [1, "desc"]
+        ],
+    });
     $("#example thead th").each(function(i) {
-
         if ($(this).text() !== '') {
             var isStatusColumn = (($(this).text() == 'Status') ? true : false);
-            var select = $('<select><option value="">' + $(this).text() + '</option></select>')
+            var select = $('<select class="selectedFilter"><option value="">' + $(this).text() +
+                    '</option></select>')
                 .appendTo($(this).empty())
                 .on('change', function() {
                     var val = $(this).val();
-
+                    console.log(val);
                     table.column(i)
                         .search(val ? '^' + $(this).val() + '$' : val, true, false)
                         .draw();
@@ -178,14 +282,35 @@ $(function() {
 
         }
     });
-
+    let selected = document.querySelector('.selectedFilter');
+    //  selected.val('0333')
+    console.log(selected);
 
 });
+
+const changeFilter = (filter) => {
+    console.log(filter)
+}
+
 const encodeB64Utf8 = (str) => {
     return btoa(unescape(encodeURIComponent(str)));
 }
 const decodeB64Utf8 = (str) => {
     return decodeURIComponent(escape(atob(str)));
+}
+
+let change = 0;
+
+const changeVisualization = () => {
+    if (change == 0) {
+        change = 1;
+        $('#mode1').hide();
+        $('#mode2').show();
+    } else {
+        change = 0;
+        $('#mode1').show();
+        $('#mode2').hide();
+    }
 }
 
 const verDetails = (details) => {
