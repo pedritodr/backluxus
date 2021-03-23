@@ -188,7 +188,7 @@
                                 <option value="0"><?= translate('select_opction_lang') ?></option>
                                 <?php if ($countrys) { ?>
                                     <?php foreach ($countrys as $item) { ?>
-                                        <option itemId="<?= $item->country_id ?>" value="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                        <option value="<?= $item->country_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
                                     <?php   } ?>
                                 <?php } ?>
                             </select>
@@ -672,9 +672,9 @@
         if (country != 0) {
             country = JSON.parse(decodeB64Utf8(country));
             if (country.citys.length > 0) {
-                let cadena = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                let cadena = ' <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
                 country.citys.forEach(item => {
-                    cadena += '<option value="' + encodeB64Utf8(JSON.stringify(item)) + '" itemId="' + item.city_id + '">' + item.name + '</option>'
+                    cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.city_id + '">' + item.name + '</option>'
                 });
                 $('#citysMarking').append(cadena);
                 $('#citysMarking').prop('disabled', false);
@@ -709,9 +709,9 @@
         if (country != 0) {
             country = JSON.parse(decodeB64Utf8(country));
             if (country.citys.length > 0) {
-                let cadena = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                let cadena = ' <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
                 country.citys.forEach(item => {
-                    cadena += '<option value="' + encodeB64Utf8(JSON.stringify(item)) + '" itemId="' + item.city_id + '">' + item.name + '</option>'
+                    cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.city_id + '">' + item.name + '</option>'
                 });
                 $('#citysEdit').append(cadena);
                 $('#citysEdit').prop('disabled', false);
@@ -742,13 +742,13 @@
     $('[name=country]').change(() => {
         $('#citys').prop('disabled', true);
         $('#citys').empty();
-        let country = $('select[name=country] option').filter(':selected').val();
+        let country = $('select[name=country] option').filter(':selected').attr('itemId');
         if (country != 0) {
             country = JSON.parse(decodeB64Utf8(country));
             if (country.citys.length > 0) {
-                let cadena = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
+                let cadena = ' <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
                 country.citys.forEach(item => {
-                    cadena += '<option value="' + encodeB64Utf8(JSON.stringify(item)) + '" itemId="' + item.city_id + '">' + item.name + '</option>'
+                    cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.city_id + '">' + item.name + '</option>'
                 });
                 $('#citys').append(cadena);
                 $('#citys').prop('disabled', false);
@@ -778,8 +778,8 @@
 
     const submitAddAddress = () => {
         $('#btnCancelModalAddAddress').prop('disabled', true);
-        let country = $('select[name=country] option').filter(':selected').val();
-        let city = $('select[name=citys] option').filter(':selected').val();
+        let country = $('select[name=country] option').filter(':selected').attr('itemId');
+        let city = $('select[name=citys] option').filter(':selected').attr('itemId');
         let userIdAdd = $('#userIdAdd').val();
         if (country == 0) {
             const toast = swal.mixin({
@@ -871,7 +871,7 @@
     const submitEditAddress = () => {
         $('#btnCancelModalEditAddress').prop('disabled', true);
         let country = $('select[name=countryEdit] option').filter(':selected').attr('itemId');
-        let city = $('select[name=citysEdit] option').filter(':selected').val();
+        let city = $('select[name=citysEdit] option').filter(':selected').attr('itemId');
         let userIdAdd = $('#userIdEdit').val();
         if (country == 0) {
             const toast = swal.mixin({
@@ -962,6 +962,7 @@
     const addMarking = (userId, address) => {
         address = decodeB64Utf8(address);
         address = JSON.parse(address);
+        $('#citysMarking').empty();
         if (address) {
             $('#countryMarking').val(address.country_id);
             let country = $('select[name=countryMarking] option').filter(':selected').attr('itemId');
