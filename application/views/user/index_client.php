@@ -1077,7 +1077,7 @@
         let userIdAdd = $('#clienteMarking').val();
         let nameMarking = $('#nameMarking').val();
         let comment = $('#editor-container1').text();
-        console.log('city', city);
+        console.log('city2', city);
         if (nameMarking == '') {
             const toast = swal.mixin({
                 toast: true,
