@@ -112,6 +112,7 @@ $config['add_invoice_farm_lang'] = "Adicionar factura finca";
 $config['update_invoice_farm_lang'] = "Actualizar factura finca";
 $config['date2_lang'] = "Date";
 $config['to_lang'] = "To";
+$config['mode_billing_lang'] = "Modo de facturación";
 //$config['country_lang'] = "Country";
 $config['address2_lang'] = "Address";
 $config['customer_lang'] = "Customer";
