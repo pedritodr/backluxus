@@ -1070,11 +1070,13 @@
 
     const submitAddMarking = () => {
         $('#btnCancelModalAddMarking').prop('disabled', true);
-        let country = $('select[name=countryMarking] option').filter(':selected').attr('itemId');;
+        let country = $('select[name=countryMarking] option').filter(':selected').attr('itemId');
+        console.log('country', country);
         let city = $('select[name=citysMarking] option').filter(':selected').attr('itemId');
         let userIdAdd = $('#clienteMarking').val();
         let nameMarking = $('#nameMarking').val();
         let comment = $('#editor-container1').text();
+        console.log('city', city);
         if (nameMarking == '') {
             const toast = swal.mixin({
                 toast: true,
