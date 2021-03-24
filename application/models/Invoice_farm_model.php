@@ -14,6 +14,12 @@ class Invoice_farm_model extends CI_Model
         $newId = $this->mongo_db->insert('invoice_farm', $data);
         return $newId;
     }
+    function create_invoice_client($data)
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->insert('invoice_cliente', $data);
+        return $newId;
+    }
     function get_by_id($id)
     {
         $result = $this->mongo_db->where(['invoice_farm_id' => $id])->get('invoice_farm');
@@ -51,6 +57,40 @@ class Invoice_farm_model extends CI_Model
         $result = $this->mongo_db->where(['invoice_farm_id' => $id])->delete('invoice_farm');
         return $result;
     }
+    function update_invoice_farm_details($id, $data)
+    {
+        foreach ($data as $key => $value) {
+            $this->mongo_db->set('details.$.' . $key, $value);
+        }
+        $result = $this->mongo_db->where('details.id', $id)->update('invoice_farm');
+        return $result;
+    }
+    function update_invoice_farm($id, $data)
+    {
+        foreach ($data as $key => $value) {
+            $this->mongo_db->set($key, $value);
+        }
+        $result = $this->mongo_db->where('details.id', $id)->update('invoice_farm');
+        return $result;
+    }
+    function get_all_details_status($id = 0, $status = '0')
+    {
+        $fields = [
+            'details' => ['$filter'  => ['input' => '$details', 'as' => 'detail', 'cond' => ['$eq' => ['$$detail.status', $status]]]],
+            '_id' => 1,
+        ];
+        $conditions = ['details.id' => $id];
+        $query      = $this->mongo_db->get_customize_fields('invoice_farm', $fields, $conditions, false, []);
+        $details = [];
+        foreach ($query as $item) {
+            if (count($item->details) > 0) {
+                foreach ($item->details as $det) {
+                    $details[] = $det;
+                }
+            }
+        }
 
+        return (count($details) > 0) ? $details : false;
+    }
     //------------------------------------------------------------------------------------------------------------------------------------------
 }

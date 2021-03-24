@@ -78,6 +78,11 @@ class Invoice_farm extends CI_Controller
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $invoice_farm = 'invoice_farm' . uniqid();
         $date_create = date("Y-m-d H:i:s");
+
+        foreach ($arrayRequest as $item) {
+            $item->id = uniqid();
+            $item->status = 0;
+        }
         $data_invoice = [
             'invoice_farm' => $invoice_farm,
             'invoice_number' => $invoceNumber,
@@ -87,7 +92,8 @@ class Invoice_farm extends CI_Controller
             'farms' => $farms,
             'details' => $arrayRequest,
             'status' => 0,
-            'date_create' => $date_create
+            'date_create' => $date_create,
+            'timestamp' => strtotime($date_create)
         ];
         $resquest =  $this->invoice_farm->create($data_invoice);
         if ($resquest) {
@@ -224,7 +230,68 @@ class Invoice_farm extends CI_Controller
             redirect('login/index');
         }
 
-        $all_invoice_farm = $this->invoice_farm->get_all(['status'=>0]);
+        $all_invoice_farm = $this->invoice_farm->get_all(['status' => 0]);
+        $data['all_invoice_farm'] = $all_invoice_farm;
+        $this->load_view_admin_g("invoice_farm/index_wait", $data);
+    }
+    public function add_invoice_client()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $awb = trim(($this->input->post('awb')));
+        $marking = ($_POST['marking']);
+        $arrayRequest =  json_decode($_POST['arrayRequest']);
+        $invoice = 'invoice_' . uniqid();
+        $date_create = date("Y-m-d H:i:s");
+        $data_invoice = [
+            'invoice' => $invoice,
+            'awb' => $awb,
+            'marking' => $marking,
+            'details' => $arrayRequest,
+            'status' => 0,
+            'date_create' => $date_create,
+            'timestamp' => strtotime($date_create)
+        ];
+        $resquest =  $this->invoice_farm->create_invoice_client($data_invoice);
+        if ($resquest) {
+            foreach ($arrayRequest as $item) {
+                foreach ($item->boxs as $box) {
+                    $this->invoice_farm->update_invoice_farm_details($box->id, ['status' => 1]);
+                    $response =   $this->invoice_farm->get_all_details_status($box->id, 0);
+                    if (!$response) {
+                        $this->invoice_farm->update_invoice_farm($box->id, ['status' => 1]);
+                    }
+                }
+            }
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+    public function example()
+    {
+        $q =   $this->invoice_farm->get_all_details_status('605b5f750e2ed', 1);
+        var_dump($q);
+        die();
+    }
+    public function index_invoice_client()
+    {
+
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        var_dump('ok');
+        die();
+        $all_invoice_farm = $this->invoice_farm->get_all(['status' => 0]);
         $data['all_invoice_farm'] = $all_invoice_farm;
         $this->load_view_admin_g("invoice_farm/index_wait", $data);
     }

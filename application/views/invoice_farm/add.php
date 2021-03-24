@@ -1509,7 +1509,6 @@
                 padding: '3em',
             })
         } else {
-
             addArrayRequest(tempObject);
             $('#modalAddVarieties').modal('hide');
             setTimeout(() => {

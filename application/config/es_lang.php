@@ -546,7 +546,7 @@ $config['add_pages'] = "Adicionar Páginas";
 $config['manage_pages_lang'] = "Gestionar Páginas";
 $config['pages_lang'] = "Páginas";
 $config['page_lang'] = "Página";
-
+$config['add_box_lang'] = "Adicionar caja";
 $config['archivo_lang'] = "Archivo";
 $config['paquete_lang'] = "Paquete";
 $config['paquetes_lang'] = "paquetes";

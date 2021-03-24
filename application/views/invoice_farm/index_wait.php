@@ -59,6 +59,13 @@
         color: white;
         display: block;
     }
+
+    .swal2-modal .swal2-image {
+        margin: 20px auto;
+        max-width: 100%;
+        width: 100%;
+        border-radius: 6px;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">
@@ -70,7 +77,7 @@
             <div class="statbox widget box box-shadow">
                 <div class="widget-header">
                     <h3 class="text-simple"><?= translate('listar_invoice_wait_lang'); ?> <span><button class="btn btn-info" onclick="changeVisualization()" type="button">Cambiar
-                                visualización</button></span><span><button class="btn btn-success" onclick="loadingInvoice()" type="button">Generar invoice
+                                visualización</button></span><span><button class="btn btn-success" onclick="loadingInvoice()" type="button"><?= translate('mode_billing_lang') ?>
                             </button></span></h3>
                 </div><!-- /.box-header -->
                 <div class="widget-content widget-content-area">
@@ -112,64 +119,60 @@
 
                             <tbody>
                                 <?php foreach ($all_invoice_farm as $item) { ?>
-                                    <?php foreach ($item->details as $detail) { ?>
-                                        <tr>
-                                            <td><?= $item->dispatch_day ?></td>
-                                            <td><?= $item->markings->name_marking ?></td>
-                                            <td><?= $detail->boxNumber . $detail->typeBoxs->name ?></td>
-                                            <td><?= $item->invoice_number ?></td>
-                                            <td><?= $item->farms->name_commercial ?></td>
-                                            <?php
-                                            $varieties = "";
-                                            $totalStringStems = "";
-                                            $totalStems = 0;
-                                            $priceString = "";
-                                            $size = "";
-                                            $i = 0;
-                                            $priceAcum = 0;
-                                            foreach ($detail->varieties as $variety) {
-                                                if ($i == 0) {
-                                                    $varieties = $variety->products->name;
-                                                    $totalStringStems = $variety->bunches * $variety->stems;
-                                                    $priceString = number_format($variety->price, 2);
-                                                    $size = $variety->measures->name;
-                                                } else {
-                                                    $varieties .= '/' . $variety->products->name;
-                                                    $totalStringStems .= '/' . $variety->bunches * $variety->stems;
-                                                    $priceString .= '/' . number_format($variety->price, 2);
-                                                    $size .= '/' . $variety->measures->name;
-                                                }
-                                                $totalStems += $variety->bunches * $variety->stems;
-                                                $priceAcum += $variety->price;
-                                                $i++;
-                                            }
-                                            $total = $totalStems * $priceAcum;
-                                            ?>
-                                            <td><?= $varieties ?></td>
-                                            <td><?= $size ?></td>
-                                            <td><?= $totalStringStems ?></td>
-                                            <td><?= $priceString ?></td>
-                                            <td><?= number_format($total, 2) ?></td>
-                                            <td class="text-center" style="width:10%">
-                                                <div class="dropdown custom-dropdown">
-                                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal">
-                                                            <circle cx="12" cy="12" r="1"></circle>
-                                                            <circle cx="19" cy="12" r="1"></circle>
-                                                            <circle cx="5" cy="12" r="1"></circle>
-                                                        </svg>
-                                                    </a>
+                                    <?php $item->farms->invoice_farm = $item->invoice_farm;
+                                    $item->farms->dispatch_day = $item->dispatch_day;
+                                    foreach ($item->details as $detail) {
+                                        if ($detail->status == 0) {
+                                    ?>
 
-                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
-                                                        <a class="dropdown-item" href="javascript:void(0);">View</a>
-                                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                                        <a class="dropdown-item" href="javascript:void(0);">View Response</a>
-                                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+                                            <tr>
+                                                <td><?= $item->dispatch_day ?></td>
+                                                <td><?= $item->markings->name_marking ?></td>
+                                                <td><?= $detail->boxNumber . $detail->typeBoxs->name ?></td>
+                                                <td><?= $item->invoice_number ?></td>
+                                                <td><?= $item->farms->name_commercial ?></td>
+                                                <?php
+                                                $varieties = "";
+                                                $totalStringStems = "";
+                                                $totalStems = 0;
+                                                $priceString = "";
+                                                $size = "";
+                                                $i = 0;
+                                                $priceAcum = 0;
+                                                foreach ($detail->varieties as $variety) {
+                                                    if ($i == 0) {
+                                                        $varieties = $variety->products->name;
+                                                        $totalStringStems = $variety->bunches * $variety->stems;
+                                                        $priceString = number_format($variety->price, 2);
+                                                        $size = $variety->measures->name;
+                                                    } else {
+                                                        $varieties .= '/' . $variety->products->name;
+                                                        $totalStringStems .= '/' . $variety->bunches * $variety->stems;
+                                                        $priceString .= '/' . number_format($variety->price, 2);
+                                                        $size .= '/' . $variety->measures->name;
+                                                    }
+                                                    $totalStems += $variety->bunches * $variety->stems;
+                                                    $priceAcum += $variety->price;
+                                                    $i++;
+                                                }
+                                                $total = $totalStems * $priceAcum;
+                                                ?>
+                                                <td><?= $varieties ?></td>
+                                                <td><?= $size ?></td>
+                                                <td><?= $totalStringStems ?></td>
+                                                <td><?= $priceString ?></td>
+                                                <td><?= number_format($total, 2) ?></td>
+                                                <td class="text-center" style="width:10%">
+                                                    <div class="n-chk" style="display:none">
+                                                        <label id="<?= $detail->id ?>" onclick="addItemBox((this),'<?= base64_encode(json_encode($item->markings)) ?>','<?= base64_encode(json_encode($item->farms)) ?>','<?= base64_encode(json_encode($detail)) ?>')" class="new-control new-checkbox new-checkbox-rounded checkbox-primary">
+                                                            <input id="input_<?= $detail->id ?>" type="checkbox" class="new-control-input">
+                                                            <span class="new-control-indicator"></span><?= translate('add_box_lang') ?>
+                                                        </label>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php } ?>
+                                                </td>
+                                            </tr>
+                                    <?php }
+                                    } ?>
                                 <?php } ?>
                             </tbody>
                         </table>
@@ -194,50 +197,45 @@
 
                             <tbody>
                                 <?php foreach ($all_invoice_farm as $item) { ?>
-                                    <?php foreach ($item->details as $detail) { ?>
-                                        <tr>
-                                            <?php
-                                            $acumQB = 0;
-                                            $acumHB = 0;
-                                            $acumEB = 0;
-                                            $piezas = 0;
-                                            if ($detail->typeBoxs->name == 'QB') {
-                                                $acumQB += (int)$detail->boxNumber;
-                                            } elseif ($detail->typeBoxs->name == 'HB') {
-                                                $acumHB += (int)$detail->boxNumber;
-                                            } else {
-                                                $acumEB += (int)$detail->boxNumber;
-                                            }
-                                            $piezas += (int)$detail->boxNumber;
-                                            $fulles = ($acumHB * 0.50) + ($acumQB * 0.25) + ($acumEB * 0.125);
-                                            if ($acumEB > 0) {
-                                                $fulles = number_format($fulles, 3);
-                                            } else {
-                                                $fulles = number_format($fulles, 2);
-                                            }
-                                            ?>
-                                            <td><?= $item->markings->name_marking . '<b>/</b>' . $item->farms->name_commercial . '(' . $item->farms->name_legal . ')<b>/</b>' . $item->invoice_number . '<b>/</b>' . $item->dispatch_day . '<b>/</b>' . $fulles . '<b>/</b>' . $piezas . '<b>/</b>' . $item->awb ?>
-                                            </td>
-                                            <td class="text-center" style="width:10%">
-                                                <div class="dropdown custom-dropdown">
-                                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal">
-                                                            <circle cx="12" cy="12" r="1"></circle>
-                                                            <circle cx="19" cy="12" r="1"></circle>
-                                                            <circle cx="5" cy="12" r="1"></circle>
-                                                        </svg>
-                                                    </a>
-
-                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
-                                                        <a class="dropdown-item" href="javascript:void(0);">View</a>
-                                                        <a class="dropdown-item" href="javascript:void(0);">Edit</a>
-                                                        <a class="dropdown-item" href="javascript:void(0);">View Response</a>
-                                                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+                                    <?php foreach ($item->details as $detail) {
+                                        if ($detail->status == 0) {
+                                    ?>
+                                            <tr>
+                                                <?php
+                                                $acumQB = 0;
+                                                $acumHB = 0;
+                                                $acumEB = 0;
+                                                $piezas = 0;
+                                                $item->farms->invoice_farm = $item->invoice_farm;
+                                                $item->farms->dispatch_day = $item->dispatch_day;
+                                                if ($detail->typeBoxs->name == 'QB') {
+                                                    $acumQB += (int)$detail->boxNumber;
+                                                } elseif ($detail->typeBoxs->name == 'HB') {
+                                                    $acumHB += (int)$detail->boxNumber;
+                                                } else {
+                                                    $acumEB += (int)$detail->boxNumber;
+                                                }
+                                                $piezas += (int)$detail->boxNumber;
+                                                $fulles = ($acumHB * 0.50) + ($acumQB * 0.25) + ($acumEB * 0.125);
+                                                if ($acumEB > 0) {
+                                                    $fulles = number_format($fulles, 3);
+                                                } else {
+                                                    $fulles = number_format($fulles, 2);
+                                                }
+                                                ?>
+                                                <td><?= $item->markings->name_marking . '<b>/</b>' . $item->farms->name_commercial . '(' . $item->farms->name_legal . ')<b>/</b>' . $item->invoice_number . '<b>/</b>' . $item->dispatch_day . '<b>/</b>' . $fulles . '<b>/</b>' . $piezas . '<b>/</b>' . $item->awb ?>
+                                                </td>
+                                                <td class="text-center" style="width:10%">
+                                                    <div class="n-chk" style="display:none">
+                                                        <label id="mode_<?= $detail->id ?>" onclick="addItemBox((this),'<?= base64_encode(json_encode($item->markings)) ?>','<?= base64_encode(json_encode($item->farms)) ?>','<?= base64_encode(json_encode($detail)) ?>')" class="new-control new-checkbox new-checkbox-rounded checkbox-primary">
+                                                            <input id="input_mode_<?= $detail->id ?>" type="checkbox" class="new-control-input">
+                                                            <span class="new-control-indicator"></span><?= translate('add_box_lang') ?>
+                                                        </label>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php } ?>
+                                                </td>
+                                            </tr>
+                                    <?php }
+                                    } ?>
                                 <?php } ?>
                             </tbody>
                         </table>
@@ -274,7 +272,7 @@
                     <div class="col-lg-6">
                         <label><?= translate("markings_lang"); ?></label>
                         <div class="input-group">
-                            <select id="markings" name="markings" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                            <select class="form-control select2 input-sm" data-placeholder="Seleccione una opción" id="markings" onchange="changeMarking()" style="width: 100%">
                             </select>
                         </div>
                     </div>
@@ -320,12 +318,12 @@
                             <tfoot>
                                 <tr>
                                     <th style="border:none"></th>
-                                    <th style="border:none"></th>
+                                    <th id="fulles">0</th>
                                     <th id="full">0</th>
-                                    <th id="1/2">0</th>
-                                    <th id="1/4">0</th>
-                                    <th id="1/8">0</th>
-                                    <th id="1/16">0</th>
+                                    <th id="hb">0</th>
+                                    <th id="qb">0</th>
+                                    <th id="eb">0</th>
+                                    <th id="ebb">0</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -336,6 +334,7 @@
             </div>
             <div class=" modal-footer">
                 <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                <button class="btn btn-success" onclick="generateInvoice()" type="button">generar invoice</button>
             </div>
         </div>
     </div>
@@ -353,7 +352,7 @@
                 [1, "desc"]
             ],
         });
-        let table2 = $('#example2').DataTable({
+        table2 = $('#example2').DataTable({
             "order": [
                 [1, "desc"]
             ],
@@ -402,12 +401,23 @@
             placeholder: '<?= translate('select_opction_lang') ?>',
             allowClear: false,
         });
+        loadMarkings();
     });
     let table;
+    let table2;
     const loadingInvoice = () => {
+        printSelectedInvoice();
+        $('#modalLoadInvoice').modal({
+            backdrop: false
+        })
+
+    }
+
+    const loadMarkings = () => {
         listInvoice = JSON.parse(listInvoice);
         let arrayTemp = [];
         listInvoice.forEach(item => {
+            item.markings.awb = item.awb;
             if (arrayTemp.length == 0) {
                 arrayTemp.push(item.markings);
             } else {
@@ -424,54 +434,217 @@
             cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.marking_id + '">' + item.name_marking + ' | ' + item.name_commercial + '</option>';
         });
         $('#markings').html(cadena);
-        $('#modalLoadInvoice').modal({
-            backdrop: false
-        })
-        /* table.column(4)
-            .search('Luxus Blumen' ? '^' + 'Luxus Blumen' + '$' : 'Luxus Blumen', true, false)
-            .draw(); */
     }
 
     const printSelectedInvoice = () => {
         $('#bodyTableLoadInvoice').empty();
         if (arraySelectedInvoice.length > 0) {
+            let acumHb = 0;
+            let acumQb = 0;
+            let acumEb = 0;
+            let stringSelected = '';
             arraySelectedInvoice.forEach((item, index, array) => {
-                stringSelected += '<tr>';
-                stringSelected += '<td>';
+                item.boxs.forEach((box) => {
+                    let hb = 0;
+                    let qb = 0;
+                    let eb = 0;
+                    if (box.typeBoxs.name.toUpperCase().trim() === "HB") {
+                        hb = parseInt(box.boxNumber);
+                        acumHb += parseInt(box.boxNumber);
+                    } else if (box.typeBoxs.name.toUpperCase().trim() === "QB") {
+                        qb = parseInt(box.boxNumber);
+                        acumQb += parseInt(box.boxNumber);
+                    } else {
+                        eb = parseInt(box.boxNumber);
+                        acumEb += parseInt(box.boxNumber);
+                    }
+                    stringSelected += '<tr>';
+                    stringSelected += '<td>';
+                    stringSelected += item.farm.name_commercial + ' (' + item.farm.name_legal + ')';
+                    stringSelected += '</td>';
+                    stringSelected += '<td class="text-center">';
+                    if (hb > 0) {
+                        stringSelected += (0.50 * hb).toFixed(3);
+                    } else if (qb > 0) {
+                        stringSelected += (0.25 * qb).toFixed(3);
+                    } else {
+                        stringSelected += (0.125 * eb).toFixed(3);
+                    }
 
-                stringSelected += '</td>';
-                stringSelected += '<td>';
+                    stringSelected += '</td>';
+                    stringSelected += '<td>';
 
-                stringSelected += '</td>';
-                stringSelected += '<td>';
+                    stringSelected += '</td>';
+                    stringSelected += '<td class="text-center">';
+                    stringSelected += hb > 0 ? hb : '';
+                    stringSelected += '</td>';
+                    stringSelected += '<td class="text-center">';
+                    stringSelected += qb > 0 ? qb : '';
+                    stringSelected += '</td>';
+                    stringSelected += '<td class="text-center">';
+                    stringSelected += eb > 0 ? eb : '';
+                    stringSelected += '</td>';
+                    stringSelected += '<td class="text-center">';
 
-                stringSelected += '</td>';
-                stringSelected += '<td>';
-
-                stringSelected += '</td>';
-                stringSelected += '<td>';
-
-                stringSelected += '</td>';
-                stringSelected += '<td>';
-
-                stringSelected += '</td>';
-                stringSelected += '<td>';
-
-                stringSelected += '</td>';
-                stringSelected += '</tr>';
+                    stringSelected += '</td>';
+                    stringSelected += '</tr>';
+                })
             });
-            $('#bodyTableLoadInvoice').html(stringSelected)
+            $('#bodyTableLoadInvoice').html(stringSelected);
+            let fulles = (acumHb * 0.50) + (acumQb * 0.25) + (acumEb * 0.125);
+            $('#fulles').text(fulles.toFixed(3));
+            $('#full').text(0);
+            $('#hb').text(acumHb);
+            $('#qb').text(acumQb);
+            $('#eb').text(acumEb);
+            $('#ebb').text(0);
         } else {
             let stringDefault = '<tr><td>Vacio</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-            $('#bodyTableLoadInvoice').html(stringDefault)
+            $('#bodyTableLoadInvoice').html(stringDefault);
         }
     }
 
     const encodeB64Utf8 = (str) => {
         return btoa(unescape(encodeURIComponent(str)));
     }
+
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
+    }
+
+    const addItemBox = (e, marking, farm, box) => {
+        let markingS = $('select[id=markings] option').filter(':selected').attr('itemId');
+        markingS = JSON.parse(decodeB64Utf8(marking));
+        marking = JSON.parse(decodeB64Utf8(marking));
+        farm = JSON.parse(decodeB64Utf8(farm));
+        box = JSON.parse(decodeB64Utf8(box));
+        if ($('#input_' + e.id).prop('checked')) {
+            if (arraySelectedInvoice.length > 0) {
+                if (arraySelectedInvoice[0].marking.name_marking === markingS.name_marking) {
+                    let encontro = false;
+                    arraySelectedInvoice.forEach(item => {
+                        if (item.farm.farm_id == farm.farm_id) {
+                            encontro = true;
+                            item.boxs.push(box);
+                        }
+                    });
+                    if (!encontro) {
+                        let arrayBoxs = [];
+                        arrayBoxs.push(box);
+                        let temp = {
+                            farm: farm,
+                            boxs: arrayBoxs,
+                            marking: marking
+                        }
+                        arraySelectedInvoice.push(temp);
+                    }
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        padding: '3em'
+                    });
+                    toast({
+                        type: 'success',
+                        title: 'item agregado correctamente',
+                        padding: '3em',
+                    })
+                    if (e.id.indexOf("mode_") >= 0) {
+                        let idTemp = e.id;
+                        let dividido = idTemp.split("mode_");
+                        $('#input_' + dividido[1]).prop('checked', true);
+                    } else {
+                        $('#input_mode_' + e.id).prop('checked', true);
+                    }
+                } else {
+                    swal({
+                        title: 'Información',
+                        text: `${arraySelectedInvoice[0].marking.name_marking} es diferente de ${marking.name_marking}`,
+                        type: 'warning',
+                        showCancelButton: false,
+                        confirmButtonText: 'Continuar',
+                        padding: '2em',
+                        allowOutsideClick: false,
+                    }).then(function(result) {
+                        if (result.value) {
+                            if (e.id.indexOf("mode_") >= 0) {
+                                let idTemp = e.id;
+                                let dividido = idTemp.split("mode_");
+                                $('#input_' + e.id).prop('checked', false);
+                                $('#input_' + dividido[1]).prop('checked', false);
+                            } else {
+                                $('#input_mode_' + e.id).prop('checked', false);
+                                $('#input_' + e.id).prop('checked', false);
+                            }
+                        }
+                    })
+                }
+            } else {
+                let arrayBoxs = [];
+                arrayBoxs.push(box);
+                let temp = {
+                    farm: farm,
+                    boxs: arrayBoxs,
+                    marking: marking
+                }
+                arraySelectedInvoice.push(temp);
+                const toast = swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    padding: '3em'
+                });
+                toast({
+                    type: 'success',
+                    title: 'item agregado correctamente',
+                    padding: '3em',
+                })
+                if (e.id.indexOf("mode_") >= 0) {
+                    let idTemp = e.id;
+                    let dividido = idTemp.split("mode_");
+                    $('#input_' + dividido[1]).prop('checked', true);
+                } else {
+                    $('#input_mode_' + e.id).prop('checked', true);
+                }
+            }
+        } else {
+            arraySelectedInvoice.forEach((element, indice, array) => {
+                const index = element.boxs.findIndex(x => x.id === box.id);
+                if (index > -1) {
+                    element.boxs.splice(index, 1);
+                }
+                if (element.boxs.length == 0) {
+                    arraySelectedInvoice.splice(indice, 1);
+                }
+            });
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '3em'
+            });
+            toast({
+                type: 'success',
+                title: 'item removido correctamente',
+                padding: '3em',
+            })
+        }
+
+        //   console.log(arraySelectedInvoice);
+    }
+
+    const changeMarking = () => {
+        let marking = $('select[id=markings] option').filter(':selected').attr('itemId');
+        marking = JSON.parse(decodeB64Utf8(marking));
+        $('#awb').val(marking.awb);
+        table.column(1)
+            .search(marking.name_marking ? '^' + marking.name_marking + '$' : marking.name_marking, true, false)
+            .draw();
+        $('.n-chk').show();
+        table2.search(marking.name_marking).draw();
     }
 
     let change = 0;
@@ -729,5 +902,75 @@
             $('#bodyModalDetails').append('<div class="alert alert-info">Se encuentra vacio</div>');
         }
 
+    }
+
+    const generateInvoice = () => {
+
+        if (arraySelectedInvoice.length > 0) {
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Creando invoice del cliente...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            let marking = $('select[id=markings] option').filter(':selected').attr('itemId');
+            marking = JSON.parse(decodeB64Utf8(marking));
+            let awb = $('#awb').val();
+            let arrayRequest = JSON.stringify(arraySelectedInvoice);
+            let data = {
+                awb,
+                arrayRequest,
+                marking
+            }
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('invoice_farm/add_invoice_client') ?>",
+                    data: data,
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                window.location = '<?= site_url('invoice_farm/index_invoice_client') ?>';
+                            }, 1000);
+                        } else {
+                            Swal.close();
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+                    }
+                });
+            }, 1500)
+        } else {
+            swal({
+                title: 'Información',
+                text: 'El invoice se encuentra vacio',
+                type: 'warning',
+                showCancelButton: false,
+                confirmButtonText: 'Continuar',
+                padding: '2em',
+                allowOutsideClick: false,
+            }).then(function(result) {
+                if (result.value) {}
+            })
+        }
     }
 </script>
