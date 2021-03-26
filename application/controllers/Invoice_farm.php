@@ -358,11 +358,12 @@ class Invoice_farm extends CI_Controller
         foreach ($all_invoice_farm as $item) {
             foreach ($item->details as $box) {
                 $box->id = uniqid();
-                $box->status = 0;
+                var_dump(uniqid());
+                // $box->status = 0;
             }
 
-            $result = $this->invoice_farm->update($item->invoice_farm, ['details' => $item->details]);
-            var_dump($result);
+            //   $result = $this->invoice_farm->update($item->invoice_farm, ['details' => $item->details]);
+            //   var_dump($result);
         }
         die();
     }
