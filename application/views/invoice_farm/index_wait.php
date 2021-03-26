@@ -77,7 +77,9 @@
             <div class="statbox widget box box-shadow">
                 <div class="widget-header">
                     <h3 class="text-simple"><?= translate('listar_invoice_wait_lang'); ?> <span><button class="btn btn-info" onclick="changeVisualization()" type="button">Cambiar
-                                visualización</button></span><span><button class="btn btn-success" onclick="loadingInvoice()" type="button"><?= translate('mode_billing_lang') ?>
+                                visualización</button></span><span><button class="btn btn-success" id="btnInvoiceClient" onclick="loadingInvoice()" type="button"><?= translate('mode_billing_lang') ?>
+                            </button></span><span><button class="btn btn-primary" id="btnLoadInvoice" onclick="showModalInvoiceClients()" type="button"><?= translate('add_items_invoice_clients_lang') ?>
+                            </button></span><span><button class="btn btn-danger" id="btnCancel" onclick="cancel()" style="display:none" type="button"><?= translate('cancel_lang') ?>
                             </button></span></h3>
                 </div><!-- /.box-header -->
                 <div class="widget-content widget-content-area">
@@ -121,10 +123,10 @@
                                 <?php foreach ($all_invoice_farm as $item) { ?>
                                     <?php $item->farms->invoice_farm = $item->invoice_farm;
                                     $item->farms->dispatch_day = $item->dispatch_day;
+                                    $item->farms->invoice_number = $item->invoice_number;
                                     foreach ($item->details as $detail) {
                                         if ($detail->status == 0) {
                                     ?>
-
                                             <tr>
                                                 <td><?= $item->dispatch_day ?></td>
                                                 <td><?= $item->markings->name_marking ?></td>
@@ -208,6 +210,7 @@
                                                 $piezas = 0;
                                                 $item->farms->invoice_farm = $item->invoice_farm;
                                                 $item->farms->dispatch_day = $item->dispatch_day;
+                                                $item->farms->invoice_number = $item->invoice_number;
                                                 if ($detail->typeBoxs->name == 'QB') {
                                                     $acumQB += (int)$detail->boxNumber;
                                                 } elseif ($detail->typeBoxs->name == 'HB') {
@@ -266,9 +269,28 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel"><?= translate('mode_billing_lang') ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <div class="modal-body table-responsive" id="bodyModalLoadInvoice">
                 <div class="row">
+                    <div class="col-lg-6" id="bodySearchAwb">
+                        <label><?= translate("search_awb_lang"); ?></label>
+                        <div class="input-group">
+                            <input id="searchAwb" type="text" class="form-control" placeholder="<?= translate('search_awb_lang') ?>" aria-label="<?= translate('search_awb_lang') ?>">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" onclick="searchInvoiceByAwb()" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg></button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-lg-6">
                         <label><?= translate("markings_lang"); ?></label>
                         <div class="input-group">
@@ -276,10 +298,10 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-6" id="bodyAwb">
                         <label><?= translate("awb_lang"); ?></label>
                         <div class="input-group">
-                            <input type="text" class="form-control input-sm" id="awb" name="awb" placeholder="<?= translate('awb_lang'); ?>">
+                            <input type="text" class="form-control input-sm" id="awb" name="awb" onchange="validAwb()" placeholder="<?= translate('awb_lang'); ?>">
                         </div>
                     </div>
                 </div>
@@ -333,8 +355,8 @@
 
             </div>
             <div class=" modal-footer">
-                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
-                <button class="btn btn-success" onclick="generateInvoice()" type="button">generar invoice</button>
+                <button class="btn" onclick="validSelectedItems()"><i class="flaticon-cancel-12"></i> Seleccionar items</button>
+                <button class="btn btn-success" id="btnInvoice" onclick="generateInvoice()" type="button">generar invoice</button>
             </div>
         </div>
     </div>
@@ -406,11 +428,32 @@
     let table;
     let table2;
     const loadingInvoice = () => {
+        $('#btnInvoice').attr('onclick', 'generateInvoice()');
+        $('#btnInvoice').text('Generar invoice');
+        $('#markings').prop('disabled', false);
+        $('#bodySearchAwb').hide();
+        $('#bodyAwb').show();
         printSelectedInvoice();
         $('#modalLoadInvoice').modal({
             backdrop: false
         })
 
+    }
+
+    const cancel = () => {
+        swal({
+            title: '¿ Estás seguro de realizar esta operación ?',
+            text: "Usted no podrá revertir este cambio !!!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Cancelar todo',
+            padding: '2em',
+            allowOutsideClick: false,
+        }).then(function(result) {
+            if (result.value) {
+                location.reload();
+            }
+        })
     }
 
     const loadMarkings = () => {
@@ -429,7 +472,7 @@
                 }
             }
         });
-        let cadena = '<option value="0"><?= translate('select_opction_lang') ?></option>';
+        let cadena = '<option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
         arrayTemp.forEach(item => {
             cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.marking_id + '">' + item.name_marking + ' | ' + item.name_commercial + '</option>';
         });
@@ -439,6 +482,13 @@
     const printSelectedInvoice = () => {
         $('#bodyTableLoadInvoice').empty();
         if (arraySelectedInvoice.length > 0) {
+            if (arrayInvoiceUpdate.length > 0) {
+                $('#btnInvoiceClient').hide();
+                $('#btnLoadInvoice').show();
+            } else {
+                $('#btnInvoiceClient').show();
+                $('#btnLoadInvoice').hide();
+            }
             let acumHb = 0;
             let acumQb = 0;
             let acumEb = 0;
@@ -502,6 +552,7 @@
             let stringDefault = '<tr><td>Vacio</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
             $('#bodyTableLoadInvoice').html(stringDefault);
         }
+        validBtnCancel();
     }
 
     const encodeB64Utf8 = (str) => {
@@ -601,6 +652,7 @@
                     title: 'item agregado correctamente',
                     padding: '3em',
                 })
+
                 if (e.id.indexOf("mode_") >= 0) {
                     let idTemp = e.id;
                     let dividido = idTemp.split("mode_");
@@ -632,8 +684,32 @@
                 padding: '3em',
             })
         }
+        validBtnCancel();
+        swal({
+            title: '¿ Quieres ir al detalle de la factura ?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si',
+            cancelButtonText: 'No',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                if (arrayInvoiceUpdate.length > 0) {
+                    showModalInvoiceClients();
+                } else {
+                    loadingInvoice();
+                }
+            } else {
+                if (arrayInvoiceUpdate.length > 0) {
+                    $('#btnInvoiceClient').hide();
+                    $('#btnLoadInvoice').show();
+                } else {
+                    $('#btnInvoiceClient').show();
+                    $('#btnLoadInvoice').hide();
+                }
+            }
+        })
 
-        //   console.log(arraySelectedInvoice);
     }
 
     const changeMarking = () => {
@@ -645,20 +721,36 @@
             .draw();
         $('.n-chk').show();
         table2.search(marking.name_marking).draw();
+        if (marking.awb !== '') {
+            validAwb();
+        }
     }
 
     let change = 0;
 
     const changeVisualization = () => {
-        if (change == 0) {
-            change = 1;
-            $('#mode1').hide();
-            $('#mode2').show();
-        } else {
-            change = 0;
-            $('#mode1').show();
-            $('#mode2').hide();
-        }
+        Swal.fire({
+            title: 'Completando operación',
+            text: 'Cambiando la visualización...',
+            imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+            imageAlt: 'No realice acciones sobre la página',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            footer: '<a href>No realice acciones sobre la página</a>',
+        });
+        setTimeout(() => {
+            if (change == 0) {
+                change = 1;
+                $('#mode1').hide();
+                $('#mode2').show();
+            } else {
+                change = 0;
+                $('#mode1').show();
+                $('#mode2').hide();
+            }
+            Swal.close();
+        }, 1500);
+
     }
 
     const verDetails = (details) => {
@@ -962,7 +1054,7 @@
         } else {
             swal({
                 title: 'Información',
-                text: 'El invoice se encuentra vacio',
+                text: 'La factura se encuentra vacio',
                 type: 'warning',
                 showCancelButton: false,
                 confirmButtonText: 'Continuar',
@@ -971,6 +1063,268 @@
             }).then(function(result) {
                 if (result.value) {}
             })
+        }
+    }
+
+    const showModalInvoiceClients = () => {
+        $('#btnInvoice').attr('onclick', 'updateInvoice()');
+        $('#btnInvoice').text('Adicionar items');
+        $('#markings').prop('disabled', true);
+        $('#bodySearchAwb').show();
+        $('#bodyAwb').hide();
+        printSelectedInvoice();
+        $('#modalLoadInvoice').modal({
+            backdrop: false
+        })
+    }
+
+    let arrayInvoiceUpdate = [];
+
+    const searchInvoiceByAwb = () => {
+        let searchAwb = $('#searchAwb').val().trim();
+        if (searchAwb === '') {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '3em'
+            });
+            toast({
+                type: 'error',
+                title: 'El campo buscar invoice por AWB es requerido',
+                padding: '3em',
+            })
+        } else {
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Buscando factura...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            let data = {
+                searchAwb
+            }
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('invoice_farm/search_invoice_by_awb') ?>",
+                    data: data,
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            if (result.data) {
+                                arraySelectedInvoice = result.data.details;
+                                result.data.details.forEach(element => {
+                                    arrayInvoiceUpdate.push(element);
+                                });
+                                invoiceClientUpdate = result.data.invoice;
+                                $('#markings').val(result.data.marking.marking_id);
+                                $('#markings').trigger('change');
+                                printSelectedInvoice();
+                                const toast = swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    padding: '2em'
+                                });
+                                toast({
+                                    type: 'success',
+                                    title: '¡Correcto!',
+                                    padding: '2em',
+                                })
+                            } else {
+                                Swal.close();
+                                swal({
+                                    title: '¡Mensaje!',
+                                    text: `No se encontró la factura asociada a ${searchAwb}`,
+                                    padding: '2em'
+                                });
+                            }
+
+                        } else {
+                            Swal.close();
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+                    }
+                });
+            }, 2000)
+
+        }
+        validBtnCancel();
+    }
+
+    const validBtnCancel = () => {
+        if (arraySelectedInvoice.length > 0) {
+            $('#btnCancel').show();
+        } else {
+            $('#btnCancel').hide();
+        }
+    }
+
+    const validSelectedItems = () => {
+        let markingS = $('select[id=markings] option').filter(':selected').attr('itemId');
+        let bodySearchAwb = $('#bodySearchAwb').css('display');
+        if (bodySearchAwb === 'block') {
+            if (arrayInvoiceUpdate.length > 0) {
+                $('#modalLoadInvoice').modal('hide');
+            } else {
+                swal({
+                    title: '¡Mensaje!',
+                    text: 'La factura no esta cargada para continuar',
+                    padding: '2em'
+                });
+            }
+        } else {
+            if (markingS == 0) {
+                swal({
+                    title: '¡Mensaje!',
+                    text: 'Seleccione una marcación para continuar con la selección de facturas',
+                    padding: '2em'
+                });
+            } else {
+                $('#modalLoadInvoice').modal('hide');
+            }
+        }
+    }
+
+    const validAwb = () => {
+        let bodySearchAwb = $('#bodySearchAwb').css('display');
+        if (bodySearchAwb === 'none') {
+            let searchAwb = $('#awb').val().trim();
+            if (searchAwb !== '') {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('invoice_farm/search_invoice_by_awb') ?>",
+                    data: {
+                        searchAwb
+                    },
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            if (result.data) {
+                                swal({
+                                    title: '¡Mensaje!',
+                                    text: `Existe una factura asociada a ${searchAwb}`,
+                                    padding: '2em'
+                                });
+                                $('#awb').val('')
+                            }
+                        } else {
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    let invoiceClientUpdate = null;
+
+    const updateInvoice = () => {
+        let valid = validAddItem();
+        if (valid) {
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Actualizando invoice del cliente...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            let invoice = invoiceClientUpdate;
+            let arrayRequest = JSON.stringify(arraySelectedInvoice);
+            let data = {
+                invoice,
+                arrayRequest
+            }
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('invoice_farm/update_invoice_client') ?>",
+                    data: data,
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                window.location = '<?= site_url('invoice_farm/index_invoice_client') ?>';
+                            }, 1000);
+                        } else {
+                            Swal.close();
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+                    }
+                });
+            }, 1500)
+        } else {
+            swal({
+                title: 'Información',
+                text: 'No se ha ingresado items a la factura',
+                type: 'warning',
+                showCancelButton: false,
+                confirmButtonText: 'Continuar',
+                padding: '2em',
+                allowOutsideClick: false,
+            }).then(function(result) {
+                if (result.value) {}
+            })
+        }
+    }
+
+    const validAddItem = () => {
+        countQtyA = 0;
+        countQtyB = 0;
+        if (arrayInvoiceUpdate.length > 0) {
+            if (arrayInvoiceUpdate.length > 0) {
+                arrayInvoiceUpdate.forEach(item => {
+                    countQtyA += item.boxs.length;
+                });
+            } else {
+                return false;
+            }
+            if (arraySelectedInvoice.length > 0) {
+                arraySelectedInvoice.forEach((item) => {
+                    countQtyB += item.boxs.length;
+                });
+            } else {
+                return false;
+            }
+            if (countQtyB > countQtyA) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 </script>

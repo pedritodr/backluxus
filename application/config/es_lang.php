@@ -23,6 +23,7 @@ $config['end_boxlang'] = "Cerrar caja";
 $config['edit_boxlang'] = "Actualizar caja";
 $config['add_boxlang'] = "Adicionar caja";
 $config['cancel_lang'] = "Cancelar";
+$config['add_items_invoice_clients_lang'] = "Agregar items facturas clientes";
 
 
 $config['manage_measures_lang'] = "Gestionar medidas y pesos";
@@ -110,6 +111,9 @@ $config['manage_invoice_farms_lang'] = "Gestionar factura de fincas";
 $config['listar_invoice_farms_lang'] = "Listar facturas de fincas";
 $config['add_invoice_farm_lang'] = "Adicionar factura finca";
 $config['update_invoice_farm_lang'] = "Actualizar factura finca";
+$config['invoice_wait_lang'] = "Facturas en espera";
+$config['invoice_client_lang'] = "Facturas clientes";
+$config['listar_invoice_clients_lang'] = "Listar facturas de clientes";
 $config['date2_lang'] = "Date";
 $config['to_lang'] = "To";
 $config['mode_billing_lang'] = "Modo de facturación";
@@ -120,6 +124,7 @@ $config['airline_lang'] = "Airline";
 $config['shippement_date_lang'] = "Shippement date";
 $config['due_date_lang'] = "Due date";
 $config['awb_lang'] = "AWB";
+$config['search_awb_lang'] = "Buscar factura por AWB";
 $config['hawb_lang'] = "HAWB";
 $config['freigh_forward_lang'] = "Freigh forward";
 $config['dae_lang'] = "Dae";

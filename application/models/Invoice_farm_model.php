@@ -14,12 +14,7 @@ class Invoice_farm_model extends CI_Model
         $newId = $this->mongo_db->insert('invoice_farm', $data);
         return $newId;
     }
-    function create_invoice_client($data)
-    {
-        $data['_id'] = $this->mongo_db->create_document_id();
-        $newId = $this->mongo_db->insert('invoice_cliente', $data);
-        return $newId;
-    }
+
     function get_by_id($id)
     {
         $result = $this->mongo_db->where(['invoice_farm_id' => $id])->get('invoice_farm');
@@ -92,5 +87,39 @@ class Invoice_farm_model extends CI_Model
 
         return (count($details) > 0) ? $details : false;
     }
-    //------------------------------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------invoice cliente
+
+    function create_invoice_client($data)
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->insert('invoice_cliente', $data);
+        return $newId;
+    }
+    function get_by_id_invoice_client($id)
+    {
+        $result = $this->mongo_db->where(['invoice' => $id])->get('invoice_cliente');
+        return (count($result) > 0) ? (object) $result[0] : false;
+    }
+    function get_all_invoice_client($conditions = [], $get_as_row = FALSE)
+    {
+        if (count($conditions) > 0) {
+            $result = $this->mongo_db->where($conditions)->get('invoice_cliente');
+        } else {
+            $result = $this->mongo_db->get('invoice_cliente');
+        }
+        if ($get_as_row) {
+            if (count($result) > 0) {
+                return (object) $result[0];
+            } else {
+                return false;
+            }
+        } else {
+            return $result;
+        }
+    }
+    function update_invoice_client($id, $data)
+    {
+        $result = $this->mongo_db->where('invoice', $id)->set($data)->update('invoice_cliente');
+        return $result;
+    }
 }

@@ -282,17 +282,84 @@ class Invoice_farm extends CI_Controller
         var_dump($q);
         die();
     }
+
     public function index_invoice_client()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $all_invoice = $this->invoice_farm->get_all_invoice_client();
+        $data['all_invoice'] = $all_invoice;
+        $this->load_view_admin_g("invoice_farm/index_invoice_client", $data);
+    }
+
+    public function search_invoice_by_awb()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $awb = $this->input->post('searchAwb');
+
+        $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb], true);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $resquest]);
+        exit();
+    }
+    public function update_invoice_client()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $arrayRequest =  json_decode($_POST['arrayRequest']);
+        $invoice = $this->input->post('invoice');
+        $data_invoice = [
+            'details' => $arrayRequest,
+        ];
+        $resquest =  $this->invoice_farm->update_invoice_client($invoice, $data_invoice);
+        if ($resquest) {
+            foreach ($arrayRequest as $item) {
+                foreach ($item->boxs as $box) {
+                    $this->invoice_farm->update_invoice_farm_details($box->id, ['status' => 1]);
+                    $response =   $this->invoice_farm->get_all_details_status($box->id, 0);
+                    if (!$response) {
+                        $this->invoice_farm->update_invoice_farm($box->id, ['status' => 1]);
+                    }
+                }
+            }
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
+            exit();
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
+        }
+    }
+
+    public function updateStatusAndId()
     {
 
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
             redirect('login/index');
         }
-        var_dump('ok');
-        die();
-        $all_invoice_farm = $this->invoice_farm->get_all(['status' => 0]);
-        $data['all_invoice_farm'] = $all_invoice_farm;
-        $this->load_view_admin_g("invoice_farm/index_wait", $data);
+
+        $all_invoice_farm = $this->invoice_farm->get_all();
+        foreach ($all_invoice_farm as $item) {
+            foreach ($item->details as $box) {
+                $box->id = uniqid();
+                $box->status = 0;
+            }
+            $this->invoice_farm->update($item->invoice_farm, ['details' => $item->details]);
+        }
     }
 }
