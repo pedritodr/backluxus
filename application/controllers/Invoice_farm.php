@@ -354,6 +354,7 @@ class Invoice_farm extends CI_Controller
         }
 
         $all_invoice_farm = $this->invoice_farm->get_all();
+        var_dump($all_invoice_farm);
         foreach ($all_invoice_farm as $item) {
             foreach ($item->details as $box) {
                 $box->id = uniqid();
@@ -361,5 +362,6 @@ class Invoice_farm extends CI_Controller
             }
             $this->invoice_farm->update($item->invoice_farm, ['details' => $item->details]);
         }
+        die();
     }
 }
