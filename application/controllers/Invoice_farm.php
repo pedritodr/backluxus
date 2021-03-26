@@ -360,8 +360,9 @@ class Invoice_farm extends CI_Controller
                 $box->id = uniqid();
                 $box->status = 0;
             }
-            var_dump($item->details);
-            $this->invoice_farm->update($item->invoice_farm, ['details' => $item->details]);
+
+            $result = $this->invoice_farm->update($item->invoice_farm, ['details' => $item->details]);
+            var_dump($result);
         }
         die();
     }
