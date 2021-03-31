@@ -970,12 +970,8 @@
                         if (result.products.length > 0) {
                             let cadenaProducts = ' <option value="0"><?= translate('select_opction_lang') ?></option>';
                             result.products.forEach(item => {
-                                if (object.products.product_id == item.product_id) {
-                                    cadenaProducts += '<option selected itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
-                                } else {
-                                    cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
-                                }
 
+                                cadenaProducts += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.product_id + '">' + item.name + '</option>'
                             });
                             $('#product').append(cadenaProducts);
                             $('#product').prop('disabled', false);
@@ -1158,19 +1154,19 @@
             if (typeof products.categoria.type_box !== 'undefined') {
                 $('#typeBox').val(products.categoria.type_box.box_id);
             }
-            let bouquets = $('#bouquets').val();
+            let bunches = $('#bunches').val();
             let price = $('#price').val();
             if (products.stems_bunch !== undefined) {
                 $('#stems').val(products.stems_bunch !== '' ? products.stems_bunch : 25);
             }
             let stems = $('#stems').val();
-            if (bouquets > 0 && price > 0 && stems > 0) {
-                let totalTSM = parseInt(bouquets) * parseInt(stems);
+            if (bunches > 0 && price > 0 && stems > 0) {
+                let totalTSM = parseInt(bunches) * parseInt(stems);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
                 $('#total').text(totalPrice.toFixed(2));
-            } else if (bouquets > 0 && stems > 0) {
-                let totalTSM = parseInt(bouquets) * parseInt(stems);
+            } else if (bunches > 0 && stems > 0) {
+                let totalTSM = parseInt(bunches) * parseInt(stems);
                 $('#totalStm').text(totalTSM);
             } else {
                 $('#totalStm').text('0');
@@ -1288,7 +1284,7 @@
             let stems = $('#stems').val().trim();
             let bunches = $('#bunches').val().trim();
             if (price > 0 && stems > 0 && boxNumber > 0) {
-                let totalTSM = parseInt(bouquets) * parseInt(stems) * parseInt(boxNumber);
+                let totalTSM = parseInt(bunches) * parseInt(stems) * parseInt(boxNumber);
                 let totalPrice = totalTSM * parseFloat(price);
                 $('#totalStm').text(totalTSM);
                 $('#total').text(totalPrice.toFixed(2));
@@ -1799,7 +1795,7 @@
         let acumStemsDetails = 0;
         if (details.length > 0) {
             let texto_tabla = '';
-            texto_tabla += '<table id="datatablesDetailsInvoice" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
+            texto_tabla += '<table id="datatablesDetailsInvoice" class="table table-striped table-no-bordered" cellspacing="0" width="100%" style="width:100%">';
             texto_tabla += '<thead>';
             texto_tabla += '<tr>';
             texto_tabla += '<th>NRO BOX</th>';
@@ -2117,7 +2113,7 @@
             texto_tabla += '<b><p id="bunchesItems">Tallos: ' + (acumStemsItems * parseInt(tempObject.boxNumber)) + '</p></b>';
             texto_tabla += '<b><p id="totalItems">Total: ' + (acumTotal * parseInt(tempObject.boxNumber)) + '</p></b>';
             if (tempObject.varieties.length > 0) {
-                texto_tabla += '<table id="datatablesItems" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
+                texto_tabla += '<table id="datatablesItems" class="table table-striped table-no-bordered" cellspacing="0" width="100%" style="width:100%">';
                 texto_tabla += '<thead>';
                 texto_tabla += '<tr>';
                 texto_tabla += '<th>VARIETIES</th>';

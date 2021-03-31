@@ -17,7 +17,7 @@ class Invoice_farm_model extends CI_Model
 
     function get_by_id($id)
     {
-        $result = $this->mongo_db->where(['invoice_farm_id' => $id])->get('invoice_farm');
+        $result = $this->mongo_db->where(['invoice_farm' => $id])->get('invoice_farm');
         return (count($result) > 0) ? (object) $result[0] : false;
     }
     function get_by_number_invoice($id)
@@ -44,7 +44,7 @@ class Invoice_farm_model extends CI_Model
     }
     function update($id, $data)
     {
-        $result = $this->mongo_db->where('invoice_farm_id', $id)->set($data)->update('invoice_farm');
+        $result = $this->mongo_db->where('invoice_farm', $id)->set($data)->update('invoice_farm');
         return $result;
     }
     function delete($id)

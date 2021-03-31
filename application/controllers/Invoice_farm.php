@@ -82,6 +82,9 @@ class Invoice_farm extends CI_Controller
         foreach ($arrayRequest as $item) {
             $item->id = uniqid();
             $item->status = 0;
+            foreach ($item->varieties as $v) {
+                $v->id = uniqid();
+            }
         }
         $data_invoice = [
             'invoice_farm' => $invoice_farm,
@@ -152,17 +155,29 @@ class Invoice_farm extends CI_Controller
         }
     }
 
-    function update_index($id = 0)
+    function update_invoice_farm_index($id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
             redirect('login/index');
         }
 
-        $bouquet_object = $this->invoice_farm->get_by_id($id);
+        $object = $this->invoice_farm->get_by_id($id);
 
-        if ($bouquet_object) {
-            $data['bouquet_object'] = $bouquet_object;
+        if ($object) {
+            $this->load->model('Farm_model', 'farm');
+            $this->load->model('Product_model', 'product');
+            $this->load->model('Box_model', 'box');
+            $this->load->model('measure_model', 'measure');
+            $this->load->model('Country_model', 'country');
+            $this->load->model('Categoria_model', 'categoria');
+            $this->load->model('User_model', 'user');
+            $data['categories']  = $this->categoria->get_all(['is_active' => 1]);
+            $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
+            $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);;
+            $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
+            $data['measures'] = $this->measure->get_all(['is_active' => 1]);
+            $data['object'] = $object;
             $this->load_view_admin_g('invoice_farm/update', $data);
         } else {
             show_404();
@@ -171,21 +186,79 @@ class Invoice_farm extends CI_Controller
 
     public function update()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
-            $this->log_out();
-            redirect('login/index');
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
         }
-        $name = (int) $this->input->post('name');
-        $bouquet_id = $this->input->post('bouquet_id');
-        $this->form_validation->set_rules('name', "Número", 'required');
-        if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
-            $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
-            redirect("invoice_farm/update_index/" . $bouquet_id);
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $invoice_id = $this->input->post('invoiceId');
+        $awb = trim(($this->input->post('awb')));
+        $invoceNumber = trim(($this->input->post('invoceNumber')));
+        $dispatchDay = trim(($this->input->post('dispatchDay')));
+        $farms = (object)($_POST['farms']);
+        $markings = ($_POST['markings']);
+        $arrayRequest =  json_decode($_POST['arrayRequest']);
+        $object = $this->invoice_farm->get_by_id($invoice_id);
+        $arrayEdit = [];
+        $arrayNew = [];
+        foreach ($arrayRequest as $item) {
+            if (!isset($item->_id)) {
+                $item->id = uniqid();
+                $item->status = 0;
+                $item->date_create = date('Y-m-d)');
+                foreach ($item->varieties as $v) {
+                    $v->id = uniqid();
+                }
+                $arrayNew[] = $item;
+            } else {
+                $arrayEdit[] = $item;
+            }
+        }
+        $data_invoice = [
+            'invoice_number' => $invoceNumber,
+            'dispatch_day' => $dispatchDay,
+            'awb' => $awb,
+            'markings' => $markings,
+            'farms' => $farms,
+            'details' => $arrayRequest,
+        ];
+        $resquest =  $this->invoice_farm->update($invoice_id, $data_invoice);
+        if ($resquest) {
+            $this->load->model('Farm_model', 'farm');
+            $obj_farm = $this->farm->get_provider_by_id($farms->farm_id);
+            if ($obj_farm) {
+                if (isset($obj_farm->varieties)) {
+                    $arrayTemp = $obj_farm->varieties;
+                    $arrayProducts = [];
+                    foreach ($arrayRequest as $rq) {
+                        $encontro = false;
+                        foreach ($obj_farm->varieties as $item) {
+                            if ($item->product_id == $rq->products->product_id) {
+                                $encontro = true;
+                            }
+                        }
+                        if (!$encontro) {
+                            $arrayTemp[] = $rq->products;
+                        }
+                    }
+                    if (count($obj_farm->varieties) != count($arrayTemp)) {
+                        $data = [
+                            'varieties' => $arrayTemp,
+                        ];
+                        $this->farm->update_provider($farms->farm_id, $data);
+                    }
+                }
+            }
+            if ($object) {
+            }
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
+            exit();
         } else {
-            $data = ['number' => $name];
-            $row =  $this->invoice_farm->update($bouquet_id, $data);
-            $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
-            redirect("invoice_farm/index", "location", 301);
+            echo json_encode(['status' => 404, 'msj' => 'Ocurrió un error vuelva a intentarlo']);
+            exit();
         }
     }
 
@@ -290,7 +363,7 @@ class Invoice_farm extends CI_Controller
             redirect('login/index');
         }
 
-        $all_invoice = $this->invoice_farm->get_all_invoice_client();
+        $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => $this->mongo_db->ne(-1)]);
         $data['all_invoice'] = $all_invoice;
         $this->load_view_admin_g("invoice_farm/index_invoice_client", $data);
     }
@@ -366,5 +439,75 @@ class Invoice_farm extends CI_Controller
             //   var_dump($result);
         }
         die();
+    }
+    function cancel_invoice_client($id = 0)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $invoice = $this->invoice_farm->get_by_id_invoice_client($id);
+
+        if ($invoice) {
+            foreach ($invoice->details as $item) {
+                foreach ($item->boxs as $box) {
+                    $this->invoice_farm->update_invoice_farm_details($box->id, ['status' => 0]);
+                    $this->invoice_farm->update_invoice_farm($box->id, ['status' => 0]);
+                }
+            }
+            $this->invoice_farm->update_invoice_client($id, ['status' => -1]);
+            redirect("invoice_farm/index_invoice_client");
+        } else {
+            show_404();
+        }
+    }
+    function arraysDift()
+    {
+        $object  = $this->invoice_farm->get_by_id('invoice_farm605b5f750e20e');
+        $arrayOLd = $object->details;
+        $arrayEdit = $object->details;
+        $arrayDelete = [];
+        foreach ($arrayOLd as $a) {
+
+            $v = false;
+            foreach ($arrayEdit as $b) {
+                if ($a->id == $b->id) {
+                    $v = true;
+                    $obj = (object)['id' => $a->id];
+                    if ($a->typeBoxs->box_id != $b->typeBoxs->box_id) {
+                        $obj->typeBoxs = [$a->typeBoxs, $b->typeBoxs];
+                    } else {
+                        $obj->typeBoxs = null;
+                    }
+                    if ($a->boxNumber != $b->boxNumber) {
+                        $obj->boxNumber = [$a->boxNumber, $b->boxNumber];
+                    } else {
+                        $obj->boxNumber = null;
+                    }
+                    $e = false;
+                    foreach ($a->varieties as $c) {
+                        foreach ($b->varieties as $d) {
+                            $e = true;
+                            if ($c->products->product_id == $d->products->product_id) {
+                            }
+                            if ($c->measure->measure_id == $d->measure->measure_id) {
+                            }
+                            if ($c->price == $d->price) {
+                            }
+                            if ($c->bunches == $d->bunches) {
+                            }
+                            if ($c->stems == $d->stems) {
+                            }
+                        }
+                    }
+                }
+            }
+            if (!$e) {
+                $arrayDelete[] = $a;
+            }
+        }
+        // && $a->typeBoxs->box_id == $b->typeBoxs->box_id && $a->boxNumber == $b->boxNumber
+
     }
 }

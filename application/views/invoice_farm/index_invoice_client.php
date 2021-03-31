@@ -108,6 +108,7 @@
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
+                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("cancel_invoice_lang"); ?></a>
                                                     </div>
                                                 </div>
                                             </td>
@@ -420,5 +421,21 @@
             $('#bodyModalDetails').append('<div class="alert alert-info">Se encuentra vacio</div>');
         }
 
+    }
+
+    const cancelInvoice = (id) => {
+        swal({
+            title: '¿ Estás seguro de realizar esta operación ?',
+            text: "Usted no podrá revertir este cambio !!!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Cancelar factura',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                let urlCancel = '<?= site_url("invoice_farm/cancel_invoice_client"); ?>' + '/' + id;
+                window.location.href = urlCancel;
+            }
+        })
     }
 </script>
