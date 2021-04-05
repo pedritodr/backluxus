@@ -207,10 +207,12 @@ class Invoice_farm extends CI_Controller
         foreach ($arrayRequest as $item) {
             if (!isset($item->_id)) {
                 $item->id = uniqid();
+                $item->new = true;
                 $item->status = 0;
                 $item->date_create = date('Y-m-d)');
                 foreach ($item->varieties as $v) {
                     $v->id = uniqid();
+                    $item->new = true;
                 }
                 $arrayNew[] = $item;
             } else {
@@ -467,46 +469,81 @@ class Invoice_farm extends CI_Controller
         $object  = $this->invoice_farm->get_by_id('invoice_farm605b5f750e20e');
         $arrayOLd = $object->details;
         $arrayEdit = $object->details;
-        $arrayDelete = [];
-        foreach ($arrayOLd as $a) {
 
+        $arrayBoxsDelete = [];
+        $arrayBoxsNew = [];
+        $arrayBoxsEdit = [];
+        foreach ($arrayOLd as $a) {
             $v = false;
             foreach ($arrayEdit as $b) {
-                if ($a->id == $b->id) {
-                    $v = true;
-                    $obj = (object)['id' => $a->id];
-                    if ($a->typeBoxs->box_id != $b->typeBoxs->box_id) {
-                        $obj->typeBoxs = [$a->typeBoxs, $b->typeBoxs];
-                    } else {
-                        $obj->typeBoxs = null;
-                    }
-                    if ($a->boxNumber != $b->boxNumber) {
-                        $obj->boxNumber = [$a->boxNumber, $b->boxNumber];
-                    } else {
-                        $obj->boxNumber = null;
-                    }
-                    $e = false;
-                    foreach ($a->varieties as $c) {
-                        foreach ($b->varieties as $d) {
-                            $e = true;
-                            if ($c->products->product_id == $d->products->product_id) {
+                $obj = (object)['boxId' => $a->id];
+                if (!isset($b->new)) {
+                    if ($a->id == $b->id) {
+                        $changeBox = false;
+                        $v = true;
+                        if ($a->typeBoxs->box_id != $b->typeBoxs->box_id) {
+                            $obj->typeBoxs = [$a->typeBoxs, $b->typeBoxs];
+                            $changeBox = true;
+                        }
+                        if ($a->boxNumber != $b->boxNumber) {
+                            $obj->boxNumber = [$a->boxNumber, $b->boxNumber];
+                            $changeBox = true;
+                        }
+                        $obj->changeBox = $changeBox;
+                        $e = false;
+                        $obj->varietiesDelete = [];
+                        $obj->varietiesEdit = [];
+                        $obj->varietiesNew = [];
+                        foreach ($a->varieties as $c) {
+                            foreach ($b->varieties as $d) {
+                                if (!isset($d->new)) {
+                                    if ($c->id == $d->id) {
+                                        $objV = (object)['id' => $c->id];
+                                        $e = true;
+                                        $changeVariety = false;
+                                        if ($c->products->product_id != $d->products->product_id) {
+                                            $objV->products = [$c->products, $d->products];
+                                            $changeVariety = true;
+                                        }
+                                        if ($c->measures->measure_id != $d->measures->measure_id) {
+                                            $objV->measures = [$c->measures, $d->measures];
+                                            $changeVariety = true;
+                                        }
+                                        if ($c->price != $d->price) {
+                                            $objV->price = [$c->price, $d->price];
+                                            $changeVariety = true;
+                                        }
+                                        if ($c->bunches != $d->bunches) {
+                                            $objV->bunches = [$c->bunches, $d->bunches];
+                                            $changeVariety = true;
+                                        }
+                                        if ($c->stems != $d->stems) {
+                                            $objV->stems = [$c->stems, $d->stems];
+                                            $changeVariety = true;
+                                        }
+                                        $objV->changeVariety = $changeVariety;
+                                        $obj->varietiesEdit[] = $objV;
+                                    }
+                                } else {
+                                    $obj->varietiesNew[] = $d;
+                                }
                             }
-                            if ($c->measure->measure_id == $d->measure->measure_id) {
-                            }
-                            if ($c->price == $d->price) {
-                            }
-                            if ($c->bunches == $d->bunches) {
-                            }
-                            if ($c->stems == $d->stems) {
+                            if (!$e) {
+                                $obj->varietiesDelete[] = $a;
                             }
                         }
+                        $arrayBoxsEdit[] = $obj;
                     }
+                } else {
+                    $arrayBoxsNew[] = $b;
                 }
             }
-            if (!$e) {
-                $arrayDelete[] = $a;
+            if (!$v) {
+                $arrayBoxsDelete[] = $a;
             }
         }
+        var_dump($arrayBoxsDelete, $arrayBoxsNew, $arrayBoxsEdit);
+        die();
         // && $a->typeBoxs->box_id == $b->typeBoxs->box_id && $a->boxNumber == $b->boxNumber
 
     }
