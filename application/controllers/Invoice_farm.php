@@ -202,8 +202,6 @@ class Invoice_farm extends CI_Controller
         $markings = ($_POST['markings']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $object = $this->invoice_farm->get_by_id($invoice_id);
-        $arrayEdit = [];
-        $arrayNew = [];
         foreach ($arrayRequest as $item) {
             if (!isset($item->_id)) {
                 $item->id = uniqid();
@@ -212,11 +210,9 @@ class Invoice_farm extends CI_Controller
                 $item->date_create = date('Y-m-d)');
                 foreach ($item->varieties as $v) {
                     $v->id = uniqid();
-                    $item->new = true;
+                    $v->new = true;
+                    $v->date_create = date('Y-m-d)');
                 }
-                $arrayNew[] = $item;
-            } else {
-                $arrayEdit[] = $item;
             }
         }
         $data_invoice = [
@@ -234,7 +230,6 @@ class Invoice_farm extends CI_Controller
             if ($obj_farm) {
                 if (isset($obj_farm->varieties)) {
                     $arrayTemp = $obj_farm->varieties;
-                    $arrayProducts = [];
                     foreach ($arrayRequest as $rq) {
                         $encontro = false;
                         foreach ($obj_farm->varieties as $item) {
@@ -255,6 +250,23 @@ class Invoice_farm extends CI_Controller
                 }
             }
             if ($object) {
+                $result =  $this->arraysDift($object->details, $arrayRequest);
+                $dataChange = ['changes' => $result];
+                $this->invoice_farm->create_change_invoice_farm($invoice_id, $dataChange);
+                if (count($result->arrayBoxsDelete) > 0) {
+                    foreach ($result->arrayBoxsDelete as $item) {
+                        if ($item->status == 1) {
+                            $response = $this->invoice_farm->get_box_by_invoice_farm($item->id, $invoice_id);
+                            if ($response) {
+                                $this->invoice_farm->delete_box_id($response->invoice, $response->detail_id, $response->id);
+                                $detail = $this->invoice_farn->get_detail_invoice_client_by_id($response->invoice, $response->detail_id);
+                                if (count($detail->boxs) == 0) {
+                                    $this->invoice_farm->delete_detail_invoice_cliente_by_id($response->invoice, $response->detail_id);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             echo json_encode(['status' => 200, 'msj' => 'correcto']);
             exit();
@@ -322,6 +334,9 @@ class Invoice_farm extends CI_Controller
         $awb = trim(($this->input->post('awb')));
         $marking = ($_POST['marking']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
+        foreach ($arrayRequest as $item) {
+            $item->id = uniqid('detail-');
+        }
         $invoice = 'invoice_' . uniqid();
         $date_create = date("Y-m-d H:i:s");
         $data_invoice = [
@@ -353,7 +368,7 @@ class Invoice_farm extends CI_Controller
     }
     public function example()
     {
-        $q =   $this->invoice_farm->get_all_details_status('605b5f750e2ed', 1);
+        $q =   $this->invoice_farm->get_detail_invoice_client_by_id('invoice_606e2f57bbb4a', '606e2f57bbb44');
         var_dump($q);
         die();
     }
@@ -464,12 +479,8 @@ class Invoice_farm extends CI_Controller
             show_404();
         }
     }
-    function arraysDift()
+    function arraysDift($arrayOLd, $arrayEdit)
     {
-        $object  = $this->invoice_farm->get_by_id('invoice_farm605b5f750e20e');
-        $arrayOLd = $object->details;
-        $arrayEdit = $object->details;
-
         $arrayBoxsDelete = [];
         $arrayBoxsNew = [];
         $arrayBoxsEdit = [];
@@ -542,9 +553,6 @@ class Invoice_farm extends CI_Controller
                 $arrayBoxsDelete[] = $a;
             }
         }
-        var_dump($arrayBoxsDelete, $arrayBoxsNew, $arrayBoxsEdit);
-        die();
-        // && $a->typeBoxs->box_id == $b->typeBoxs->box_id && $a->boxNumber == $b->boxNumber
-
+        return (object)['arrayBoxsDelete' => $arrayBoxsDelete, 'arrayBoxsNew' => $arrayBoxsNew, 'arrayBoxsEdit' => $arrayBoxsEdit];
     }
 }

@@ -569,6 +569,7 @@
         marking = JSON.parse(decodeB64Utf8(marking));
         farm = JSON.parse(decodeB64Utf8(farm));
         box = JSON.parse(decodeB64Utf8(box));
+        box.invoice_farm = farm.invoice_farm;
         if ($('#input_' + e.id).prop('checked')) {
             if (arraySelectedInvoice.length > 0) {
                 if (arraySelectedInvoice[0].marking.name_marking === markingS.name_marking) {

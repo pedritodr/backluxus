@@ -1,11 +1,12 @@
 <?php
-
+require 'vendor/autoload.php';
 class Invoice_farm_model extends CI_Model
 {
-
+    private $mongodb;
     function __construct()
     {
         parent::__construct();
+        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
     }
 
     function create($data)
@@ -87,6 +88,12 @@ class Invoice_farm_model extends CI_Model
 
         return (count($details) > 0) ? $details : false;
     }
+    function create_change_invoice_farm($invoice_id = 0, $data = [])
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->where('invoice_farm', $invoice_id)->push('change', $data)->update('invoice_farm');
+        return $newId;
+    }
     //------------------------------------------------------------------------------------------------------------invoice cliente
 
     function create_invoice_client($data)
@@ -121,5 +128,61 @@ class Invoice_farm_model extends CI_Model
     {
         $result = $this->mongo_db->where('invoice', $id)->set($data)->update('invoice_cliente');
         return $result;
+    }
+    function get_box_by_invoice_farm($box_id, $invoice_id)
+    {
+        $tuberia = [
+            ['$project' => ['details' => 1, 'invoice' => 1, '_id' => 0]],
+            ['$unwind' => '$details'],
+            ['$unwind' => '$details.boxs'],
+            ['$match' => ['details.boxs.id' => $box_id, 'details.boxs.invoice_farm' => $invoice_id]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('invoice_cliente', $tuberia);
+        if (isset($query[0]->details)) {
+            if (is_object($query[0]->details)) {
+                $query[0]->details->boxs->detail_id =  $query[0]->details->id;
+                return $query[0]->details->boxs;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    function delete_box_id($invoice_id, $detail_id, $box_id)
+    {
+        $query = $this->mongodb->luxus->invoice_cliente->updateOne(
+            ['invoice' => $invoice_id, 'details.id' => $detail_id],
+            ['$pull' => ['details.$.boxs' => ['id' => $box_id]]]
+        );
+        return $query;
+    }
+    function get_detail_invoice_client_by_id($invoice_id, $detail_id)
+    {
+        $tuberia = [
+            ['$project' => ['details' => 1, 'invoice' => 1, '_id' => 0]],
+            ['$unwind' => '$details'],
+            ['$match' => ['details.id' => $detail_id, 'invoice' => $invoice_id]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('invoice_cliente', $tuberia);
+        if (isset($query[0]->details)) {
+            if (is_object($query[0]->details)) {
+                return $query[0]->details;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    function delete_detail_invoice_cliente_by_id($invoice_id, $detail_id)
+    {
+        $query = $this->mongodb->luxus->invoice_cliente->updateOne(
+            ['invoice' => $invoice_id],
+            ['$pull' => ['details' => ['id' => $detail_id]]]
+        );
+        return $query;
     }
 }
