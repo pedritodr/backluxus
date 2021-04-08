@@ -1,5 +1,5 @@
 echo "Deploy script started"
-cd /var/www/pagahoy.com/luxus
+cd /var/www/luxus
 git pull origin master
 echo "Deploy script finished execution"
 exit
