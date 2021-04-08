@@ -21,7 +21,7 @@ class Login extends CI_Controller
 
     public function index()
     {
-        var_dump('hola');
+        var_dump('hola mundo');
         die();
         $this->load->view("login");
     }
