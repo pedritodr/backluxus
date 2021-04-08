@@ -21,6 +21,8 @@ class Login extends CI_Controller
 
     public function index()
     {
+        var_dump('hola');
+        die();
         $this->load->view("login");
     }
 
@@ -33,7 +35,7 @@ class Login extends CI_Controller
             if ($user->password == $password) {
                 $session_data = object_to_array($user);
                 $this->session->set_userdata($session_data);
-                echo json_encode(['status' => 200, 'msj' => 'correcto','user'=>$this->session->userdata()]);
+                echo json_encode(['status' => 200, 'msj' => 'correcto', 'user' => $this->session->userdata()]);
             } else {
                 echo json_encode(['status' => 500, 'msj' => 'La contraseña no coincide con la registrada en la base de datos']);
             }
