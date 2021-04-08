@@ -263,6 +263,30 @@ class Invoice_farm extends CI_Controller
                                 if (count($detail->boxs) == 0) {
                                     $this->invoice_farm->delete_detail_invoice_cliente_by_id($response->invoice, $response->detail_id);
                                 }
+                                $dataDelete = [
+                                    'date_create' => date('Y-m-d'),
+                                    'timestamp' => (int) strtotime(date('Y-m-d')),
+                                    'delete' => $item,
+                                    'farm' => $farms
+                                ];
+                                $this->invoice_farm->create_change_invoice_client($response->invoice, $dataDelete);
+                            }
+                        }
+                    }
+                }
+                if (count($result->arrayBoxsEdit) > 0) {
+                    foreach ($result->arrayBoxsEdit as $item) {
+                        if ($item->change && $item->edit->status == 1) {
+                            $response = $this->invoice_farm->get_box_by_invoice_farm($item->boxId, $invoice_id);
+                            if ($response) {
+                                $this->invoice_farm->update_detail_box($response->invoice, $response->detail_id, $response->id, $item->edit);
+                                $dataEdit = [
+                                    'date_create' => date('Y-m-d'),
+                                    'timestamp' => (int) strtotime(date('Y-m-d')),
+                                    'edit' => $item,
+                                    'farm' => $farms
+                                ];
+                                $this->invoice_farm->create_change_invoice_client($response->invoice, $dataEdit);
                             }
                         }
                     }
@@ -487,18 +511,21 @@ class Invoice_farm extends CI_Controller
         foreach ($arrayOLd as $a) {
             $v = false;
             foreach ($arrayEdit as $b) {
-                $obj = (object)['boxId' => $a->id];
+                $obj = (object)['boxId' => $a->id, 'edit' => $b];
                 if (!isset($b->new)) {
                     if ($a->id == $b->id) {
                         $changeBox = false;
+                        $change = false;
                         $v = true;
                         if ($a->typeBoxs->box_id != $b->typeBoxs->box_id) {
                             $obj->typeBoxs = [$a->typeBoxs, $b->typeBoxs];
                             $changeBox = true;
+                            $change = true;
                         }
                         if ($a->boxNumber != $b->boxNumber) {
                             $obj->boxNumber = [$a->boxNumber, $b->boxNumber];
                             $changeBox = true;
+                            $change = true;
                         }
                         $obj->changeBox = $changeBox;
                         $e = false;
@@ -515,22 +542,27 @@ class Invoice_farm extends CI_Controller
                                         if ($c->products->product_id != $d->products->product_id) {
                                             $objV->products = [$c->products, $d->products];
                                             $changeVariety = true;
+                                            $change = true;
                                         }
                                         if ($c->measures->measure_id != $d->measures->measure_id) {
                                             $objV->measures = [$c->measures, $d->measures];
                                             $changeVariety = true;
+                                            $change = true;
                                         }
                                         if ($c->price != $d->price) {
                                             $objV->price = [$c->price, $d->price];
                                             $changeVariety = true;
+                                            $change = true;
                                         }
                                         if ($c->bunches != $d->bunches) {
                                             $objV->bunches = [$c->bunches, $d->bunches];
                                             $changeVariety = true;
+                                            $change = true;
                                         }
                                         if ($c->stems != $d->stems) {
                                             $objV->stems = [$c->stems, $d->stems];
                                             $changeVariety = true;
+                                            $change = true;
                                         }
                                         $objV->changeVariety = $changeVariety;
                                         $obj->varietiesEdit[] = $objV;
@@ -543,6 +575,7 @@ class Invoice_farm extends CI_Controller
                                 $obj->varietiesDelete[] = $a;
                             }
                         }
+                        $obj->change = $change;
                         $arrayBoxsEdit[] = $obj;
                     }
                 } else {

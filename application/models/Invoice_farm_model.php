@@ -185,4 +185,24 @@ class Invoice_farm_model extends CI_Model
         );
         return $query;
     }
+    function create_change_invoice_client($invoice_id = 0, $data = [])
+    {
+        $data['_id'] = $this->mongo_db->create_document_id();
+        $newId = $this->mongo_db->where('invoice', $invoice_id)->push('change', $data)->update('invoice_cliente');
+        return $newId;
+    }
+    function update_detail_box($invoice_id, $detail_id, $box_id, $data)
+    {
+        $query = $this->mongodb->luxus->invoice_cliente->updateOne(
+            ['invoice' => ['$eq' => $invoice_id]],
+            ['$set' => [
+                'details.$[d].boxs.$[b]' => $data,
+            ]],
+            ['arrayFilters' => [
+                ['d.id' => ['$eq' => $detail_id]],
+                ['b.id' => ['$eq' => $box_id]]
+            ]]
+        );
+        return $query;
+    }
 }
