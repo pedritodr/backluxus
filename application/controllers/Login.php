@@ -75,7 +75,7 @@ class Login extends CI_Controller
 
             $config['protocol'] = 'smtp';
             $config['smtp_host'] = 'smtp.zoho.com';
-            $config['smtp_user'] = 'ventas@ranicsport.com';
+            $config['smtp_user'] = 'luxus@luxus.com';
             $config['smtp_pass'] = "ranic1234";
             $config['smtp_port'] = '465';
             //$config['smtp_timeout'] = '5';
@@ -88,8 +88,7 @@ class Login extends CI_Controller
 
             $this->email->initialize($config);
 
-            $this->email->from('ventas@ranicsport.com', 'Recuperación de Contraseña');
-
+            $this->email->from('luxus@luxus.com', 'Recuperación de Contraseña');
 
             $this->email->to($email);
 
