@@ -1,5 +1,6 @@
 echo "Deploy script started"
 cd /var/www/luxus
+ls
 git pull origin master
 echo "Deploy script finished execution"
 exit
