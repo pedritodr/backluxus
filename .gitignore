@@ -38,3 +38,6 @@ uploads/*
 *.sublime-project
 /tests/tests/
 /tests/results/
+
+vendor/*
+composer.lock
