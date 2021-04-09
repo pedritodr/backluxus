@@ -203,7 +203,15 @@ class Invoice_farm extends CI_Controller
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $object = $this->invoice_farm->get_by_id($invoice_id);
         foreach ($arrayRequest as $item) {
-            if (!isset($item->_id)) {
+            if (isset($item->id)) {
+                foreach ($item->varieties as $v) {
+                    if (!isset($v->id)) {
+                        $v->id = uniqid();
+                        $v->new = true;
+                        $v->date_create = date('Y-m-d)');
+                    }
+                }
+            } else {
                 $item->id = uniqid();
                 $item->new = true;
                 $item->status = 0;
@@ -223,6 +231,7 @@ class Invoice_farm extends CI_Controller
             'farms' => $farms,
             'details' => $arrayRequest,
         ];
+        $result =  $this->arraysDift($object->details, $arrayRequest);
         $resquest =  $this->invoice_farm->update($invoice_id, $data_invoice);
         if ($resquest) {
             $this->load->model('Farm_model', 'farm');
@@ -250,7 +259,6 @@ class Invoice_farm extends CI_Controller
                 }
             }
             if ($object) {
-                $result =  $this->arraysDift($object->details, $arrayRequest);
                 $dataChange = ['changes' => $result];
                 $this->invoice_farm->create_change_invoice_farm($invoice_id, $dataChange);
                 if (count($result->arrayBoxsDelete) > 0) {
@@ -421,7 +429,7 @@ class Invoice_farm extends CI_Controller
         }
         $awb = $this->input->post('searchAwb');
 
-        $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb], true);
+        $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb, 'status' => $this->mongo_db->ne(-1)], true);
         echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $resquest]);
         exit();
     }
@@ -511,8 +519,11 @@ class Invoice_farm extends CI_Controller
         foreach ($arrayOLd as $a) {
             $v = false;
             foreach ($arrayEdit as $b) {
-                $obj = (object)['boxId' => $a->id, 'edit' => $b];
-                if (!isset($b->new)) {
+                if (isset($b->new)) {
+                    unset($b->new);
+                    $arrayBoxsNew[] = $b;
+                } else {
+                    $obj = (object)['boxId' => $a->id, 'edit' => $b];
                     if ($a->id == $b->id) {
                         $changeBox = false;
                         $change = false;
@@ -534,7 +545,11 @@ class Invoice_farm extends CI_Controller
                         $obj->varietiesNew = [];
                         foreach ($a->varieties as $c) {
                             foreach ($b->varieties as $d) {
-                                if (!isset($d->new)) {
+                                if (isset($d->new)) {
+                                    unset($d->new);
+                                    $obj->varietiesNew[] = $d;
+                                    $change = true;
+                                } else {
                                     if ($c->id == $d->id) {
                                         $objV = (object)['id' => $c->id];
                                         $e = true;
@@ -564,22 +579,22 @@ class Invoice_farm extends CI_Controller
                                             $changeVariety = true;
                                             $change = true;
                                         }
-                                        $objV->changeVariety = $changeVariety;
-                                        $obj->varietiesEdit[] = $objV;
+                                        if ($changeVariety) {
+                                            $objV->changeVariety = $changeVariety;
+                                            $obj->varietiesEdit[] = $objV;
+                                        }
                                     }
-                                } else {
-                                    $obj->varietiesNew[] = $d;
                                 }
                             }
                             if (!$e) {
                                 $obj->varietiesDelete[] = $a;
                             }
                         }
-                        $obj->change = $change;
-                        $arrayBoxsEdit[] = $obj;
+                        if ($change) {
+                            $obj->change = $change;
+                            $arrayBoxsEdit[] = $obj;
+                        }
                     }
-                } else {
-                    $arrayBoxsNew[] = $b;
                 }
             }
             if (!$v) {

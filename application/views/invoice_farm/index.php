@@ -131,7 +131,7 @@
         let acumEb = 0;
         if (details.length > 0) {
             let texto_tabla = '';
-            texto_tabla += '<table id="datatablesVarieties" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
+            texto_tabla += '<table id="datatablesVarieties" class="table table-striped table-no-bordered" cellspacing="0" width="100%" style="width:100%">';
             texto_tabla += '<thead>';
             texto_tabla += '<tr>';
             texto_tabla += '<th>NRO BOX</th>';

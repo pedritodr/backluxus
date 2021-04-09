@@ -577,7 +577,6 @@
     $(document).ready(function() {
 
         LoadInvoiceFarm();
-        console.log(arrayRequest);
         $("#selectFarms").select2({
             tags: false,
             placeholder: '<?= translate('select_opction_lang') ?>',
@@ -704,8 +703,8 @@
                     $('#spanFinalize').text('Creando invoice...');
                     $('#btnPrevius').prop('disabled', true);
                     //crear invoice
-                    let farms = $('select[name=farms] option').filter(':selected').val();
-                    let markings = $('select[name=markings] option').filter(':selected').val();
+                    let farms = $('select[name=farms] option').filter(':selected').attr('itemId');
+                    let markings = $('select[name=markings] option').filter(':selected').attr('itemId');
                     markings = JSON.parse(decodeB64Utf8(markings));
                     farms = JSON.parse(decodeB64Utf8(farms));
                     delete farms.personal;
@@ -929,7 +928,6 @@
     const addVarieties = (object = null, editBox = false) => {
 
         if (!object) {
-            alert()
             $('#btnModalVarieties').attr('onclick', 'addVarietiesInvoice()');
             $('#btnModalVarieties').text('<?= translate('end_boxlang') ?>');
             $('#product').prop('disabled', true);

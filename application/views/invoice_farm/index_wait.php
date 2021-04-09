@@ -1108,7 +1108,7 @@
             });
             let data = {
                 searchAwb
-            }
+            };
             setTimeout(function() {
                 $.ajax({
                     type: 'POST',
@@ -1123,7 +1123,11 @@
                                     arrayInvoiceUpdate.push(element);
                                 });
                                 invoiceClientUpdate = result.data.invoice;
-                                $('#markings').val(result.data.marking.marking_id);
+                                //   $('#markings').val(result.data.marking.marking_id);
+                                //    $('#markings').trigger('change');
+
+                                let cadena = '<option itemId="' + encodeB64Utf8(JSON.stringify(result.data.marking)) + '" value="' + result.data.marking.marking_id + '">' + result.data.marking.name_marking + ' | ' + result.data.marking.name_commercial + '</option>';
+                                $('#markings').html(cadena);
                                 $('#markings').trigger('change');
                                 printSelectedInvoice();
                                 const toast = swal.mixin({
