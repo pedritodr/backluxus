@@ -136,7 +136,7 @@ $config['mongo_db']['default'] = [
 	'connection_string' => '',
 
 	'connection' => [
-		'host'          => 'localhost',
+		'host'          => '104.236.0.183',
 		'port'          => '27017',
 		'user_name'     => 'adminDemo',
 		'user_password' => '5Tgbvfr43edcxsw21qaz',
