@@ -127,7 +127,7 @@ $config['mongo_db']['active_config_group'] = 'default';
  */
 $config['mongo_db']['default'] = [
 	'settings' => [
-		'auth'             => false,
+		'auth'             => True,
 		'debug'            => TRUE,
 		'return_as'        => 'object',
 		'auto_reset_query' => TRUE
