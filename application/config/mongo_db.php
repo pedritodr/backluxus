@@ -138,8 +138,8 @@ $config['mongo_db']['default'] = [
 	'connection' => [
 		'host'          => 'localhost',
 		'port'          => '27017',
-		'user_name'     => '',
-		'user_password' => '',
+		'user_name'     => 'adminDemo',
+		'user_password' => '5Tgbvfr43edcxsw21qaz',
 		'db_name'       => 'luxus',
 		'db_options'    => []
 	],
