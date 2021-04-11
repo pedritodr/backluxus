@@ -125,26 +125,50 @@ $config['mongo_db']['active_config_group'] = 'default';
 /**
  *  Connection settings for #default group.
  */
-$config['mongo_db']['default'] = [
-	'settings' => [
-		'auth'             => True,
-		'debug'            => TRUE,
-		'return_as'        => 'object',
-		'auto_reset_query' => TRUE
-	],
+if (ENVIRONMENT == 'development') {
+	$config['mongo_db']['default'] = [
+		'settings' => [
+			'auth'             => TRUE,
+			'debug'            => TRUE,
+			'return_as'        => 'object',
+			'auto_reset_query' => TRUE
+		],
 
-	'connection_string' => '',
+		'connection_string' => '',
 
-	'connection' => [
-		'host'          => '104.236.0.183',
-		'port'          => '27017',
-		'user_name'     => 'adminDemo',
-		'user_password' => '5Tgbvfr43edcxsw21qaz',
-		'db_name'       => 'luxus',
-		'db_options'    => []
-	],
-	'driver' => []
-];
+		'connection' => [
+			'host'          => 'localhost',
+			'port'          => '27017',
+			'user_name'     => '',
+			'user_password' => '',
+			'db_name'       => 'luxus',
+			'db_options'    => []
+		],
+		'driver' => []
+	];
+} else {
+	$config['mongo_db']['default'] = [
+		'settings' => [
+			'auth'             => false,
+			'debug'            => TRUE,
+			'return_as'        => 'object',
+			'auto_reset_query' => TRUE
+		],
+
+		'connection_string' => '',
+
+		'connection' => [
+			'host'          => 'localhost',
+			'port'          => '27017',
+			'user_name'     => 'adminDemo',
+			'user_password' => '5Tgbvfr43edcxsw21qaz',
+			'db_name'       => 'luxus',
+			'db_options'    => []
+		],
+		'driver' => []
+	];
+}
+
 
 
 
