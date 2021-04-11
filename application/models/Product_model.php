@@ -6,7 +6,11 @@ class Product_model extends CI_Model
     function __construct()
     {
         parent::__construct();
-        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
+        if (ENVIRONMENT == 'development') {
+            $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
+        } else {
+            $this->mongodb = new MongoDB\Client("mongodb://adminDemo:5Tgbvfr43edcxsw21qaz@localhost:27017/");
+        }
     }
     function seo_url($text, $limit = 75)
     {
@@ -161,7 +165,7 @@ class Product_model extends CI_Model
     function update_product_farm($product_id, $data)
     {
         foreach ($data as $key => $value) {
-           $this->mongo_db->set('varieties.$.'.$key,$value);
+            $this->mongo_db->set('varieties.$.' . $key, $value);
         }
         $query = $this->mongo_db->where('varieties.product_id', $product_id)->updateAll('providers');
         return $query;
@@ -180,23 +184,23 @@ class Product_model extends CI_Model
     {
         $query = $this->mongo_db->where('varieties.color.color_id', $color_id)->get('providers');
         $update = false;
-       foreach ($query as $item) {
-           if(isset($item->varieties)){
-               foreach ($item->varieties as $variety) {
-                $result = $this->mongodb->luxus->providers->updateOne(
-                    ['farm_id' => ['$eq' => $item->farm_id]],
-                    ['$set' => [
-                        'varieties.$[var].color.name' => $data,
-                    ]],
-                    ['arrayFilters' => [
-                        ['var.product_id' => ['$eq' => $variety->product_id]]
-                    ]]
-                );
-                if($result){
-                    $update = true;
+        foreach ($query as $item) {
+            if (isset($item->varieties)) {
+                foreach ($item->varieties as $variety) {
+                    $result = $this->mongodb->luxus->providers->updateOne(
+                        ['farm_id' => ['$eq' => $item->farm_id]],
+                        ['$set' => [
+                            'varieties.$[var].color.name' => $data,
+                        ]],
+                        ['arrayFilters' => [
+                            ['var.product_id' => ['$eq' => $variety->product_id]]
+                        ]]
+                    );
+                    if ($result) {
+                        $update = true;
+                    }
                 }
-               }
-           }
+            }
         }
         return $update;
     }
@@ -204,23 +208,23 @@ class Product_model extends CI_Model
     {
         $query = $this->mongo_db->where('varieties.type.type_id', $type_id)->get('providers');
         $update = false;
-       foreach ($query as $item) {
-           if(isset($item->varieties)){
-               foreach ($item->varieties as $variety) {
-                $result = $this->mongodb->luxus->providers->updateOne(
-                    ['farm_id' => ['$eq' => $item->farm_id]],
-                    ['$set' => [
-                        'varieties.$[var].type.name' => $data,
-                    ]],
-                    ['arrayFilters' => [
-                        ['var.product_id' => ['$eq' => $variety->product_id]]
-                    ]]
-                );
-                if($result){
-                    $update = true;
+        foreach ($query as $item) {
+            if (isset($item->varieties)) {
+                foreach ($item->varieties as $variety) {
+                    $result = $this->mongodb->luxus->providers->updateOne(
+                        ['farm_id' => ['$eq' => $item->farm_id]],
+                        ['$set' => [
+                            'varieties.$[var].type.name' => $data,
+                        ]],
+                        ['arrayFilters' => [
+                            ['var.product_id' => ['$eq' => $variety->product_id]]
+                        ]]
+                    );
+                    if ($result) {
+                        $update = true;
+                    }
                 }
-               }
-           }
+            }
         }
         return $update;
     }
@@ -228,23 +232,23 @@ class Product_model extends CI_Model
     {
         $query = $this->mongo_db->where('varieties.categoria.category_id', $category_id)->get('providers');
         $update = false;
-       foreach ($query as $item) {
-           if(isset($item->varieties)){
-               foreach ($item->varieties as $variety) {
-                $result = $this->mongodb->luxus->providers->updateOne(
-                    ['farm_id' => ['$eq' => $item->farm_id]],
-                    ['$set' => [
-                        'varieties.$[var].categoria' => $data,
-                    ]],
-                    ['arrayFilters' => [
-                        ['var.product_id' => ['$eq' => $variety->product_id]]
-                    ]]
-                );
-                if($result){
-                    $update = true;
+        foreach ($query as $item) {
+            if (isset($item->varieties)) {
+                foreach ($item->varieties as $variety) {
+                    $result = $this->mongodb->luxus->providers->updateOne(
+                        ['farm_id' => ['$eq' => $item->farm_id]],
+                        ['$set' => [
+                            'varieties.$[var].categoria' => $data,
+                        ]],
+                        ['arrayFilters' => [
+                            ['var.product_id' => ['$eq' => $variety->product_id]]
+                        ]]
+                    );
+                    if ($result) {
+                        $update = true;
+                    }
                 }
-               }
-           }
+            }
         }
         return $update;
     }
@@ -252,23 +256,23 @@ class Product_model extends CI_Model
     {
         $query = $this->mongo_db->where('varieties.categoria.type_box.box_id', $category_id)->get('providers');
         $update = false;
-       foreach ($query as $item) {
-           if(isset($item->varieties)){
-               foreach ($item->varieties as $variety) {
-                $result = $this->mongodb->luxus->providers->updateOne(
-                    ['farm_id' => ['$eq' => $item->farm_id]],
-                    ['$set' => [
-                        'varieties.$[var].categoria.type_box' => $data,
-                    ]],
-                    ['arrayFilters' => [
-                        ['var.product_id' => ['$eq' => $variety->product_id]]
-                    ]]
-                );
-                if($result){
-                    $update = true;
+        foreach ($query as $item) {
+            if (isset($item->varieties)) {
+                foreach ($item->varieties as $variety) {
+                    $result = $this->mongodb->luxus->providers->updateOne(
+                        ['farm_id' => ['$eq' => $item->farm_id]],
+                        ['$set' => [
+                            'varieties.$[var].categoria.type_box' => $data,
+                        ]],
+                        ['arrayFilters' => [
+                            ['var.product_id' => ['$eq' => $variety->product_id]]
+                        ]]
+                    );
+                    if ($result) {
+                        $update = true;
+                    }
                 }
-               }
-           }
+            }
         }
         return $update;
     }

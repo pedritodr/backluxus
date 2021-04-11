@@ -7,7 +7,11 @@ class Farm_model extends CI_Model
     function __construct()
     {
         parent::__construct();
-        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
+        if (ENVIRONMENT == 'development') {
+            $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
+        } else {
+            $this->mongodb = new MongoDB\Client("mongodb://adminDemo:5Tgbvfr43edcxsw21qaz@localhost:27017/");
+        }
         // $this->load->database();
     }
 
@@ -25,35 +29,35 @@ class Farm_model extends CI_Model
     function get_min_farm_by_id($id)
     {
         $fields = [
-			'farm_id'=> 1,
-			'name_legal'=> 1,
-			'name_commercial'=> 1,
-			'owner'=> 1,
-			'_id'=> 0
-		];
-		$conditions = [
-			'farm_id' => $id
-		];
-		$query = $this->mongo_db->get_customize_fields('providers', $fields, $conditions);
-		if (count($query) > 0) {
-			return $query[0];
-		} else {
-			return false;
-		}
+            'farm_id' => 1,
+            'name_legal' => 1,
+            'name_commercial' => 1,
+            'owner' => 1,
+            '_id' => 0
+        ];
+        $conditions = [
+            'farm_id' => $id
+        ];
+        $query = $this->mongo_db->get_customize_fields('providers', $fields, $conditions);
+        if (count($query) > 0) {
+            return $query[0];
+        } else {
+            return false;
+        }
     }
     function get_all_farm_father()
     {
-        $result = $this->mongo_db->where(['farm_father'=>false,'is_active'=>1])->get('providers');
+        $result = $this->mongo_db->where(['farm_father' => false, 'is_active' => 1])->get('providers');
         return (count($result) > 0) ? $result : false;
     }
     function get_all_farm_father_edit($id)
     {
-        $result = $this->mongo_db->where(['farm_father'=>false,'is_active'=>1,'farm_id' => $this->mongo_db->ne($id)])->get('providers');
+        $result = $this->mongo_db->where(['farm_father' => false, 'is_active' => 1, 'farm_id' => $this->mongo_db->ne($id)])->get('providers');
         return (count($result) > 0) ? $result : false;
     }
     function get_all_farm_sons($id)
     {
-        $result = $this->mongo_db->where(['farm_father.farm_id'=>$id,'farm_id' => $this->mongo_db->ne($id),'is_active'=>1])->get('providers');
+        $result = $this->mongo_db->where(['farm_father.farm_id' => $id, 'farm_id' => $this->mongo_db->ne($id), 'is_active' => 1])->get('providers');
         return (count($result) > 0) ? $result : false;
     }
     function get_farms($id)
@@ -109,13 +113,12 @@ class Farm_model extends CI_Model
         $data['_id'] = $this->mongo_db->create_document_id();
         $newId = $this->mongo_db->where('farm_id', $farm_id)->push('personal', $data)->update('providers');
         return $newId;
-
     }
 
     function update_farm($id, $data)
     {
         foreach ($data as $key => $value) {
-            $this->mongo_db->set('farms.$.'.$key, $value);
+            $this->mongo_db->set('farms.$.' . $key, $value);
         }
         $result = $this->mongo_db->where('farms.farm_id', $id)->update('providers');
         return $result;
@@ -158,7 +161,7 @@ class Farm_model extends CI_Model
             return false;
         }
     }
-   /*  function update_person($params, $data)
+    /*  function update_person($params, $data)
     {
         $query = $this->mongodb->luxus->providers->updateOne(
             ['provider_id' => ['$eq' => $params->provider_id]],
@@ -179,7 +182,7 @@ class Farm_model extends CI_Model
     function update_person($id, $data)
     {
         foreach ($data as $key => $value) {
-            $this->mongo_db->set('personal.$.'.$key, $value);
+            $this->mongo_db->set('personal.$.' . $key, $value);
         }
         $result = $this->mongo_db->where('personal.person_id', $id)->update('providers');
         return $result;
@@ -201,11 +204,11 @@ class Farm_model extends CI_Model
         ];
         $conditions = [];
         $query      = $this->mongo_db->get_customize_fields('providers', $fields, $conditions, false, []);
-        $farms =[];
+        $farms = [];
         foreach ($query as $item) {
-            if(count($item->farms)>0){
+            if (count($item->farms) > 0) {
                 foreach ($item->farms as $farm) {
-                        $farms[]=$farm;
+                    $farms[] = $farm;
                 }
             }
         }
@@ -215,7 +218,7 @@ class Farm_model extends CI_Model
     function update_user_person($user_id, $data)
     {
         foreach ($data as $key => $value) {
-           $this->mongo_db->set('person_luxus.'.$key,$value);
+            $this->mongo_db->set('person_luxus.' . $key, $value);
         }
         $query = $this->mongo_db->where('person_luxus.user_id', $user_id)->updateAll('providers');
         return $query;
@@ -223,7 +226,7 @@ class Farm_model extends CI_Model
     function update_farm_sons($farm_id, $data)
     {
         foreach ($data as $key => $value) {
-           $this->mongo_db->set('farm_father.'.$key,$value);
+            $this->mongo_db->set('farm_father.' . $key, $value);
         }
         $query = $this->mongo_db->where('farm_father.farm_id', $farm_id)->updateAll('providers');
 
@@ -234,7 +237,6 @@ class Farm_model extends CI_Model
         $data['_id'] = $this->mongo_db->create_document_id();
         $newId = $this->mongo_db->where('farm_id', $farm_id)->push('varieties', $data)->update('providers');
         return $newId;
-
     }
 
     function delete_variety($farm_id, $variety_id)

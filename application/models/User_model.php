@@ -6,7 +6,11 @@ class User_model extends CI_Model
     function __construct()
     {
         parent::__construct();
-        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
+        if (ENVIRONMENT == 'development') {
+            $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
+        } else {
+            $this->mongodb = new MongoDB\Client("mongodb://adminDemo:5Tgbvfr43edcxsw21qaz@localhost:27017/");
+        }
         // $this->load->database();
     }
     function create($data)
@@ -22,7 +26,7 @@ class User_model extends CI_Model
     }
     function get_all_users()
     {
-        $result = $this->mongo_db->where(['role_id' => $this->mongo_db->ne(3),'is_active'=>1])->get('users');
+        $result = $this->mongo_db->where(['role_id' => $this->mongo_db->ne(3), 'is_active' => 1])->get('users');
         return (count($result) > 0) ? $result : false;
     }
     function get_all($conditions = [], $get_as_row = FALSE)
@@ -73,7 +77,7 @@ class User_model extends CI_Model
         $newId = $this->mongo_db->where('user_id', $user_id)->push('markings', $data)->update('users');
         return $newId;
     }
-    function update_marking($id,$data)
+    function update_marking($id, $data)
     {
         foreach ($data as $key => $value) {
             $this->mongo_db->set($key, $value);
@@ -95,7 +99,7 @@ class User_model extends CI_Model
         $newId = $this->mongo_db->where('user_id', $user_id)->push('managers', $data)->update('users');
         return $newId;
     }
-    function update_manager($id,$data)
+    function update_manager($id, $data)
     {
 
         foreach ($data as $key => $value) {
@@ -115,14 +119,14 @@ class User_model extends CI_Model
     function update_user_person($user_id, $data)
     {
         foreach ($data as $key => $value) {
-           $this->mongo_db->set('person_luxus.'.$key,$value);
+            $this->mongo_db->set('person_luxus.' . $key, $value);
         }
         $query = $this->mongo_db->where('person_luxus.user_id', $user_id)->updateAll('users');
         return $query;
     }
     function login($email, $password)
-	{
-		$query = $this->mongo_db->where(['email' => $email, 'password' => $password])->get('users');
-		return (count($query) > 0) ? $query[0] : false;
-	}
+    {
+        $query = $this->mongo_db->where(['email' => $email, 'password' => $password])->get('users');
+        return (count($query) > 0) ? $query[0] : false;
+    }
 }

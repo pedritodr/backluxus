@@ -6,7 +6,11 @@ class Invoice_farm_model extends CI_Model
     function __construct()
     {
         parent::__construct();
-        $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
+        if (ENVIRONMENT == 'development') {
+            $this->mongodb = new MongoDB\Client("mongodb://localhost:27017/");
+        } else {
+            $this->mongodb = new MongoDB\Client("mongodb://adminDemo:5Tgbvfr43edcxsw21qaz@localhost:27017/");
+        }
     }
 
     function create($data)
