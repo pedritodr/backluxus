@@ -128,7 +128,7 @@ $config['mongo_db']['active_config_group'] = 'default';
 if (ENVIRONMENT == 'development') {
 	$config['mongo_db']['default'] = [
 		'settings' => [
-			'auth'             => TRUE,
+			'auth'             => FALSE,
 			'debug'            => TRUE,
 			'return_as'        => 'object',
 			'auto_reset_query' => TRUE

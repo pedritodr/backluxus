@@ -66,6 +66,11 @@
         width: 100%;
         border-radius: 6px;
     }
+
+    .modal-content .modal-header svg {
+        width: 28px;
+        color: #acb0c3;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">
@@ -136,6 +141,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel"><?= translate('details_lang') ?></h5>
+                <button type="button" class="close" onclick="handleActiveEdit()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
             </div>
             <div class="modal-body table-responsive" id="bodyModalDetails">
 
@@ -149,6 +160,7 @@
 
 
 <script>
+    let activeEdit = false;
     $(() => {
         let table = $('#example1').DataTable({
             "order": [
@@ -183,7 +195,7 @@
         if (details.length > 0) {
             let texto_tabla = '';
             texto_tabla +=
-                '<table id="datatablesVarieties" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">';
+                '<table id="datatablesVarieties" class="table table-striped table-no-bordered" cellspacing="0" width="100%" style="width:100%">';
             texto_tabla += '<thead>';
             texto_tabla += '<tr>';
             texto_tabla += '<th>FARM</th>';
@@ -196,6 +208,7 @@
             texto_tabla += '<th>TOTAL STM</th>';
             texto_tabla += '<th>PRICE</th>';
             texto_tabla += '<th>TOTAL</th>';
+            texto_tabla += '<th>Acciones</th>';
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
             texto_tabla += '<tbody id="bodyTableDetails">';
@@ -206,6 +219,7 @@
 
             details.forEach((item, indice, array) => {
                 item.boxs.forEach((box, index, boxs) => {
+                    box.detailId = item.id;
                     if (box.typeBoxs.name.toUpperCase().trim() === "HB") {
                         acumHb += parseInt(box.boxNumber);
                     } else if (box.typeBoxs.name.toUpperCase().trim() === "QB") {
@@ -245,6 +259,13 @@
                     textBox += '</td>';
 
                     textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '<div class="edit-item-invoices" style="display:none">';
+                    textBox += '<button class="btn btn-primary" id="delete_' + item.id + '" onclick=deleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>';
+                    textBox += '<button class="btn btn-danger" id="cancel_' + item.id + '" onclick=cancelInvoice("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
+                    textBox += '</div>';
                     textBox += '</td>';
 
                     textBox += '</tr>';
@@ -308,6 +329,8 @@
                             textVariety += totalBoxItem.toFixed(2);
                             textVariety += '</td>';
 
+                            textVariety += '<td></td>';
+
                             textVariety += '</tr>';
                             $('#bodyTableDetails').append(textVariety);
                         });
@@ -344,6 +367,8 @@
 
                     textFooterBox += '<td bgcolor= "#b9e0f1">';
                     textFooterBox += acumTotalBox.toFixed(2);
+                    textFooterBox += '</td>';
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
                     textFooterBox += '</td>';
 
                     textFooterBox += '</tr>';
@@ -437,5 +462,44 @@
                 window.location.href = urlCancel;
             }
         })
+    }
+
+    const handleActiveEdit = () => {
+        if (!activeEdit) {
+            activeEdit = true;
+            $('.edit-item-invoices').show()
+        } else {
+            activeEdit = false;
+            $('.edit-item-invoices').hide();
+        }
+    }
+
+    let arrayDeleteItems = [];
+
+    const deleteItem = (item) => {
+        swal({
+            title: '¿ Quieres eliminar este item ?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si',
+            cancelButtonText: 'No',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                item = JSON.parse(decodeB64Utf8(item));
+                arrayDeleteItems.push(item);
+            }
+        })
+
+        console.log(item);
+    }
+
+    const cancelDeleteItem = (item) => {
+        if (arrayDeleteItems.length > 0) {
+            const index = arrayDeleteItems.findIndex(x => x.detailId === item.detailId);
+            if (index > -1) {
+                arrayDeleteItems.splice(index, 1);
+            }
+        }
     }
 </script>
