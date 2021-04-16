@@ -603,4 +603,27 @@ class Invoice_farm extends CI_Controller
         }
         return (object)['arrayBoxsDelete' => $arrayBoxsDelete, 'arrayBoxsNew' => $arrayBoxsNew, 'arrayBoxsEdit' => $arrayBoxsEdit];
     }
+
+    public function delete_items_invoice_client()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $arrayRequest =  json_decode($_POST['arrayRequest']);
+        $invoice = $this->input->post('invoice');
+        foreach ($arrayRequest as $item) {
+            $response =   $this->invoice_farm->delete_box_id($invoice, $item->detailId, $item->id);
+            if ($response) {
+                $this->invoice_farm->update_invoice_farm($item->id, ['status' => 0]);
+            }
+        }
+
+        echo json_encode(['status' => 200, 'msj' => 'correcto']);
+        exit();
+    }
 }

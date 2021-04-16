@@ -112,7 +112,7 @@
                                                             <polyline points="6 9 12 15 18 9"></polyline>
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
-                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
+                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("cancel_invoice_lang"); ?></a>
                                                     </div>
                                                 </div>
@@ -153,6 +153,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                <button class="btn btn-success" id="btnUpdateInvoice" onclick="handleUpdateItems()" style="display:none">Actualizar</button>
             </div>
         </div>
     </div>
@@ -169,7 +170,6 @@
         });
     });
 
-
     const encodeB64Utf8 = (str) => {
         return btoa(unescape(encodeURIComponent(str)));
     }
@@ -178,10 +178,17 @@
         return decodeURIComponent(escape(atob(str)));
     }
 
-    const verDetails = (details) => {
+    let arrayDetails = [];
+    let idInvoice = null;
+    const verDetails = (details, id) => {
         details = decodeB64Utf8(details);
         details = JSON.parse(details);
-        $("#modalDetails").modal('show');
+        idInvoice = id;
+        arrayDetails = details;
+        arrayDeleteItems = [];
+        $('#modalDetails').modal({
+            backdrop: false
+        })
         $("#bodyModalDetails").empty();
         let qtyBox = 0;
         let qtyStems = 0;
@@ -264,7 +271,7 @@
                     textBox += '<td bgcolor= "#f1f2f3">';
                     textBox += '<div class="edit-item-invoices" style="display:none">';
                     textBox += '<button class="btn btn-primary" id="delete_' + item.id + '" onclick=deleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>';
-                    textBox += '<button class="btn btn-danger" id="cancel_' + item.id + '" onclick=cancelInvoice("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
+                    textBox += '<button class="btn btn-danger" style="display:none" id="cancel_' + item.id + '" onclick=cancelDeleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
                     textBox += '</div>';
                     textBox += '</td>';
 
@@ -468,8 +475,10 @@
         if (!activeEdit) {
             activeEdit = true;
             $('.edit-item-invoices').show()
+            $('#btnUpdateInvoice').show();
         } else {
             activeEdit = false;
+            $('#btnUpdateInvoice').hide();
             $('.edit-item-invoices').hide();
         }
     }
@@ -488,18 +497,120 @@
             if (result.value) {
                 item = JSON.parse(decodeB64Utf8(item));
                 arrayDeleteItems.push(item);
+                $('#delete_' + item.detailId).hide();
+                $('#cancel_' + item.detailId).show();
+                const toast = swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    padding: '2em'
+                });
+                toast({
+                    type: 'success',
+                    title: '¡Correcto!',
+                    padding: '2em',
+                })
             }
         })
-
-        console.log(item);
     }
 
     const cancelDeleteItem = (item) => {
-        if (arrayDeleteItems.length > 0) {
-            const index = arrayDeleteItems.findIndex(x => x.detailId === item.detailId);
-            if (index > -1) {
-                arrayDeleteItems.splice(index, 1);
+
+        swal({
+            title: '¿ Quieres volver este item a la factura ?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si',
+            cancelButtonText: 'No',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                item = JSON.parse(decodeB64Utf8(item));
+                if (arrayDeleteItems.length > 0) {
+                    const index = arrayDeleteItems.findIndex(x => x.detailId === item.detailId);
+                    if (index > -1) {
+                        arrayDeleteItems.splice(index, 1);
+                        $('#delete_' + item.detailId).show();
+                        $('#cancel_' + item.detailId).hide();
+                    }
+                }
+                const toast = swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    padding: '2em'
+                });
+                toast({
+                    type: 'success',
+                    title: '¡Correcto!',
+                    padding: '2em',
+                })
             }
+        })
+    }
+
+    const handleUpdateItems = () => {
+        if (arrayDeleteItems.length > 0) {
+            if (arrayDeleteItems.length == arrayDetails.length) {
+                cancelInvoice(idInvoice);
+            } else {
+                Swal.fire({
+                    title: 'Completando operación',
+                    text: 'Actualizando invoice del cliente...',
+                    imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                    imageAlt: 'No realice acciones sobre la página',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    footer: '<a href>No realice acciones sobre la página</a>',
+                });
+                let invoice = idInvoice;
+                let arrayRequest = JSON.stringify(arrayDeleteItems);
+                let data = {
+                    invoice,
+                    arrayRequest
+                }
+                setTimeout(function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: "<?= site_url('invoice_farm/update_invoice_client') ?>",
+                        data: data,
+                        success: function(result) {
+                            result = JSON.parse(result);
+                            if (result.status == 200) {
+                                const toast = swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    padding: '2em'
+                                });
+                                toast({
+                                    type: 'success',
+                                    title: '¡Correcto!',
+                                    padding: '2em',
+                                })
+
+                            } else {
+                                Swal.close();
+                                swal({
+                                    title: '¡Error!',
+                                    text: result.msj,
+                                    padding: '2em'
+                                });
+                            }
+                        }
+                    });
+                }, 1500)
+
+            }
+        } else {
+            swal({
+                title: '¡Error!',
+                text: 'No tiene items seleccionados',
+                padding: '2em'
+            });
         }
     }
 </script>
