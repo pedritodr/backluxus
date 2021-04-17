@@ -616,14 +616,19 @@ class Invoice_farm extends CI_Controller
         }
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $invoice = $this->input->post('invoice');
+        $invoiceActual = $this->invoice_farm->get_by_id_invoice_client($invoice);
+        $dataChange = ['change' => [$invoiceActual->details, $arrayRequest], 'date_create' => date('Y-m-d')];
         foreach ($arrayRequest as $item) {
             $response =   $this->invoice_farm->delete_box_id($invoice, $item->detailId, $item->id);
             if ($response) {
+                $this->invoice_farm->update_invoice_farm_details($item->id, ['status' => 0]);
                 $this->invoice_farm->update_invoice_farm($item->id, ['status' => 0]);
             }
         }
+        $this->invoice_farm->create_change_invoice_client($invoice, $dataChange);
+        $invoice = $this->invoice_farm->get_by_id_invoice_client($invoice);
 
-        echo json_encode(['status' => 200, 'msj' => 'correcto']);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $invoice->details]);
         exit();
     }
 }

@@ -112,7 +112,7 @@
                                                             <polyline points="6 9 12 15 18 9"></polyline>
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
-                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
+                                                        <a class="dropdown-item" id="<?= 'btneyeDetails_' . $item->invoice ?>" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("cancel_invoice_lang"); ?></a>
                                                     </div>
                                                 </div>
@@ -186,9 +186,11 @@
         idInvoice = id;
         arrayDetails = details;
         arrayDeleteItems = [];
+        activeEdit = false;
         $('#modalDetails').modal({
             backdrop: false
-        })
+        });
+        $('#btnUpdateInvoice').hide();
         $("#bodyModalDetails").empty();
         let qtyBox = 0;
         let qtyStems = 0;
@@ -383,9 +385,6 @@
 
                 });
 
-
-
-
             });
             let textFooter = '<tfoot>';
             textFooter += '<tr>';
@@ -556,6 +555,7 @@
             if (arrayDeleteItems.length == arrayDetails.length) {
                 cancelInvoice(idInvoice);
             } else {
+                $('#modalDetails').modal('hide');
                 Swal.fire({
                     title: 'Completando operación',
                     text: 'Actualizando invoice del cliente...',
@@ -574,7 +574,7 @@
                 setTimeout(function() {
                     $.ajax({
                         type: 'POST',
-                        url: "<?= site_url('invoice_farm/update_invoice_client') ?>",
+                        url: "<?= site_url('invoice_farm/delete_items_invoice_client') ?>",
                         data: data,
                         success: function(result) {
                             result = JSON.parse(result);
@@ -591,7 +591,8 @@
                                     title: '¡Correcto!',
                                     padding: '2em',
                                 })
-
+                                $('#btneyeDetails_' + invoice).attr('onclick', 'verDetails("' + encodeB64Utf8(JSON.stringify(result.data)) + '")');
+                                verDetails(encodeB64Utf8(JSON.stringify(result.data)));
                             } else {
                                 Swal.close();
                                 swal({
