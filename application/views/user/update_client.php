@@ -20,7 +20,7 @@
                             <label><?= translate("name_company_lang"); ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
-                                <input type="text" class="form-control input-sm" name="name_company" required placeholder="<?= translate('name_company_lang'); ?>" value="<?= $user_object->name_company ?>">
+                                <input autocomplete="off" type="text" class="form-control input-sm" name="name_company" required placeholder="<?= translate('name_company_lang'); ?>" value="<?= $user_object->name_company ?>">
                                 <input type="hidden" name="user_id" value="<?= $user_object->user_id ?>">
                             </div>
                         </div>
@@ -28,14 +28,14 @@
                             <label><?= translate('name_commercial_lang') ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
-                                <input type="text" class="form-control input-sm" name="name_commercial" required placeholder="<?= translate('name_commercial_lang') ?>" value="<?= $user_object->name_commercial ?>">
+                                <input autocomplete="off" type="text" class="form-control input-sm" name="name_commercial" required placeholder="<?= translate('name_commercial_lang') ?>" value="<?= $user_object->name_commercial ?>">
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <label><?= translate('phone_lang') ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
-                                <input type="text" class="form-control input-sm" name="phone" required placeholder="<?= translate('phone_lang') ?>" value="<?= $user_object->phone ?>">
+                                <input autocomplete="off" type="text" class="form-control input-sm" name="phone" required placeholder="<?= translate('phone_lang') ?>" value="<?= $user_object->phone ?>">
                             </div>
                         </div>
                         <div class="col-lg-12">
