@@ -363,6 +363,7 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
+        $this->load->model('User_model', 'user');
         $awb = trim(($this->input->post('awb')));
         $marking = ($_POST['marking']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
@@ -371,6 +372,18 @@ class Invoice_farm extends CI_Controller
         }
         $invoice = 'invoice_' . uniqid();
         $date_create = date("Y-m-d H:i:s");
+        $objUser = $this->user->get_min_client_by_marking_id($marking['marking_id']);
+        $numberSecuencial = 0;
+        if (isset($objUser->secuencial)) {
+            if ($objUser->secuencial > 0) {
+                $numberSecuencial = (int)$objUser->secuencial + 1;
+            } else {
+                $numberSecuencial =  1;
+            }
+        } else {
+            $numberSecuencial = 1;
+        }
+
         $data_invoice = [
             'invoice' => $invoice,
             'awb' => $awb,
@@ -378,10 +391,12 @@ class Invoice_farm extends CI_Controller
             'details' => $arrayRequest,
             'status' => 0,
             'date_create' => $date_create,
-            'timestamp' => strtotime($date_create)
+            'timestamp' => strtotime($date_create),
+            'number_invoice' => $numberSecuencial
         ];
         $resquest =  $this->invoice_farm->create_invoice_client($data_invoice);
         if ($resquest) {
+            $this->user->update($objUser->user_id, ['secuencial' => $numberSecuencial]);
             foreach ($arrayRequest as $item) {
                 foreach ($item->boxs as $box) {
                     $this->invoice_farm->update_invoice_farm_details($box->id, ['status' => 1]);
@@ -427,9 +442,31 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
-        $awb = $this->input->post('searchAwb');
+        $awb = (int)$this->input->post('searchAwb');
 
         $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb, 'status' => $this->mongo_db->ne(-1)], true);
+        if ($resquest) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $resquest]);
+        } else {
+            $resquest =  $this->invoice_farm->get_all_invoice_client(['number_invoice' => $awb, 'status' => $this->mongo_db->ne(-1)], true);
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $resquest]);
+        }
+        exit();
+    }
+    public function search_invoice_by_awb_id()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $awb = (int)$this->input->post('searchAwb');
+
+        $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb, 'status' => $this->mongo_db->ne(-1)], true);
+
         echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $resquest]);
         exit();
     }
@@ -629,6 +666,43 @@ class Invoice_farm extends CI_Controller
         $invoice = $this->invoice_farm->get_by_id_invoice_client($invoice);
 
         echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $invoice->details]);
+        exit();
+    }
+    public function search_user_by_marking()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $this->load->model('User_model', 'user');
+        $marking = $this->input->post('marking');
+        $objUser = $this->user->get_min_client_by_marking_id($marking);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $objUser]);
+        exit();
+    }
+    public function update_awb()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $invoice = $this->input->post('invoice');
+        $awb = $this->input->post('awb');
+        $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb, 'status' => $this->mongo_db->ne(-1)], true);
+        if ($resquest) {
+            echo json_encode(['status' => 404, 'msj' => 'correcto', 'data' => $resquest]);
+        } else {
+            $this->invoice_farm->update_invoice_client($invoice, ['awb' => $awb]);
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
+        }
         exit();
     }
 }

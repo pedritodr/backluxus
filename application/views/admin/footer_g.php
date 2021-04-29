@@ -20,6 +20,7 @@
 <script src="<?= base_url() ?>admin_template/bootstrap/js/bootstrap.min.js"></script>
 <script src="<?= base_url() ?>admin_template/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 <script src="<?= base_url() ?>admin_template/assets/js/app.js"></script>
+<script src="<?= base_url() ?>admin_template/plugins/input-mask/jquery.inputmask.bundle.min.js"></script>
 <script>
     $(document).ready(function() {
         App.init();

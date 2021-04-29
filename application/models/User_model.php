@@ -129,4 +129,24 @@ class User_model extends CI_Model
         $query = $this->mongo_db->where(['email' => $email, 'password' => $password])->get('users');
         return (count($query) > 0) ? $query[0] : false;
     }
+    function get_min_client_by_marking_id($id)
+    {
+        $fields = [
+            'user_id' => 1,
+            'name_company' => 1,
+            'name_commercial' => 1,
+            'email' => 1,
+            'secuencial' => 1,
+            '_id' => 0
+        ];
+        $conditions = [
+            'markings.marking_id' => $id
+        ];
+        $query = $this->mongo_db->get_customize_fields('users', $fields, $conditions);
+        if (count($query) > 0) {
+            return $query[0];
+        } else {
+            return false;
+        }
+    }
 }

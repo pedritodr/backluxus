@@ -268,7 +268,7 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel"><?= translate('mode_billing_lang') ?></h5>
+                <h5 class="modal-title" id="lblHeaderInvoice"><?= translate('mode_billing_lang') ?></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -279,9 +279,9 @@
             <div class="modal-body table-responsive" id="bodyModalLoadInvoice">
                 <div class="row">
                     <div class="col-lg-6" id="bodySearchAwb">
-                        <label><?= translate("search_awb_lang"); ?></label>
+                        <label><?= translate("search_invoice_number_awb_lang"); ?></label>
                         <div class="input-group">
-                            <input id="searchAwb" type="text" class="form-control" placeholder="<?= translate('search_awb_lang') ?>" aria-label="<?= translate('search_awb_lang') ?>">
+                            <input id="searchAwb" type="text" class="form-control" placeholder="<?= translate('search_invoice_number_awb_lang') ?>" aria-label="<?= translate('search_awb_lang') ?>">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" onclick="searchInvoiceByAwb()" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
                                         <circle cx="11" cy="11" r="8"></circle>
@@ -301,7 +301,7 @@
                     <div class="col-lg-6" id="bodyAwb">
                         <label><?= translate("awb_lang"); ?></label>
                         <div class="input-group">
-                            <input type="text" class="form-control input-sm" id="awb" name="awb" onchange="validAwb()" placeholder="<?= translate('awb_lang'); ?>">
+                            <input type="text" class="form-control input-sm" id="awb" name="awb" onchange="validAwb()">
                         </div>
                     </div>
                 </div>
@@ -366,6 +366,7 @@
     let listInvoice = '<?= json_encode($all_invoice_farm) ?>';
     let arraySelectedInvoice = [];
     $(() => {
+        $('#awb').inputmask("999-9999-9999");
         if (change == 0) {
             $('#mode2').hide();
         }
@@ -434,9 +435,39 @@
         $('#bodySearchAwb').hide();
         $('#bodyAwb').show();
         printSelectedInvoice();
+        $('#lblHeaderInvoice').text('<?= translate('mode_billing_lang') ?>');
         $('#modalLoadInvoice').modal({
             backdrop: false
         })
+        let marking = $('select[id=markings] option').filter(':selected').attr('itemId');
+        if (marking != 0) {
+            marking = JSON.parse(decodeB64Utf8(marking));
+            $.ajax({
+                type: 'POST',
+                url: "<?= site_url('invoice_farm/search_user_by_marking') ?>",
+                data: {
+                    marking: marking.marking_id
+                },
+                success: function(result) {
+                    result = JSON.parse(result);
+                    if (result.status == 200) {
+                        if (result.data) {
+                            let secuencial;
+                            result.data.secuencial ? secuencial = result.data.secuencial + 1 : secuencial = 1;
+                            $('#lblHeaderInvoice').text('Factura nro: ' + secuencial);
+                        }
+                    } else {
+                        Swal.close();
+                        swal({
+                            title: '¡Error!',
+                            text: result.msj,
+                            padding: '2em'
+                        });
+                    }
+                }
+            });
+        }
+
 
     }
 
@@ -476,13 +507,14 @@
         arrayTemp.forEach(item => {
             cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.marking_id + '">' + item.name_marking + ' | ' + item.name_commercial + '</option>';
         });
+        $('#markings').empty();
         $('#markings').html(cadena);
     }
 
     const printSelectedInvoice = () => {
         $('#bodyTableLoadInvoice').empty();
         if (arraySelectedInvoice.length > 0) {
-            if (arrayInvoiceUpdate.length > 0) {
+            if (arrayInvoiceUpdate > 0) {
                 $('#btnInvoiceClient').hide();
                 $('#btnLoadInvoice').show();
             } else {
@@ -551,6 +583,12 @@
         } else {
             let stringDefault = '<tr><td>Vacio</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
             $('#bodyTableLoadInvoice').html(stringDefault);
+            $('#ebb').text(0);
+            $('#full').text(0);
+            $('#hb').text(0);
+            $('#qb').text(0);
+            $('#eb').text(0);
+            $('#fulles').text(0);
         }
         validBtnCancel();
     }
@@ -686,44 +724,71 @@
             })
         }
         validBtnCancel();
-        swal({
-            title: '¿ Quieres ir al detalle de la factura ?',
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Si',
-            cancelButtonText: 'No',
-            padding: '2em'
-        }).then(function(result) {
-            if (result.value) {
-                if (arrayInvoiceUpdate.length > 0) {
-                    showModalInvoiceClients();
-                } else {
-                    loadingInvoice();
-                }
-            } else {
-                if (arrayInvoiceUpdate.length > 0) {
-                    $('#btnInvoiceClient').hide();
-                    $('#btnLoadInvoice').show();
-                } else {
-                    $('#btnInvoiceClient').show();
-                    $('#btnLoadInvoice').hide();
-                }
-            }
-        })
+        /*   swal({
+              title: '¿ Quieres ir al detalle de la factura ?',
+              type: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Si',
+              cancelButtonText: 'No',
+              padding: '2em'
+          }).then(function(result) {
+              if (result.value) {
+                  if (arrayInvoiceUpdate.length > 0) {
+                      showModalInvoiceClients();
+                  } else {
+                      loadingInvoice();
+                  }
+              } else {
+                  if (arrayInvoiceUpdate.length > 0) {
+                      $('#btnInvoiceClient').hide();
+                      $('#btnLoadInvoice').show();
+                  } else {
+                      $('#btnInvoiceClient').show();
+                      $('#btnLoadInvoice').hide();
+                  }
+              }
+          }) */
 
     }
 
     const changeMarking = () => {
         let marking = $('select[id=markings] option').filter(':selected').attr('itemId');
-        marking = JSON.parse(decodeB64Utf8(marking));
-        $('#awb').val(marking.awb);
-        table.column(1)
-            .search(marking.name_marking ? '^' + marking.name_marking + '$' : marking.name_marking, true, false)
-            .draw();
-        $('.n-chk').show();
-        table2.search(marking.name_marking).draw();
-        if (marking.awb !== '') {
-            validAwb();
+        marking !== '0' ? marking = JSON.parse(decodeB64Utf8(marking)) : marking = 0;
+        if (marking !== 0) {
+
+            $("#awb").inputmask("setvalue", marking.awb);
+            table.column(1)
+                .search(marking.name_marking ? '^' + marking.name_marking + '$' : marking.name_marking, true, false)
+                .draw();
+            $('.n-chk').show();
+            table2.search(marking.name_marking).draw();
+            if (marking.awb !== '') {
+                validAwb();
+            }
+            $.ajax({
+                type: 'POST',
+                url: "<?= site_url('invoice_farm/search_user_by_marking') ?>",
+                data: {
+                    marking: marking.marking_id
+                },
+                success: function(result) {
+                    result = JSON.parse(result);
+                    if (result.status == 200) {
+                        if (result.data) {
+                            let secuencial;
+                            result.data.secuencial ? secuencial = result.data.secuencial + 1 : secuencial = 1;
+                            $('#lblHeaderInvoice').text('Factura nro: ' + secuencial);
+                        }
+                    } else {
+                        Swal.close();
+                        swal({
+                            title: '¡Error!',
+                            text: result.msj,
+                            padding: '2em'
+                        });
+                    }
+                }
+            });
         }
     }
 
@@ -1000,58 +1065,78 @@
     const generateInvoice = () => {
 
         if (arraySelectedInvoice.length > 0) {
-            Swal.fire({
-                title: 'Completando operación',
-                text: 'Creando invoice del cliente...',
-                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
-                imageAlt: 'No realice acciones sobre la página',
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                footer: '<a href>No realice acciones sobre la página</a>',
-            });
+
             let marking = $('select[id=markings] option').filter(':selected').attr('itemId');
             marking = JSON.parse(decodeB64Utf8(marking));
             let awb = $('#awb').val();
-            let arrayRequest = JSON.stringify(arraySelectedInvoice);
-            let data = {
-                awb,
-                arrayRequest,
-                marking
+            let awbDividido = awb.split('-');
+            let format = true;
+            for (let i = 0; i < awbDividido.length; i++) {
+                let position = awbDividido[i].indexOf('_');
+                if (position >= 0) {
+                    format = false
+                    break;
+                }
             }
-            setTimeout(function() {
-                $.ajax({
-                    type: 'POST',
-                    url: "<?= site_url('invoice_farm/add_invoice_client') ?>",
-                    data: data,
-                    success: function(result) {
-                        result = JSON.parse(result);
-                        if (result.status == 200) {
-                            const toast = swal.mixin({
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 2000,
-                                padding: '2em'
-                            });
-                            toast({
-                                type: 'success',
-                                title: '¡Correcto!',
-                                padding: '2em',
-                            })
-                            setTimeout(function() {
-                                window.location = '<?= site_url('invoice_farm/index_invoice_client') ?>';
-                            }, 1000);
-                        } else {
-                            Swal.close();
-                            swal({
-                                title: '¡Error!',
-                                text: result.msj,
-                                padding: '2em'
-                            });
-                        }
-                    }
+            if (!format) {
+                swal({
+                    title: '¡Información!',
+                    text: "La Awb no cumple con el formato adecuado",
+                    type: 'info',
+                    showConfirmButton: true,
+                    padding: '2em'
+                })
+            } else {
+                Swal.fire({
+                    title: 'Completando operación',
+                    text: 'Creando invoice del cliente...',
+                    imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                    imageAlt: 'No realice acciones sobre la página',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    footer: '<a href>No realice acciones sobre la página</a>',
                 });
-            }, 1500)
+                let arrayRequest = JSON.stringify(arraySelectedInvoice);
+                let data = {
+                    awb,
+                    arrayRequest,
+                    marking
+                }
+                setTimeout(function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: "<?= site_url('invoice_farm/add_invoice_client') ?>",
+                        data: data,
+                        success: function(result) {
+                            result = JSON.parse(result);
+                            if (result.status == 200) {
+                                const toast = swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    padding: '2em'
+                                });
+                                toast({
+                                    type: 'success',
+                                    title: '¡Correcto!',
+                                    padding: '2em',
+                                })
+                                setTimeout(function() {
+                                    window.location = '<?= site_url('invoice_farm/index_invoice_client') ?>';
+                                }, 1000);
+                            } else {
+                                Swal.close();
+                                swal({
+                                    title: '¡Error!',
+                                    text: result.msj,
+                                    padding: '2em'
+                                });
+                            }
+                        }
+                    });
+                }, 1500)
+            }
         } else {
             swal({
                 title: 'Información',
@@ -1118,17 +1203,19 @@
                         result = JSON.parse(result);
                         if (result.status == 200) {
                             if (result.data) {
-                                arraySelectedInvoice = result.data.details;
-                                result.data.details.forEach(element => {
-                                    arrayInvoiceUpdate.push(element);
-                                });
+                                const details = result.data.details;
+                                arraySelectedInvoice = details;
+                                arrayInvoiceUpdate = 0;
+                                let countBoxs = 0;
+                                details.forEach(element => {
+                                    countBoxs += element.boxs.length;
+                                })
+                                arrayInvoiceUpdate = countBoxs;
                                 invoiceClientUpdate = result.data.invoice;
-                                //   $('#markings').val(result.data.marking.marking_id);
-                                //    $('#markings').trigger('change');
-
                                 let cadena = '<option itemId="' + encodeB64Utf8(JSON.stringify(result.data.marking)) + '" value="' + result.data.marking.marking_id + '">' + result.data.marking.name_marking + ' | ' + result.data.marking.name_commercial + '</option>';
                                 $('#markings').html(cadena);
                                 $('#markings').trigger('change');
+                                $('#lblHeaderInvoice').text('<?= translate("invoice_number_lang"); ?>: ' + result.data.number_invoice);
                                 printSelectedInvoice();
                                 const toast = swal.mixin({
                                     toast: true,
@@ -1143,6 +1230,11 @@
                                     padding: '2em',
                                 })
                             } else {
+                                $('#markings').val(0);
+                                $('#markings').trigger('change');
+                                arraySelectedInvoice = [];
+                                arrayInvoiceUpdate = 0;
+                                printSelectedInvoice();
                                 Swal.close();
                                 swal({
                                     title: '¡Mensaje!',
@@ -1152,6 +1244,11 @@
                             }
 
                         } else {
+                            $('#markings').val(0);
+                            $('#markings').trigger('change');
+                            arraySelectedInvoice = [];
+                            arrayInvoiceUpdate = 0;
+                            printSelectedInvoice();
                             Swal.close();
                             swal({
                                 title: '¡Error!',
@@ -1179,7 +1276,7 @@
         let markingS = $('select[id=markings] option').filter(':selected').attr('itemId');
         let bodySearchAwb = $('#bodySearchAwb').css('display');
         if (bodySearchAwb === 'block') {
-            if (arrayInvoiceUpdate.length > 0) {
+            if (arrayInvoiceUpdate > 0) {
                 $('#modalLoadInvoice').modal('hide');
             } else {
                 swal({
@@ -1205,34 +1302,55 @@
         let bodySearchAwb = $('#bodySearchAwb').css('display');
         if (bodySearchAwb === 'none') {
             let searchAwb = $('#awb').val().trim();
-            if (searchAwb !== '') {
-                $.ajax({
-                    type: 'POST',
-                    url: "<?= site_url('invoice_farm/search_invoice_by_awb') ?>",
-                    data: {
-                        searchAwb
-                    },
-                    success: function(result) {
-                        result = JSON.parse(result);
-                        if (result.status == 200) {
-                            if (result.data) {
+            let awbDividido = searchAwb.split('-');
+            let format = true;
+            for (let i = 0; i < awbDividido.length; i++) {
+                let position = awbDividido[i].indexOf('_');
+                if (position >= 0) {
+                    format = false
+                    break;
+                }
+            }
+            if (!format) {
+                swal({
+                    title: '¡Información!',
+                    text: "La Awb no cumple con el formato adecuado",
+                    type: 'info',
+                    showConfirmButton: true,
+                    padding: '2em'
+                })
+
+            } else {
+                if (searchAwb !== '') {
+                    $.ajax({
+                        type: 'POST',
+                        url: "<?= site_url('invoice_farm/search_invoice_by_awb_id') ?>",
+                        data: {
+                            searchAwb
+                        },
+                        success: function(result) {
+                            result = JSON.parse(result);
+                            if (result.status == 200) {
+                                if (result.data) {
+                                    swal({
+                                        title: '¡Mensaje!',
+                                        text: `Existe una factura asociada a ${searchAwb}`,
+                                        padding: '2em'
+                                    });
+                                    $('#awb').val('')
+                                }
+                            } else {
                                 swal({
-                                    title: '¡Mensaje!',
-                                    text: `Existe una factura asociada a ${searchAwb}`,
+                                    title: '¡Error!',
+                                    text: result.msj,
                                     padding: '2em'
                                 });
-                                $('#awb').val('')
                             }
-                        } else {
-                            swal({
-                                title: '¡Error!',
-                                text: result.msj,
-                                padding: '2em'
-                            });
                         }
-                    }
-                });
+                    });
+                }
             }
+
         }
     }
 
@@ -1306,16 +1424,8 @@
     }
 
     const validAddItem = () => {
-        countQtyA = 0;
         countQtyB = 0;
-        if (arrayInvoiceUpdate.length > 0) {
-            if (arrayInvoiceUpdate.length > 0) {
-                arrayInvoiceUpdate.forEach(item => {
-                    countQtyA += item.boxs.length;
-                });
-            } else {
-                return false;
-            }
+        if (arrayInvoiceUpdate > 0) {
             if (arraySelectedInvoice.length > 0) {
                 arraySelectedInvoice.forEach((item) => {
                     countQtyB += item.boxs.length;
@@ -1323,7 +1433,7 @@
             } else {
                 return false;
             }
-            if (countQtyB > countQtyA) {
+            if (countQtyB > arrayInvoiceUpdate) {
                 return true;
             } else {
                 return false;

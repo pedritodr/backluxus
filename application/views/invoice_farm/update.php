@@ -568,7 +568,10 @@
         $('#selectFarms').trigger('change');
         $('[id=markings]').val(objectInvoice.markings.marking_id);
         $('#markings').trigger('change');
-        $('#awb').val(objectInvoice.awb);
+        $("#awb").inputmask({
+            mask: "999-9999-9999"
+        })
+        $("#awb").inputmask("setvalue", objectInvoice.awb);
         $('#invoceNumber').val(objectInvoice.invoice_number);
         arrayRequest = objectInvoice.details;
         cargarDetails();
@@ -663,6 +666,15 @@
                 $('#spanTotal').text(acumTotal);
                 validNext = false;
                 let awb = $('#awb').val().trim();
+                let awbDividido = awb.split('-');
+                let format = true;
+                for (let i = 0; i < awbDividido.length; i++) {
+                    let position = awbDividido[i].indexOf('_');
+                    if (position >= 0) {
+                        format = false
+                        break;
+                    }
+                }
                 let invoceNumber = $('#invoceNumber').val().trim();
                 let dispatchDay = $('#dispatchDay').val().trim();
                 if (invoceNumber == "") {
@@ -689,6 +701,19 @@
                     toast({
                         type: 'error',
                         title: `El campo <?= translate('dispatch_day_lang'); ?> es requerido`,
+                        padding: '3em',
+                    })
+                } else if (!format) {
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        padding: '2em'
+                    });
+                    toast({
+                        type: 'error',
+                        title: 'La Awb no cumple con el formato adecuado',
                         padding: '3em',
                     })
                 } else {

@@ -291,7 +291,8 @@
                                             <div class="col-lg-4">
                                                 <label><?= translate("awb_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control input-sm" id="awb" name="awb" placeholder="<?= translate('awb_lang'); ?>">
+
+                                                    <input type="text" class="form-control input-sm" id="awb" name="awb">
                                                 </div>
                                             </div>
 
@@ -622,6 +623,7 @@
             next_fs = $(this).parent().next();
             if ($("fieldset").index(current_fs) == 0) {
                 $('.fulles').hide();
+                $('#awb').inputmask("999-9999-9999");
                 validNext = false;
                 let farms = $('select[name=farms] option').filter(':selected').val();
                 let markings = $('select[name=markings] option').filter(':selected').val();
@@ -670,6 +672,15 @@
                 // let shippementDate = $('#shippementDate').val().trim();
                 // let dueDate = $('#dueDate').val().trim();
                 let awb = $('#awb').val().trim();
+                let awbDividido = awb.split('-');
+                let format = true;
+                for (let i = 0; i < awbDividido.length; i++) {
+                    let position = awbDividido[i].indexOf('_');
+                    if (position >= 0) {
+                        format = false
+                        break;
+                    }
+                }
                 // let hawb = $('#hawb').val().trim();
                 //  let freighForward = $('#freighForward').val().trim();
                 // let packingList = $('#packingList').val().trim();
@@ -702,22 +713,20 @@
                         title: `El campo <?= translate('dispatch_day_lang'); ?> es requerido`,
                         padding: '3em',
                     })
-                }
-                /*  else if (awb == "") {
-                                    const toast = swal.mixin({
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000,
-                                        padding: '2em'
-                                    });
-                                    toast({
-                                        type: 'error',
-                                        title: `El campo <?= translate('awb_lang'); ?> es requerido`,
-                                        padding: '3em',
-                                    })
-                                } */
-                else {
+                } else if (!format) {
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        padding: '2em'
+                    });
+                    toast({
+                        type: 'error',
+                        title: 'La Awb no cumple con el formato adecuado',
+                        padding: '3em',
+                    })
+                } else {
                     validNext = true;
                 }
 

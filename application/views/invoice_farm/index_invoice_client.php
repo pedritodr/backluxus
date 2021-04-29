@@ -11,6 +11,10 @@
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
 
+    #modalAwb {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
     #modalLoadInvoice {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
@@ -103,6 +107,7 @@
                                                 <p><b><?= translate("marking_lang"); ?>: <?= $item->marking->name_marking ?></b></p>
                                             </td>
                                             <td>
+                                                <p><strong><?= translate("invoice_number_lang"); ?> : </strong><?= $item->number_invoice; ?></p>
                                                 <p><strong><?= translate("dispatch_day_lang"); ?> : </strong><?= $item->details[0]->farm->dispatch_day; ?></p>
                                                 <p><strong><?= translate("awb_lang"); ?> : </strong><?= $item->awb; ?></p>
                                             </td>
@@ -113,6 +118,7 @@
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" id="<?= 'btneyeDetails_' . $item->invoice ?>" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
+                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="updateAwb('<?= base64_encode(json_encode($item)) ?>')"><?= translate("edit_awb_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("cancel_invoice_lang"); ?></a>
                                                     </div>
                                                 </div>
@@ -158,6 +164,37 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modalAwb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="titleModalAwb"><?= translate('edit_awb_lang') ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <label id="lblNumberAwb"><?= translate("awb_lang"); ?></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="awbEdit">
+                            <input id="invoiceId" type="hidden">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                <button class="btn btn-success" onclick="handleSubmitUpdateAwb()">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -168,6 +205,9 @@
                 [0, "desc"]
             ],
         });
+        $("#awbEdit").inputmask({
+            mask: "999-9999-9999"
+        })
     });
 
     const encodeB64Utf8 = (str) => {
@@ -453,7 +493,93 @@
         }
 
     }
+    const updateAwb = (objInvoice) => {
+        objInvoice = decodeB64Utf8(objInvoice);
+        objInvoice = JSON.parse(objInvoice);
+        $('#titleModalAwb').text('<?= translate("invoice_number_lang"); ?>: ' + objInvoice.number_invoice);
+        $('#lblNumberAwb').text('<?= translate("awb_lang"); ?>: ' + objInvoice.awb);
+        $('#invoiceId').val(objInvoice.invoice);
 
+        $('#modalAwb').modal({
+            backdrop: false
+        });
+    }
+
+    const handleSubmitUpdateAwb = () => {
+        let invoice = $('#invoiceId').val();
+        let awb = $('#awbEdit').val().trim();
+        let awbDividido = awb.split('-');
+        let format = true;
+        for (let i = 0; i < awbDividido.length; i++) {
+            let position = awbDividido[i].indexOf('_');
+            if (position >= 0) {
+                format = false
+                break;
+            }
+        }
+        if (!format) {
+            swal({
+                title: '¡Información!',
+                text: "La Awb no cumple con el formato adecuado",
+                type: 'info',
+                showConfirmButton: true,
+                padding: '2em'
+            })
+        } else {
+            $('#modalAwb').modal('hide');
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Actualizando Awb...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            let data = {
+                invoice,
+                awb
+            }
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('invoice_farm/update_awb') ?>",
+                    data: data,
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2000);
+                        } else {
+                            Swal.close();
+                            swal({
+                                title: '¡Error!',
+                                text: `Existe una Awb:${awb}, asociada a la factura: ${result.data.number_invoice}`,
+                                padding: '2em'
+                            });
+                            $('#modalAwb').modal({
+                                backdrop: false
+                            });
+                        }
+                    }
+                });
+            }, 1500)
+
+        }
+    }
     const cancelInvoice = (id) => {
         swal({
             title: '¿ Estás seguro de realizar esta operación ?',
