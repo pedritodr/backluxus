@@ -149,7 +149,7 @@ if (ENVIRONMENT == 'development') {
 } else {
 	$config['mongo_db']['default'] = [
 		'settings' => [
-			'auth'             => TRUE,
+			'auth'             => false,
 			'debug'            => TRUE,
 			'return_as'        => 'object',
 			'auto_reset_query' => TRUE
