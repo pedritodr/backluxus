@@ -143,6 +143,7 @@ $config['data_lang'] = "Datos";
 $config['confirmation_lang'] = "Confirmación";
 $config['finalize_lang'] = "Finalizar";
 $config['box_number_lang'] = "Nro de cajas";
+$config['export_invoice_lang'] = "Exportar factura";
 
 $config['me_dicen_lang'] = "Me dicen";
 $config['reception_pedido_lang'] = "Recepción";

@@ -120,6 +120,7 @@
                                                         <a class="dropdown-item" id="<?= 'btneyeDetails_' . $item->invoice ?>" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="updateAwb('<?= base64_encode(json_encode($item)) ?>')"><?= translate("edit_awb_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("cancel_invoice_lang"); ?></a>
+                                                        <a class="dropdown-item" href="<?= site_url('invoice_farm/export_invoice/' . $item->invoice) ?>"><?= translate("export_invoice_lang"); ?></a>
                                                     </div>
                                                 </div>
                                             </td>
@@ -220,6 +221,7 @@
 
     let arrayDetails = [];
     let idInvoice = null;
+
     const verDetails = (details, id) => {
         details = decodeB64Utf8(details);
         details = JSON.parse(details);
@@ -493,6 +495,7 @@
         }
 
     }
+
     const updateAwb = (objInvoice) => {
         objInvoice = decodeB64Utf8(objInvoice);
         objInvoice = JSON.parse(objInvoice);
@@ -580,6 +583,7 @@
 
         }
     }
+
     const cancelInvoice = (id) => {
         swal({
             title: '¿ Estás seguro de realizar esta operación ?',
