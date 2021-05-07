@@ -720,12 +720,32 @@ class Invoice_farm extends CI_Controller
             $arrClavel = [];
             $arrRose = [];
             $arrOtros = [];
+            $arrCategory = [];
             foreach ($object->details as $item) {
                 $arrBoxClavel = [];
                 $arrBoxRose = [];
                 $arrBoxOtros = [];
                 if (count($item->boxs) > 0) {
                     foreach ($item->boxs as $box) {
+                        if (count($arrCategory) == 0) {
+                            $objTemp = ['category' => $box->varieties[0]->products->categoria, 'arr' => [$box]];
+                            $arrCategory[] = $objTemp;
+                        } else {
+                            $encontroCat = false;
+                            for ($i = 0; $i < count($arrCategory); $i++) {
+                                if ($arrCategory[$i]['category']->category_id == $box->varieties[0]->products->categoria->category_id) {
+                                    $arrTemp = $arrCategory[$i]['arr'];
+                                    $arrTemp[] = $box;
+                                    $arrCategory[$i]['arr'] = $arrTemp;
+                                    $encontroCat = true;
+                                }
+                            }
+
+                            if (!$encontroCat) {
+                                $objTemp = ['category' => $box->varieties[0]->products->categoria, 'arr' => [$box]];
+                                $arrCategory[] = $objTemp;
+                            }
+                        }
                         if ($box->varieties[0]->products->categoria->category_id == 'category_5fea02c2aff96') {
                             //rose
                             $arrBoxRose[] = $box;
@@ -781,9 +801,16 @@ class Invoice_farm extends CI_Controller
                 }
                 array_unshift($arrOtros, $tempLuxus);
             }
-
-            //  var_dump($arrRose, $arrClavel, $arrOtros);
-            //   die();
+            $tempLuxusCat = null;
+            if (count($arrCategory) > 1) {
+                for ($i = 0; $i < count($arrCategory); $i++) {
+                    if ($arrCategory[$i]['category']->category_id == 'farm_60256e217cb10') {
+                        $tempLuxusCat = $arrCategory[$i];
+                        unset($arrCategory[$i]);
+                    }
+                }
+                array_unshift($arrCategory, $tempLuxusCat);
+            }
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
             $sheet->setTitle("Información");
@@ -814,7 +841,7 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A1:E1')->getFill()->getStartColor()->setARGB('ffffff');
 
             $sheet->setCellValueByColumnAndRow(1, 2, "Factura");
-            $sheet->setCellValueByColumnAndRow(3, 2, "xx");
+            $sheet->setCellValueByColumnAndRow(3, 2, $object->number_invoice);
             $sheet->setCellValueByColumnAndRow(5, 2, "IN");
             $sheet->getStyle('A2')->getFont()->setSize(16);
             $sheet->getStyle('C2:E2')->getFont()->setSize(10);
@@ -830,9 +857,9 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A3:E3')->getFill()->getStartColor()->setARGB('ffffff');
 
             $sheet->setCellValueByColumnAndRow(1, 4, "Fecha:");
-            $sheet->setCellValueByColumnAndRow(2, 4, "20-20-20");
+            $sheet->setCellValueByColumnAndRow(2, 4, "");
             $sheet->setCellValueByColumnAndRow(4, 4, "Fecha ams:");
-            $sheet->setCellValueByColumnAndRow(5, 4, "20-20-20");
+            $sheet->setCellValueByColumnAndRow(5, 4, "");
             $sheet->getStyle('A4:E4')->getFont()->setSize(10);
             $sheet->getStyle('A4:D4')->getFont()->setBold(true);
             $sheet->getStyle("A4:E4")->getAlignment()->setWrapText(true);
@@ -850,7 +877,7 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A5:E5')->getFill()->getStartColor()->setARGB('ffffff');
 
             $sheet->setCellValueByColumnAndRow(1, 6, "AWB:");
-            $sheet->setCellValueByColumnAndRow(2, 6, "0");
+            $sheet->setCellValueByColumnAndRow(2, 6, $object->awb);
             $sheet->getStyle('A6:E6')->getFont()->setSize(10);
             $sheet->getStyle('A6:E6')->getFont()->setBold(true);
             $sheet->getStyle("A6:E6")->getAlignment()->setWrapText(true);
@@ -1314,7 +1341,7 @@ class Invoice_farm extends CI_Controller
 
             $sheet->setCellValueByColumnAndRow(1, 1, "LUXUS BLUMEN");
             $sheet->setCellValueByColumnAndRow(4, 1, "AWB");
-            $sheet->setCellValueByColumnAndRow(5, 1, "0");
+            $sheet->setCellValueByColumnAndRow(5, 1, $object->awb);
             $sheet->setCellValueByColumnAndRow(15, 1, "IN");
             $sheet->getStyle('A1:O1')->getFont()->setSize(9);
             $sheet->getStyle('A1:O1')->getFont()->setBold(true);
@@ -1552,6 +1579,92 @@ class Invoice_farm extends CI_Controller
             foreach (range('A', 'O') as $columnID) {
                 $sheet->getColumnDimension($columnID)->setAutoSize(true);
             }
+
+            $sheet->setCellValueByColumnAndRow(4, 3, "Tarifa kg");
+            $sheet->getStyle('D3')->getFont()->setSize(10);
+            $sheet->getStyle("A3")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('D3')->applyFromArray($styleArray);
+
+            $sheet->setCellValueByColumnAndRow(2, 4, "Precio");
+            $sheet->getStyle('B4')->getFont()->setSize(10);
+            $sheet->getStyle("B4")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B4')->applyFromArray($styleArray);
+
+            $sheet->setCellValueByColumnAndRow(2, 5, "Impuesto");
+            $sheet->getStyle('B5')->getFont()->setSize(10);
+            $sheet->getStyle("B5")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B5')->applyFromArray($styleArray);
+
+            $sheet->setCellValueByColumnAndRow(2, 6, "Otros cargos");
+            $sheet->getStyle('B6')->getFont()->setSize(10);
+            $sheet->getStyle("B6")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B6')->applyFromArray($styleArray);
+
+            $sheet->setCellValueByColumnAndRow(2, 7, "Total AWB");
+            $sheet->setCellValueByColumnAndRow(5, 7, 0);
+            $sheet->getStyle('B7:E7')->getFont()->setSize(10);
+            $sheet->getStyle("B7:E7")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B7:E7')->applyFromArray($styleArray);
+
+            $sheet->setCellValueByColumnAndRow(2, 11, "Pais de origen");
+            $sheet->setCellValueByColumnAndRow(3, 11, "ECUADOR");
+            $sheet->setCellValueByColumnAndRow(2, 12, "Numero AWB:");
+            $sheet->setCellValueByColumnAndRow(3, 12, $object->awb);
+            $sheet->setCellValueByColumnAndRow(2, 13, "Fecha de vuelo (AWB):");
+            $sheet->setCellValueByColumnAndRow(3, 13, '12/12/12');
+            $sheet->setCellValueByColumnAndRow(2, 14, "Peso bruto AWB, kg:");
+            $sheet->setCellValueByColumnAndRow(3, 14, 0);
+            $sheet->setCellValueByColumnAndRow(2, 15, "Piezas en AWB:");
+            $sheet->setCellValueByColumnAndRow(3, 15, 0);
+            $sheet->setCellValueByColumnAndRow(2, 16, "Broker/No invoice./marcacion/piezas");
+            $sheet->setCellValueByColumnAndRow(3, 16, "LUXUS BLUMEN");
+            $sheet->setCellValueByColumnAndRow(4, 16, "Nx-h");
+            $sheet->setCellValueByColumnAndRow(5, 16, 0);
+            $sheet->setCellValueByColumnAndRow(6, 16, 0);
+
+            $sheet->setCellValueByColumnAndRow(2, 18, "Nombre del tipo de flor");
+            $sheet->setCellValueByColumnAndRow(3, 18, "Largo");
+            $sheet->setCellValueByColumnAndRow(4, 18, "Unidad");
+            $sheet->setCellValueByColumnAndRow(5, 18, "Cantidad");
+            $sheet->getStyle('B11:E11')->getFont()->setSize(10);
+            $sheet->getStyle("B11:E11")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B11:E11')->applyFromArray($styleArray);
+            $sheet->getStyle('B12:E12')->getFont()->setSize(10);
+            $sheet->getStyle("B12:E12")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B12:E12')->applyFromArray($styleArray);
+            $sheet->getStyle('B13:E13')->getFont()->setSize(10);
+            $sheet->getStyle("B13:E13")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B13:E13')->applyFromArray($styleArray);
+            $sheet->getStyle('B14:E14')->getFont()->setSize(10);
+            $sheet->getStyle("B14:E14")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B14:E14')->applyFromArray($styleArray);
+            $sheet->getStyle('B15:E15')->getFont()->setSize(10);
+            $sheet->getStyle("B15:E15")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B15:E15')->applyFromArray($styleArray);
+            $sheet->getStyle('B16:F16')->getFont()->setSize(10);
+            $sheet->getStyle("B16:F16")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B16:F16')->applyFromArray($styleArray);
+            $sheet->getStyle('B18:E18')->getFont()->setSize(10);
+            $sheet->getStyle("B18:E18")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('B18:E18')->applyFromArray($styleArray);
+            $sheet->getStyle('B18:E18')->getFont()->setBold(true);
+            $excel_row = 19;
+            foreach ($arrCategory as $item) {
+                foreach ($item['arr'] as $arr) {
+                    foreach ($arr->varieties as $var) {
+                        $sheet->getStyle('B' . $excel_row . ':F' . $excel_row)->getFont()->setSize(10);
+                        $sheet->getStyle('B' . $excel_row . ':F' . $excel_row)->applyFromArray($styleArray);
+                        //   $sheet->getStyle('D' . $excel_row . ':E' . $excel_row)->getNumberFormat()->setFormatCode(PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                        $sheet->setCellValueByColumnAndRow(2, $excel_row, $item['category']->name);
+                        $size = trim(str_replace("CM", "", $var->measures->name));
+                        $sheet->setCellValueByColumnAndRow(3, $excel_row, $size);
+                        $sheet->setCellValueByColumnAndRow(4, $excel_row, $var->stems);
+                        $sheet->setCellValueByColumnAndRow(5, $excel_row, $var->bunches);
+                        $sheet->setCellValueByColumnAndRow(6, $excel_row, (int)$var->stems * (int)$var->bunches);
+                        $excel_row++;
+                    }
+                }
+            }
             $spreadsheet
                 ->getProperties()
                 ->setCreator("Luxus")
@@ -1562,7 +1675,7 @@ class Invoice_farm extends CI_Controller
                 ->setKeywords('etiquetas o palabras clave separadas por espacios')
                 ->setCategory('Invoice');
 
-            $nombreDelDocumento = "Invoice-.xlsx";
+            $nombreDelDocumento = "Invoice-" . $object->number_invoice . '-' . time() . ".xlsx";
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="' . $nombreDelDocumento . '"');
