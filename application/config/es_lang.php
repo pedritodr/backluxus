@@ -775,3 +775,12 @@ $config['mapa_lang'] = "Mapa";
 $config['posicion_seleccionada'] = "Posición";
 
 $config['contacto_lang'] = "Contacto";
+
+$config['balance_farm_lang'] = "Balance de fincas";
+$config['balance_lang'] = "Balance";
+$config['form_search_lang'] = "Formulario de búsqueda";
+$config['since_lang'] = "Desde";
+$config['until_lang'] = "Hasta";
+$config['list_invoice_farm_lang'] = "lista de facturas";
+$config['search_now_lang'] = "Buscar ahora...";
+$config['msg_range_date_lang'] = "Usted debe seleccionar un rango de fechas";

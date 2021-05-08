@@ -228,12 +228,12 @@
                                     <circle cx="12" cy="12" r="10"></circle>
                                 </svg></span> <?= translate('manage_farms_lang') ?> </a>
                     </li>
-                    <!--   <li>
-                        <a href="user_account_setting.html"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span> Account Settings </a>
-                    </li>
                     <li>
+                        <a href="<?= site_url('farm/index_balance') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                </svg></span> <?= translate('balance_farm_lang') ?> </a>
+                    </li>
+                    <!--        <li>
                         <a href="fonticons.html"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                     <circle cx="12" cy="12" r="10"></circle>
                                 </svg></span> Font Icons </a>

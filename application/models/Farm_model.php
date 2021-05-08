@@ -81,9 +81,9 @@ class Farm_model extends CI_Model
     function get_all_providers($conditions = [], $get_as_row = FALSE)
     {
         if (count($conditions) > 0) {
-            $result = $this->mongo_db->where($conditions)->get('providers');
+            $result = $this->mongo_db->where($conditions)->sort('name_commercial', 'desc')->get('providers');
         } else {
-            $result = $this->mongo_db->get('providers');
+            $result = $this->mongo_db->sort('name_commercial', 'desc')->get('providers');
         }
 
         if ($get_as_row) {

@@ -474,4 +474,13 @@ class Farm extends CI_Controller
         echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $farm->varieties]);
         exit();
     }
+    public function index_balance()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);
+        $this->load_view_admin_g("farm/index_balance", $data);
+    }
 }
