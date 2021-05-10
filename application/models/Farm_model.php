@@ -33,6 +33,7 @@ class Farm_model extends CI_Model
             'name_legal' => 1,
             'name_commercial' => 1,
             'owner' => 1,
+            'days_credit' => 1,
             '_id' => 0
         ];
         $conditions = [
@@ -248,4 +249,23 @@ class Farm_model extends CI_Model
         return $query;
     }
     //------------------------------------------------------------------------------------------------------------------------------------------
+    function get_invoice_load_range_date($since, $until, $farm_id)
+    {
+        $query = $this->mongo_db->where('farms.farm_id', $farm_id)->where_gte('timestamp', (int)$since)->where_lte('timestamp', (int)$until)->sort('invoice_number', 'asc')->get('invoice_farm');
+        return $query;
+    }
+
+    function balance_farm($id)
+    {
+        $mesInitActual = strtotime(date('Y-m-01'));
+        $mesEndActual = strtotime(date('Y-m-31'));
+        $query = $this->mongo_db->where('farms.farm_id', $id)->where_gte('timestamp', $mesInitActual)->where_lte('timestamp', (int)$mesEndActual)->sort('invoice_number', 'asc')->get('invoice_farm');
+        return $query;
+    }
+    function balance_farm_payment($id, $days_credit)
+    {
+        $mesEndActual = strtotime(date('Y-m-' . $days_credit));
+        $query = $this->mongo_db->where(['farms.farm_id' => $id])->where_lte('timestamp', (int)$mesEndActual)->sort('invoice_number', 'asc')->get('invoice_farm');
+        return $query;
+    }
 }

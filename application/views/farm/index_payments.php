@@ -8,7 +8,7 @@
 <div class="main-container" id="container">
 	<div class="layout-px-spacing" style="width:100%">
 		<p class="titulo">
-			<small class="titulo-2"><?= translate('balance_lang'); ?></small>
+			<small class="titulo-2"><?= translate('manage_payment_farm_lang'); ?></small>
 		</p>
 		<div class="col-xs-12 col-margin-top">
 
@@ -20,18 +20,11 @@
 					<div class="row">
 						<div class="col-3">
 							<div class="form-group">
-								<label><?= translate('since_lang') ?></label>
-								<input type="text" class="form-control" id="since" />
+								<label><?= translate('fecha_lang') ?></label>
+								<input type="text" disabled class="form-control" id="until" />
 							</div>
 						</div>
-
-						<div class="col-3">
-							<div class="form-group">
-								<label><?= translate('until_lang') ?></label>
-								<input type="date" class="form-control" id="until" />
-							</div>
-						</div>
-						<div class="col-3">
+						<div class="col-6">
 							<label><?= translate("farms_lang"); ?></label>
 							<div class="input-group">
 								<select id="selectFarms" name="farms" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
@@ -52,7 +45,6 @@
 
 					<div class="row" id="bodyResumen" style="display:none">
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-							<h3 class="text-left"><b><?= translate('latest_payment_lang') ?>: </b><span id="textLatestPaymnet" style="color:#e7515a"></span> <b><?= translate('fecha_lang') ?>: </b><span id="textLatestPaymnetDate" style="color:#e7515a"></span></h3>
 							<h3 class="text-left"><b><?= translate('resumen_mes_lang') ?>: </b><span id="textResumenActual" style="color:#e7515a"></span></h3>
 						</div>
 					</div>
@@ -104,10 +96,7 @@
 		});
 		$("#selectFarms").select2('open');
 	})
-	let urlResultados = null;
-	const exportarResultados = () => {
-		location.href = urlResultados;
-	}
+
 
 	const encodeB64Uft8 = (str) => {
 		return btoa(unescape(encodeURIComponent(str)));
@@ -117,11 +106,9 @@
 	}
 
 
-	const loadInvoices = (since, until, farmId) => {
-		let url = '<?= site_url("farm/loadInvoiceRangeDate") ?>';
+	const loadInvoices = (farmId) => {
+		let url = '<?= site_url("farm/loadInvoicePayment") ?>';
 		$.post(url, {
-			since,
-			until,
 			farmId
 		}, function(response) {
 			response = JSON.parse(response);
@@ -192,20 +179,16 @@
 						let amountPayment = 0;
 						item.payment !== undefined ? amountPayment = item.payment.amount : amountPayment = 0;
 						stringTable += parseFloat(amountPayment).toFixed(2);
+						let saldo = acumDebe - (amountCredit + amountPayment);
+						balance += saldo;
 						stringTable += '</td>';
 
 						stringTable += '<td>';
-						let saldo = acumDebe - (amountCredit + amountPayment);
-						balance += saldo;
-						stringTable += balance.toFixed(2);
+						stringTable += saldo.toFixed(2);
 						stringTable += '</td>';
 
 						stringTable += '<td>';
 						stringTable += '<button type="button" class="btn btn-outline-primary" onclick=watchDetails("' + encodeB64Uft8(JSON.stringify(item.details)) + '")>Ver detalle</button>';
-						if (item.viewed === undefined) {
-							stringTable += '<button type="button" class="btn btn-outline-success" id="btnCheck' + item.invoice_farm + '" onclick=handleViewed("' + item.invoice_farm + '")>Marcar</button>';
-						}
-
 						stringTable += '</td>';
 
 						stringTable += '</tr>';
@@ -220,38 +203,11 @@
 							"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
 						}
 					});
-					if (response.latestPayment) {
-						$('#textLatestPaymnet').text('$ ' + parseFloat(response.latestPayment.amount).toFixed(2));
-						$('#textLatestPaymnetDate').text(response.latestPayment.date_create);
-					} else {
-						$('#textLatestPaymnet').text('$ 0.00');
-						$('#textLatestPaymnetDate').text('----/--/--');
-					}
-					let balanceActual = 0;
-					if (response.balance.length > 0) {
-						response.balance.forEach(function(item) {
-							let acumDebe = 0;
-							if (item.details.length > 0) {
-								item.details.forEach(box => {
-									if (box.varieties.length > 0) {
-										box.varieties.forEach(element => {
-											acumDebe += parseFloat(element.price) * (parseInt(element.stems) * parseInt(box.boxNumber) * parseInt(element.bunches));
-										});
-									}
-								});
-							}
-							let amountCredit = 0;
-							item.credit !== undefined ? amountCredit = item.credit.amount : amountCredit = 0;
 
-							let amountPayment = 0;
-							item.payment !== undefined ? amountPayment = item.payment.amount : amountPayment = 0;
-
-							let saldo = acumDebe - (amountCredit + amountPayment);
-							balanceActual += saldo;
-
-						});
-					}
-					$('#textResumenActual').text('$ ' + balanceActual.toFixed(2))
+					$('#textResumenActual').text('$ ' + balance.toFixed(2));
+					let until = flatpickr(document.getElementById('until'), {
+						defaultDate: response.date
+					});
 					$('#bodyResumen').show();
 					$("#zoneBtn").append(
 						'<button id="btnClear" style="margin-top:35px" onclick="limpiarBusqueda();" class="btn btn-danger">Limpiar</button>'
@@ -284,64 +240,15 @@
 	const searchInvoices = () => {
 
 		$("#btnClear").remove();
-		let since = $("#since").val();
-		let until = $("#until").val();
 		let selectFarms = $('select[id=selectFarms] option').filter(':selected').attr('itemId');
-
-		if (since.trim().length > 0) {
-			if (until.trim().length > 0) {
-
-				let dateSinceSeparated = since.trim().split('-');
-
-				let yearInicio = dateSinceSeparated[0];
-				let mesInicio = dateSinceSeparated[1];
-				let diaInicio = dateSinceSeparated[2];
-
-				let dateUntilSeparated = until.trim().split('-');
-
-				let yearFin = dateUntilSeparated[0];
-				let mesFin = dateUntilSeparated[1];
-				let diaFin = dateUntilSeparated[2];
-
-				let fInicio = new Date(parseInt(yearInicio), parseInt(mesInicio), parseInt(diaInicio));
-				let fFin = new Date(parseInt(yearFin), parseInt(mesFin), parseInt(diaFin));
-				if (fFin >= fInicio) {
-
-					if (selectFarms !== undefined) {
-						$("#btnSearch").hide();
-						$("#zoneLoading").show();
-						loadInvoices(since, until, selectFarms);
-					} else {
-						swal({
-							title: 'Uppsss!',
-							text: "Seleccione la finca para realizar la busqueda",
-							type: 'error',
-							padding: '2em'
-						});
-					}
-				} else {
-					swal({
-						title: 'Uppsss!',
-						text: "La fecha de fin no puede ser menor a la fecha de inicio",
-						type: 'error',
-						padding: '2em'
-					});
-				}
-
-
-
-			} else {
-				swal({
-					title: 'Uppsss!',
-					text: "La fecha de fin no puede estar en blanco",
-					type: 'error',
-					padding: '2em'
-				});
-			}
+		if (selectFarms !== undefined) {
+			$("#btnSearch").hide();
+			$("#zoneLoading").show();
+			loadInvoices(selectFarms);
 		} else {
 			swal({
 				title: 'Uppsss!',
-				text: "La fecha de inicio no puede estar en blanco",
+				text: "Seleccione la finca para realizar la busqueda",
 				type: 'error',
 				padding: '2em'
 			});

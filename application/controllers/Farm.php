@@ -276,7 +276,7 @@ class Farm extends CI_Controller
         $hectare = $this->input->post('hectare');
         $provider_id = $this->input->post('provider_id');
         $farm_id = $this->input->post('farm_id');
-        $farm_object = $this->farm->get_farm_by_id($farm_id);
+
         $this->form_validation->set_rules('name_legal', translate('name_legal_lang'), 'required');
         $this->form_validation->set_rules('name_commercial', translate('name_commercial_lang'), 'required');
         $this->form_validation->set_rules('address_farm', translate('address_farm_lang'), 'required');
@@ -480,7 +480,56 @@ class Farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
+
         $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);
         $this->load_view_admin_g("farm/index_balance", $data);
+    }
+    public function loadInvoiceRangeDate()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $this->load->model('Payments_model', 'payment');
+        $since = strtotime($this->input->post('since'));
+        $until = strtotime($this->input->post('until'));
+        $farmId = $this->input->post('farmId');
+        $latestPayment = $this->payment->get_min_payment_by_farm_id($farmId);
+        $response = $this->farm->get_invoice_load_range_date($since, $until, $farmId);
+        $balance = $this->farm->balance_farm($farmId);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $response, 'latestPayment' => $latestPayment, 'balance' => $balance]);
+        exit();
+    }
+    public function index_payments()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+
+        $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);
+        $this->load_view_admin_g("farm/index_payments", $data);
+    }
+    public function loadInvoicePayment()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $farmId = $this->input->post('farmId');
+        $farm_object = $this->farm->get_min_farm_by_id($farmId);
+        $farm_object->days_credit === '' ? $days_credit = '30' : $days_credit = $farm_object->days_credit;
+        $dateActual = date('Y-m-' . $days_credit);
+        $response = $this->farm->balance_farm_payment($farmId, $days_credit);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $response, 'date' => $dateActual]);
+        exit();
     }
 }

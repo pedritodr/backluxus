@@ -711,6 +711,21 @@ class Invoice_farm extends CI_Controller
         }
         exit();
     }
+    public function viewed_check()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $id = $this->input->post('id');
+        $response = $this->invoice_farm->update($id, ['viewed' => true]);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $response]);
+        exit();
+    }
 
     public function export_invoice($invoiceId)
     {
