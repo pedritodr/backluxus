@@ -78,7 +78,21 @@ class Farm_model extends CI_Model
         $query[0]->farms[0]->provider_id = $query[0]->provider_id;
         return (count($query) > 0) ? (object) $query[0]->farms[0] : false;
     }
+    function get_min_providers()
+    {
+        $tuberia = [
+            ['$project' => ['farm_id' => 1, 'name_legal' => 1, 'name_commercial' => 1, 'days_credit' => 1, 'is_active' => 1, '_id' => 0]],
+            ['$sort' => ['name_commercial' => -1]],
+            ['$match' => ['is_active' => 1]]
+        ];
 
+        $query      = $this->mongo_db->aggregate('providers', $tuberia);
+        if (count($query) > 0) {
+            return $query;
+        } else {
+            return false;
+        }
+    }
     function get_all_providers($conditions = [], $get_as_row = FALSE)
     {
         if (count($conditions) > 0) {
@@ -257,15 +271,9 @@ class Farm_model extends CI_Model
 
     function balance_farm($id)
     {
-        $mesInitActual = strtotime(date('Y-m-01'));
-        $mesEndActual = strtotime(date('Y-m-31'));
-        $query = $this->mongo_db->where('farms.farm_id', $id)->where_gte('timestamp', $mesInitActual)->where_lte('timestamp', (int)$mesEndActual)->sort('invoice_number', 'asc')->get('invoice_farm');
-        return $query;
-    }
-    function balance_farm_payment($id, $days_credit)
-    {
-        $mesEndActual = strtotime(date('Y-m-' . $days_credit));
-        $query = $this->mongo_db->where(['farms.farm_id' => $id])->where_lte('timestamp', (int)$mesEndActual)->sort('invoice_number', 'asc')->get('invoice_farm');
+        $mesInitActual = strtotime(date('y-m-01 00:00:00'));
+        $mesEndActual = strtotime(date('y-m-31 00:00:00'));
+        $query = $this->mongo_db->where('farms.farm_id', $id)->where_gte('timestamp', (int) $mesInitActual)->where_lte('timestamp', (int) $mesEndActual)->sort('invoice_number', 'asc')->get('invoice_farm');
         return $query;
     }
 }

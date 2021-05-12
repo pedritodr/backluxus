@@ -787,3 +787,16 @@ $config['search_now_lang'] = "Buscar ahora...";
 $config['msg_range_date_lang'] = "Usted debe seleccionar un rango de fechas";
 $config['latest_payment_lang'] = "Ultimo pago";
 $config['manage_payment_farm_lang'] = "Gestión de pagos fincas";
+$config['resumen_selected_invoice_lang'] = "Resumen total de facturas seleccionadas";
+$config['selected_all_invoice_lang'] = "Seleccionar todas las facturas";
+$config['selected_invoice_lang'] = "Seleccionar factura";
+$config['quit_invoice_lang'] = "Quitar factura";
+$config['quit_invoice_all_lang'] = "Quitar todas las factura";
+$config['register_payment_lang'] = "Registrar pago";
+
+$config['bank_lang'] = "Banco";
+$config['type_transaction_lang'] = "Tipo de transacción";
+$config['number_transaction_lang'] = "Número de transacción";
+$config['costo_transferencia_lang'] = "Costo de la transferencia";
+$config['amount_lang'] = "Monto";
+$config['process_payment_lang'] = "Procesar pago";

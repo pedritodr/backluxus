@@ -98,6 +98,29 @@ class Invoice_farm_model extends CI_Model
         $newId = $this->mongo_db->where('invoice_farm', $invoice_id)->push('change', $data)->update('invoice_farm');
         return $newId;
     }
+    function create_payment($farm_id = 0, $data = [])
+    {
+        $newId = $this->mongo_db->where('invoice_farm', $farm_id)->push('payments', $data)->update('invoice_farm');
+        return $newId;
+    }
+    function balance_farm_payment($id, $days_credit)
+    {
+        $mesEndActual = strtotime(date('Y-m-' . $days_credit));
+        $tuberia = [
+            [
+                '$project' => ['_id' => 0]
+            ],
+            ['$sort' => ['timestamp' => -1]],
+            ['$match' => ['farms.farm_id' => $id, 'timestamp' => ['$lte' => $mesEndActual], 'paid' => ['$ne' => true]]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('invoice_farm', $tuberia);
+        if (count($query) > 0) {
+            return $query;
+        } else {
+            return false;
+        }
+    }
     //------------------------------------------------------------------------------------------------------------invoice cliente
 
     function create_invoice_client($data)

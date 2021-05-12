@@ -511,7 +511,7 @@ class Farm extends CI_Controller
             redirect('login/index');
         }
 
-        $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);
+        $data['farms'] = $this->farm->get_min_providers();
         $this->load_view_admin_g("farm/index_payments", $data);
     }
     public function loadInvoicePayment()
@@ -524,12 +524,91 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
+        $this->load->model('Invoice_farm_model', 'invoice_farm');
         $farmId = $this->input->post('farmId');
         $farm_object = $this->farm->get_min_farm_by_id($farmId);
         $farm_object->days_credit === '' ? $days_credit = '30' : $days_credit = $farm_object->days_credit;
         $dateActual = date('Y-m-' . $days_credit);
-        $response = $this->farm->balance_farm_payment($farmId, $days_credit);
+        $response = $this->invoice_farm->balance_farm_payment($farmId, $days_credit);
         echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $response, 'date' => $dateActual]);
+        exit();
+    }
+    public function add_payment_invoice_farm()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $this->load->model('Invoice_farm_model', 'invoice_farm');
+        $this->load->model('Payments_model', 'payment');
+        $arrayRequest = json_decode($this->input->post('arrayRequest'));
+        $amount = (float) $this->input->post('amount');
+        $balance = (float) $this->input->post('balance');
+        $selectTypeTransaction = $this->input->post('selectTypeTransaction');
+        $costeTransfer = (float)$this->input->post('costeTransfer');
+        $numberTransaction = $this->input->post('numberTransaction');
+        $farm = json_decode($this->input->post('farm'));
+        $date_create = date("Y-m-d H:i:s");
+        $bank = $this->input->post('bank');
+        $payment_id = 'payment_' . uniqid();
+        $arrTemp = [];
+        $data = [
+            'paymentId' => $payment_id,
+            'farm' => $farm,
+            'costeTransfer' => $costeTransfer,
+            'is_active' => 1,
+            'selectTypeTransaction' => $selectTypeTransaction,
+            'bank' => $bank,
+            'balance' => $balance,
+            'numberTransaction' => $numberTransaction,
+            'date_create' => $date_create,
+            'timestamp' => strtotime($date_create)
+        ];
+        $dataMin = [
+            'paymentId' => $payment_id,
+            'costeTransfer' => $costeTransfer,
+            'is_active' => 1,
+            'selectTypeTransaction' => $selectTypeTransaction,
+            'bank' => $bank,
+            'balance' => $balance,
+            'numberTransaction' => $numberTransaction,
+            'date_create' => $date_create,
+            'timestamp' => strtotime($date_create)
+        ];
+        for ($i = 0; $i < count($arrayRequest); $i++) {
+            if ($arrayRequest[$i]->selected) {
+                unset($arrayRequest[$i]->_id);
+                if ((float)$arrayRequest[$i]->amountInvoice <= $amount) {
+                    $amount = (float) number_format($amount, 2) - (float) number_format((float)$arrayRequest[$i]->amountInvoice, 2);
+                    $dataMin['amount'] = (float)number_format((float)$arrayRequest[$i]->amountInvoice);
+                    $dataMin['csm'] = 1;
+                    $dataPayment = [
+                        'payment' => (object)$dataMin,
+                    ];
+                    $this->invoice_farm->update($arrayRequest[$i]->invoice_farm, ['paid' => true]);
+                    $this->invoice_farm->create_payment($arrayRequest[$i]->invoice_farm, $dataPayment);
+                } else {
+                    $dataMin['amount'] = $amount;
+                    $amount = 0;
+                    $dataPayment = [
+                        'payment' => (object)$dataMin,
+                    ];
+                    $this->invoice_farm->create_payment($arrayRequest[$i]->invoice_farm, $dataPayment);
+                }
+                $arrTemp[] = $arrayRequest[$i];
+            }
+            if ($amount <= 0) {
+                break;
+            }
+        }
+        $data['invoices'] = $arrTemp;
+        $this->payment->create_payment($data);
+        $payment = $this->payment->get_by_id($payment_id);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $payment]);
         exit();
     }
 }

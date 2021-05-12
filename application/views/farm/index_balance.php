@@ -125,7 +125,7 @@
 			farmId
 		}, function(response) {
 			response = JSON.parse(response);
-			//console.log(response);
+			console.log(response);
 			$("#btnSearch").show();
 			$("#zoneLoading").hide();
 			let balance = 0;
@@ -190,7 +190,13 @@
 
 						stringTable += '<td>';
 						let amountPayment = 0;
-						item.payment !== undefined ? amountPayment = item.payment.amount : amountPayment = 0;
+						if (item.payments !== undefined) {
+							if (item.payments.length > 0) {
+								item.payments.forEach(payment => {
+									amountPayment += parseFloat(parseFloat(payment.payment.amount).toFixed(2));
+								});
+							}
+						}
 						stringTable += parseFloat(amountPayment).toFixed(2);
 						stringTable += '</td>';
 
@@ -221,7 +227,7 @@
 						}
 					});
 					if (response.latestPayment) {
-						$('#textLatestPaymnet').text('$ ' + parseFloat(response.latestPayment.amount).toFixed(2));
+						$('#textLatestPaymnet').text('$ ' + parseFloat(response.latestPayment.balance).toFixed(2));
 						$('#textLatestPaymnetDate').text(response.latestPayment.date_create);
 					} else {
 						$('#textLatestPaymnet').text('$ 0.00');
@@ -244,7 +250,13 @@
 							item.credit !== undefined ? amountCredit = item.credit.amount : amountCredit = 0;
 
 							let amountPayment = 0;
-							item.payment !== undefined ? amountPayment = item.payment.amount : amountPayment = 0;
+							if (item.payments !== undefined) {
+								if (item.payments.length > 0) {
+									item.payments.forEach(payment => {
+										amountPayment += parseFloat(parseFloat(payment.payment.amount).toFixed(2));
+									});
+								}
+							}
 
 							let saldo = acumDebe - (amountCredit + amountPayment);
 							balanceActual += saldo;

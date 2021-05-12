@@ -21,7 +21,7 @@ class Payments_model extends CI_Model
         $newId = $this->mongo_db->insert('payments', $data);
         return $newId;
     }
-    function get_provider_by_id($id)
+    function get_by_id($id)
     {
         $result = $this->mongo_db->where(['payment_id' => $id])->get('payments');
         return (count($result) > 0) ? (object) $result[0] : false;
@@ -29,7 +29,7 @@ class Payments_model extends CI_Model
     function get_min_payment_by_farm_id($id)
     {
         $tuberia = [
-            ['$project' => ['payment_id' => 1, 'amount' => 1, 'date_create' => 1, 'timestamp' => 1, '_id' => 0]],
+            ['$project' => ['paymentId' => 1, 'balance' => 1, 'date_create' => 1, 'timestamp' => 1, 'farm' => 1, '_id' => 0]],
             ['$sort' => ['timestamp' => -1]],
             ['$match' => ['farm.farm_id' => $id]]
         ];
