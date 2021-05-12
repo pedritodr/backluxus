@@ -800,3 +800,11 @@ $config['number_transaction_lang'] = "Número de transacción";
 $config['costo_transferencia_lang'] = "Costo de la transferencia";
 $config['amount_lang'] = "Monto";
 $config['process_payment_lang'] = "Procesar pago";
+
+$config['management_reason_credit_lang'] = "Gestión motivos de crédito";
+$config['manage_reason_credit_lang'] = "Gestionar motivos de crédito";
+$config['add_reason_credit_lang'] = "Adicionar motivo de crédito";
+$config['Edit_reason_credit_lang'] = "Editar motivo de crédito";
+$config['delete_reason_credit_lang'] = "Eliminar motivo de crédito";
+$config['ready_reason_credit_lang'] = "Lista motivos de crédito";
+$config['reason_lang'] = "Motivos";

@@ -100,6 +100,10 @@
                 width: 230px !important;
             }
         }
+
+        .sidebar-wrapper #compact_submenuSidebar {
+            width: 270px;
+        }
     </style>
 </head>
 
