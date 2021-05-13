@@ -288,7 +288,7 @@ $config['nombre_pedido_lang'] = "Nombre del Pedido";
 $config['tipo_gestion_lang'] = "Tipo gestión";
 $config['monto_lang'] = "Monto";
 $config['actions_lang'] = "Acciones";
-$config['credito_lang'] = "Crédito";
+
 $config['debito_lang'] = "Débito";
 $config['manual_lang'] = "Manual";
 $config['automatica_lang'] = "Automática";
@@ -445,8 +445,8 @@ $config['owner_lang'] = "Dueño";
 $config['seller_lang'] = "Vendedor";
 $config['seller_payment_lang'] = "vendedor/cobros";
 $config['not_group_lang'] = "No pertence a un grupo";
-
-
+$config['escriba_aqui_lang'] = "Escriba aquí...";
+$config['save_description_lang'] = "Guardar descrición";
 
 
 
@@ -721,6 +721,7 @@ $config['personas_lang'] = "Personas";
 $config['update_evento_lang'] = "Editar evento";
 $config['manage_image_evento'] = "Gestionar imágenes de evento";
 $config['add_image_lang'] = "Adicionar imagen";
+$config['add_images_lang'] = "Adicionar imagenes";
 
 $config['galeria_principal_lang'] = "Galería principal";
 $config['manage_gallery_items_lang'] = "Gestionar elementos de galería";
@@ -785,6 +786,7 @@ $config['until_lang'] = "Hasta";
 $config['list_invoice_farm_lang'] = "lista de facturas";
 $config['search_now_lang'] = "Buscar ahora...";
 $config['msg_range_date_lang'] = "Usted debe seleccionar un rango de fechas";
+$config['msg_load_invoice_lang'] = "No se encuentra cargada la factura";
 $config['latest_payment_lang'] = "Ultimo pago";
 $config['manage_payment_farm_lang'] = "Gestión de pagos fincas";
 $config['resumen_selected_invoice_lang'] = "Resumen total de facturas seleccionadas";
@@ -793,7 +795,7 @@ $config['selected_invoice_lang'] = "Seleccionar factura";
 $config['quit_invoice_lang'] = "Quitar factura";
 $config['quit_invoice_all_lang'] = "Quitar todas las factura";
 $config['register_payment_lang'] = "Registrar pago";
-
+$config['invoice_lang'] = "Factura";
 $config['bank_lang'] = "Banco";
 $config['type_transaction_lang'] = "Tipo de transacción";
 $config['number_transaction_lang'] = "Número de transacción";
@@ -808,3 +810,16 @@ $config['Edit_reason_credit_lang'] = "Editar motivo de crédito";
 $config['delete_reason_credit_lang'] = "Eliminar motivo de crédito";
 $config['ready_reason_credit_lang'] = "Lista motivos de crédito";
 $config['reason_lang'] = "Motivos";
+
+$config['management_credit_lang'] = "Gestión de créditos";
+$config['manage_credit_lang'] = "Gestionar créditos";
+$config['add_credit_lang'] = "Adicionar crédito";
+$config['Edit_credit_lang'] = "Editar crédito";
+$config['delete_credit_lang'] = "Eliminar crédito";
+$config['ready_credit_lang'] = "Lista de crédito";
+$config['credito_lang'] = "Crédito";
+
+$config['qty_stems_lang'] = "Cantidad de tallos";
+$config['add_item_credit_lang'] = "Agregar";
+$config['udapte_item_credit_lang'] = "Actualizar";
+$config['create_credit_lang'] = "Crear crédito";

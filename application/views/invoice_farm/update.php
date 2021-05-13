@@ -535,7 +535,7 @@
                 <h5 class="modal-title" id="numberInvoiceDetail"></h5>
             </div>
             <div class="modal-body">
-                <div class="roww">
+                <div class="row">
                     <div class="col-lg-12" id="bodyInfoInvoice">
 
                     </div>

@@ -1,6 +1,6 @@
 <?php
 require 'vendor/autoload.php';
-class Reason_credit_model extends CI_Model
+class Credit_model extends CI_Model
 {
 
     function __construct()
@@ -16,25 +16,20 @@ class Reason_credit_model extends CI_Model
     function create($data)
     {
         $data['_id'] = $this->mongo_db->create_document_id();
-        $newId = $this->mongo_db->insert('reason_credit', $data);
+        $newId = $this->mongo_db->insert('credits', $data);
         return $newId;
     }
     function get_by_id($id)
     {
-        $result = $this->mongo_db->where(['reason_credit_id' => $id])->get('reason_credit');
-        return (count($result) > 0) ? (object) $result[0] : false;
-    }
-    function get_motivo_by_id($id)
-    {
-        $result = $this->mongo_db->where(['motivo_id' => $id])->get('reason_credit');
+        $result = $this->mongo_db->where(['credit_id' => $id])->get('credits');
         return (count($result) > 0) ? (object) $result[0] : false;
     }
     function get_all($conditions = [], $get_as_row = FALSE)
     {
         if (count($conditions) > 0) {
-            $result = $this->mongo_db->where($conditions)->sort('reason', 'asc')->get('reason_credit');
+            $result = $this->mongo_db->where($conditions)->get('credits');
         } else {
-            $result = $this->mongo_db->sort('reason', 'asc')->get('reason_credit');
+            $result = $this->mongo_db->get('credits');
         }
         if ($get_as_row) {
             if (count($result) > 0) {
@@ -48,12 +43,12 @@ class Reason_credit_model extends CI_Model
     }
     function update($id, $data)
     {
-        $result = $this->mongo_db->where('reason_credit_id', $id)->set($data)->update('reason_credit');
+        $result = $this->mongo_db->where('credit_id', $id)->set($data)->update('credits');
         return $result;
     }
     function delete($id)
     {
-        $result = $this->mongo_db->where(['reason_credit_id' => $id])->delete('reason_credit');
+        $result = $this->mongo_db->where(['credit_id' => $id])->delete('credits');
         return $result;
     }
     //------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,13 +1,13 @@
 <?php
 
-class Reason_credit extends CI_Controller
+class Credit extends CI_Controller
 {
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->load->model('Reason_credit_model', 'reason_credit');
+        $this->load->model('Credit_model', 'credit');
         $this->load->library(array('session'));
         $this->load->helper("mabuya");
 
@@ -24,9 +24,9 @@ class Reason_credit extends CI_Controller
             redirect('login/index');
         }
 
-        $reason_credits = $this->reason_credit->get_all(['is_active' => 1]);
-        $data['reason_credits'] = $reason_credits;
-        $this->load_view_admin_g("reason_credit/index", $data);
+        $credits = $this->credit->get_all(['is_active' => 1]);
+        $data['credits'] = $credits;
+        $this->load_view_admin_g("credit/index", $data);
     }
 
     public function add_index()
@@ -35,7 +35,12 @@ class Reason_credit extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-        $this->load_view_admin_g('reason_credit/add');
+        $this->load->model('Reason_credit_model', 'reason_credit');
+        $this->load->model('User_model', 'user');
+        $reason_credits = $this->reason_credit->get_all(['is_active' => 1]);
+        $data['reason_credits'] = $reason_credits;
+        $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
+        $this->load_view_admin_g('credit/add', $data);
     }
 
     public function add()
