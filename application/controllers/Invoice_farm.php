@@ -702,11 +702,13 @@ class Invoice_farm extends CI_Controller
         }
         $invoice = $this->input->post('invoice');
         $awb = $this->input->post('awb');
-        $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb, 'status' => $this->mongo_db->ne(-1)], true);
+        $date = $this->input->post('dateAwb');
+        $airline = $this->input->post('airline');
+        $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb, 'invoice' => $this->mongo_db->ne($invoice), 'status' => $this->mongo_db->ne(-1)], true);
         if ($resquest) {
             echo json_encode(['status' => 404, 'msj' => 'correcto', 'data' => $resquest]);
         } else {
-            $this->invoice_farm->update_invoice_client($invoice, ['awb' => $awb]);
+            $this->invoice_farm->update_invoice_client($invoice, ['awb' => $awb, 'date_awb' => $date, 'airline' => $airline]);
             echo json_encode(['status' => 200, 'msj' => 'correcto']);
         }
         exit();
@@ -753,10 +755,18 @@ class Invoice_farm extends CI_Controller
             $arrRose = [];
             $arrOtros = [];
             $arrCategory = [];
+            $totalStemsInvoice = 0;
+            $totalFullesInvoice = 0;
+            $totalStemsHeader = 0;
+            $totalFullesHeader = 0;
             foreach ($object->details as $item) {
                 $arrBoxClavel = [];
                 $arrBoxRose = [];
                 $arrBoxOtros = [];
+                $acumHbHeader = 0;
+                $acumQbHeader = 0;
+                $acumEbHeader = 0;
+                $acumBoxTotalStemsHeader = 0;
                 if (count($item->boxs) > 0) {
                     foreach ($item->boxs as $box) {
                         if (count($arrCategory) == 0) {
@@ -788,8 +798,26 @@ class Invoice_farm extends CI_Controller
                             //otros
                             $arrBoxOtros[] = $box;
                         }
+                        foreach ($box->varieties as $var) {
+                            $acumBoxTotalStemsHeader += (int) $var->bunches * (int) $var->stems;
+                        }
+                        $totalStemsHeader +=  $acumBoxTotalStemsHeader * (int)$box->boxNumber;
+                        if (strtoupper(trim($box->typeBoxs->name)) === "HB") {
+                            $acumHbHeader += (int) $box->boxNumber;
+                        } else if (strtoupper(trim($box->typeBoxs->name)) === "QB") {
+                            $acumQbHeader += (int) $box->boxNumber;
+                        } else {
+                            $acumEbHeader += (int) $box->boxNumber;
+                        }
                     }
                 }
+                $fullesHeader = ($acumHbHeader * 0.50) + ($acumQbHeader * 0.25) + ($acumEbHeader * 0.125);
+                if ($acumEbHeader > 0) {
+                    $fullesHeader = (float)number_format($fullesHeader, 3);
+                } else {
+                    $fullesHeader = (float)number_format($fullesHeader, 2);
+                }
+                $totalFullesHeader += $fullesHeader;
                 if (count($arrBoxRose) > 0) {
                     $arrR = ['farm' => $item->farm, 'boxs' => $arrBoxRose];
                     $arrRose[] = $arrR;
@@ -872,8 +900,14 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A1:E1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A1:E1')->getFill()->getStartColor()->setARGB('ffffff');
 
+            $nameCliente = "";
+            if ($object->marking->name_company != '') {
+                $nameCliente = $object->marking->name_company;
+            } else {
+                $nameCliente = $object->marking->name_commercial;
+            }
             $sheet->setCellValueByColumnAndRow(1, 2, "Factura");
-            $sheet->setCellValueByColumnAndRow(3, 2, $object->number_invoice);
+            $sheet->setCellValueByColumnAndRow(2, 2, $nameCliente);
             $sheet->setCellValueByColumnAndRow(5, 2, "IN");
             $sheet->getStyle('A2')->getFont()->setSize(16);
             $sheet->getStyle('C2:E2')->getFont()->setSize(10);
@@ -887,9 +921,12 @@ class Invoice_farm extends CI_Controller
             $sheet->getRowDimension('3')->setRowHeight(4);
             $sheet->getStyle('A3:E3')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A3:E3')->getFill()->getStartColor()->setARGB('ffffff');
-
+            $dateAwb = "";
+            if (isset($object->date_awb)) {
+                $dateAwb = $object->date_awb;
+            }
             $sheet->setCellValueByColumnAndRow(1, 4, "Fecha:");
-            $sheet->setCellValueByColumnAndRow(2, 4, "");
+            $sheet->setCellValueByColumnAndRow(2, 4, $dateAwb);
             $sheet->setCellValueByColumnAndRow(4, 4, "Fecha ams:");
             $sheet->setCellValueByColumnAndRow(5, 4, "");
             $sheet->getStyle('A4:E4')->getFont()->setSize(10);
@@ -898,9 +935,12 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A4:E4')->applyFromArray($styleArray);
             $sheet->getStyle('A4:E4')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A4:E4')->getFill()->getStartColor()->setARGB('ffffff');
-
+            $airline = "";
+            if (isset($object->airline)) {
+                $airline = $object->airline;
+            }
             $sheet->setCellValueByColumnAndRow(1, 5, "Aerolinea:");
-            $sheet->setCellValueByColumnAndRow(2, 5, "0");
+            $sheet->setCellValueByColumnAndRow(2, 5, $airline);
             $sheet->getStyle('A5:E5')->getFont()->setSize(10);
             $sheet->getStyle('A5:E5')->getFont()->setBold(true);
             $sheet->getStyle("A5:E5")->getAlignment()->setWrapText(true);
@@ -937,7 +977,7 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A8:E8')->getFill()->getStartColor()->setARGB('ffffff');
 
             $sheet->setCellValueByColumnAndRow(1, 9, "Fulles:");
-            $sheet->setCellValueByColumnAndRow(3, 9, 0.00);
+            $sheet->setCellValueByColumnAndRow(3, 9, $totalFullesHeader);
             $sheet->setCellValueByColumnAndRow(4, 9, "Cajas");
             $sheet->getStyle('A9:E9')->getFont()->setSize(10);
             $sheet->getStyle('A9:E9')->getFont()->setBold(true);
@@ -945,9 +985,9 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A9:E9')->applyFromArray($styleArray);
             $sheet->getStyle('A9:E9')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A9:E9')->getFill()->getStartColor()->setARGB('ffffff');
-
+            $sheet->getStyle('C9')->getNumberFormat()->setFormatCode(PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
             $sheet->setCellValueByColumnAndRow(1, 10, "Tallos:");
-            $sheet->setCellValueByColumnAndRow(3, 10, 0.00);
+            $sheet->setCellValueByColumnAndRow(3, 10, $totalStemsHeader);
             $sheet->setCellValueByColumnAndRow(4, 10, "Tallos");
             $sheet->getStyle('A10:E10')->getFont()->setSize(10);
             $sheet->getStyle('A10:E10')->getFont()->setBold(true);
@@ -955,7 +995,7 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A10:E10')->applyFromArray($styleArray);
             $sheet->getStyle('A10:E10')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A10:E10')->getFill()->getStartColor()->setARGB('ffffff');
-
+            $sheet->getStyle('C10')->getNumberFormat()->setFormatCode(PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
             $sheet->getRowDimension('11')->setRowHeight(4);
             $sheet->getStyle('A11:E11')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A11:E11')->getFill()->getStartColor()->setARGB('ffffff');
@@ -1202,7 +1242,8 @@ class Invoice_farm extends CI_Controller
             $sheet->setCellValueByColumnAndRow(4, $excel_row, $acumClavelFulles);
             $sheet->setCellValueByColumnAndRow(5, $excel_row, $acumClavelTotalPrice);
             $excel_row += 2;
-
+            $totalStemsInvoice = $acumClavelTotalStems + $acumOtrasTotalStems + $acumRosesTotalStems;
+            $totalFullesInvoice = $acumClavelFulles + $acumOtrasFulles + $acumRosesFulles;
             //total flores
             $sheet->getStyle('A' . $excel_row . ':E' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A' . $excel_row . ':E' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
@@ -1212,8 +1253,8 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('E' . $excel_row)->getNumberFormat()->setFormatCode(PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
             $sheet->setCellValueByColumnAndRow(1, $excel_row, 'Total de flores');
             $sheet->setCellValueByColumnAndRow(2, $excel_row, '');
-            $sheet->setCellValueByColumnAndRow(3, $excel_row, '');
-            $sheet->setCellValueByColumnAndRow(4, $excel_row, '');
+            $sheet->setCellValueByColumnAndRow(3, $excel_row, $totalStemsInvoice);
+            $sheet->setCellValueByColumnAndRow(4, $excel_row, $totalFullesInvoice);
             $sheet->setCellValueByColumnAndRow(5, $excel_row, $acumClavelTotalPrice + $acumOtrasTotalPrice + $acumRosesTotalPrice);
             $excel_row++;
             //comision luxus
@@ -1226,7 +1267,7 @@ class Invoice_farm extends CI_Controller
             $sheet->setCellValueByColumnAndRow(1, $excel_row, 'Comisión Luxus Blumen');
             $sheet->setCellValueByColumnAndRow(2, $excel_row, '');
             $sheet->setCellValueByColumnAndRow(3, $excel_row, '');
-            $sheet->setCellValueByColumnAndRow(4, $excel_row, '0%');
+            $sheet->setCellValueByColumnAndRow(4, $excel_row, '0% de donde viene esta info');
             $sheet->setCellValueByColumnAndRow(5, $excel_row, 0);
             $excel_row++;
             //comision
@@ -1239,7 +1280,7 @@ class Invoice_farm extends CI_Controller
             $sheet->setCellValueByColumnAndRow(1, $excel_row, 'Comisión');
             $sheet->setCellValueByColumnAndRow(2, $excel_row, '');
             $sheet->setCellValueByColumnAndRow(3, $excel_row, '');
-            $sheet->setCellValueByColumnAndRow(4, $excel_row, '0%');
+            $sheet->setCellValueByColumnAndRow(4, $excel_row, '0% de donde viene esta info');
             $sheet->setCellValueByColumnAndRow(5, $excel_row, 0);
             $excel_row++;
             //comision
@@ -1274,11 +1315,13 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A' . $excel_row . ':E' . $excel_row)->getFont()->setBold(true);
             $sheet->getStyle('A' . $excel_row . ':E' . $excel_row)->applyFromArray($styleArray);
             $sheet->getStyle('D' . $excel_row . ':E' . $excel_row)->getNumberFormat()->setFormatCode(PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+
             $sheet->setCellValueByColumnAndRow(1, $excel_row, 'Total de factura');
             $sheet->setCellValueByColumnAndRow(2, $excel_row, '');
-            $sheet->setCellValueByColumnAndRow(3, $excel_row, $acumClavelTotalStems);
-            $sheet->setCellValueByColumnAndRow(4, $excel_row, $acumClavelFulles);
-            $sheet->setCellValueByColumnAndRow(5, $excel_row, $acumClavelTotalPrice);
+            $sheet->setCellValueByColumnAndRow(3, $excel_row, $totalStemsInvoice);
+            $sheet->setCellValueByColumnAndRow(4, $excel_row, $totalFullesInvoice);
+            $sheet->setCellValueByColumnAndRow(5, $excel_row, $acumClavelTotalPrice + $acumOtrasTotalPrice + $acumRosesTotalPrice);
+
             $excel_row += 2;
             $sheet->getStyle('A' . $excel_row . ':D' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A' . $excel_row . ':D' . $excel_row)->getFill()->getStartColor()->setARGB('ccffcc');
@@ -1361,7 +1404,7 @@ class Invoice_farm extends CI_Controller
             $sheet->setCellValueByColumnAndRow(2, $excel_row, '');
             $sheet->setCellValueByColumnAndRow(3, $excel_row, '');
             $sheet->setCellValueByColumnAndRow(4, $excel_row, '');
-            $sheet->setCellValueByColumnAndRow(5, $excel_row, 0);
+            $sheet->setCellValueByColumnAndRow(5, $excel_row, $acumClavelTotalPrice + $acumOtrasTotalPrice + $acumRosesTotalPrice);
             $excel_row++;
             //Segunda hoha
             $spreadsheet->createSheet();
@@ -1382,9 +1425,9 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('A1:O1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
             $sheet->getStyle('A1:O1')->getFill()->getStartColor()->setARGB('ffffff');
 
-            $sheet->setCellValueByColumnAndRow(1, 2, "0");
+            $sheet->setCellValueByColumnAndRow(1, 2, $nameCliente);
             $sheet->setCellValueByColumnAndRow(4, 2, "Fecha AMS:");
-            $sheet->setCellValueByColumnAndRow(5, 2, "20/20/20");
+            $sheet->setCellValueByColumnAndRow(5, 2, "??? de donde sale este dato");
             $sheet->setCellValueByColumnAndRow(15, 2, "FB");
             $sheet->getStyle('A2:O2')->getFont()->setSize(9);
             $sheet->getStyle('A2:O2')->getFont()->setBold(true);
@@ -1463,7 +1506,7 @@ class Invoice_farm extends CI_Controller
                                     $sheet->getStyle('A' . $excel_row . ':O' . $excel_row)->applyFromArray($styleArray);
                                     $sheet->getStyle('O' . $excel_row . ':N' . $excel_row)->getNumberFormat()->setFormatCode(PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                                     $sheet->setCellValueByColumnAndRow(1, $excel_row, $box->boxNumber . '-' . $box->typeBoxs->name);
-                                    $sheet->setCellValueByColumnAndRow(2, $excel_row, '');
+                                    $sheet->setCellValueByColumnAndRow(2, $excel_row, $item->farm->invoice_number);
                                     $sheet->setCellValueByColumnAndRow(3, $excel_row, $item->farm->name_commercial);
                                     $sheet->setCellValueByColumnAndRow(4, $excel_row, (int)$var->stems);
                                     $sheet->setCellValueByColumnAndRow(5, $excel_row, $var->products->name);
@@ -1538,7 +1581,7 @@ class Invoice_farm extends CI_Controller
                                 $sheet->getStyle('A' . $excel_row . ':O' . $excel_row)->applyFromArray($styleArray);
                                 $sheet->getStyle('O' . $excel_row . ':N' . $excel_row)->getNumberFormat()->setFormatCode(PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                                 $sheet->setCellValueByColumnAndRow(1, $excel_row, $box->boxNumber . '-' . $box->typeBoxs->name);
-                                $sheet->setCellValueByColumnAndRow(2, $excel_row, '');
+                                $sheet->setCellValueByColumnAndRow(2, $excel_row, $item->farm->invoice_number);
                                 $sheet->setCellValueByColumnAndRow(3, $excel_row, $item->farm->name_commercial);
                                 $sheet->setCellValueByColumnAndRow(4, $excel_row, (int)$var->stems);
                                 $sheet->setCellValueByColumnAndRow(5, $excel_row, $var->products->name);
@@ -1602,8 +1645,10 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('F' . $excel_row . ':O' . $excel_row)->getFill()->getStartColor()->setARGB('ffff99');
             $sheet->getStyle('F' . $excel_row . ':O' . $excel_row)->getFont()->setSize(10);
             $sheet->getStyle('F' . $excel_row . ':O' . $excel_row)->applyFromArray($styleArray);
+            $sheet->getStyle('N' . $excel_row . ':O' . $excel_row)->getNumberFormat()->setFormatCode(PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
             $sheet->setCellValueByColumnAndRow(6, $excel_row, 'Total fulles rosas');
-            $sheet->setCellValueByColumnAndRow(15, $excel_row, $acumFullesFact);
+            $sheet->setCellValueByColumnAndRow(14, $excel_row, $acumFullesFact);
+            $sheet->setCellValueByColumnAndRow(15, $excel_row, $acumTotalPriceFact);
             //tercera hoja
             $spreadsheet->createSheet();
             $sheet = $spreadsheet->getSheet(2);
@@ -1611,6 +1656,16 @@ class Invoice_farm extends CI_Controller
             foreach (range('A', 'O') as $columnID) {
                 $sheet->getColumnDimension($columnID)->setAutoSize(true);
             }
+
+            $sheet->setCellValueByColumnAndRow(3, 1, $airline);
+            $sheet->getStyle('C1')->getFont()->setSize(10);
+            $sheet->getStyle("C1")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('C1')->applyFromArray($styleArray);
+
+            $sheet->setCellValueByColumnAndRow(3, 2, $object->awb);
+            $sheet->getStyle('C2')->getFont()->setSize(10);
+            $sheet->getStyle("C2")->getAlignment()->setWrapText(true);
+            $sheet->getStyle('C2')->applyFromArray($styleArray);
 
             $sheet->setCellValueByColumnAndRow(4, 3, "Tarifa kg");
             $sheet->getStyle('D3')->getFont()->setSize(10);
@@ -1633,7 +1688,7 @@ class Invoice_farm extends CI_Controller
             $sheet->getStyle('B6')->applyFromArray($styleArray);
 
             $sheet->setCellValueByColumnAndRow(2, 7, "Total AWB");
-            $sheet->setCellValueByColumnAndRow(5, 7, 0);
+            $sheet->setCellValueByColumnAndRow(5, 7, 'de donde sale este valor');
             $sheet->getStyle('B7:E7')->getFont()->setSize(10);
             $sheet->getStyle("B7:E7")->getAlignment()->setWrapText(true);
             $sheet->getStyle('B7:E7')->applyFromArray($styleArray);
@@ -1643,16 +1698,16 @@ class Invoice_farm extends CI_Controller
             $sheet->setCellValueByColumnAndRow(2, 12, "Numero AWB:");
             $sheet->setCellValueByColumnAndRow(3, 12, $object->awb);
             $sheet->setCellValueByColumnAndRow(2, 13, "Fecha de vuelo (AWB):");
-            $sheet->setCellValueByColumnAndRow(3, 13, '12/12/12');
+            $sheet->setCellValueByColumnAndRow(3, 13, $dateAwb);
             $sheet->setCellValueByColumnAndRow(2, 14, "Peso bruto AWB, kg:");
-            $sheet->setCellValueByColumnAndRow(3, 14, 0);
+            $sheet->setCellValueByColumnAndRow(3, 14, 'de donde sale esta info');
             $sheet->setCellValueByColumnAndRow(2, 15, "Piezas en AWB:");
-            $sheet->setCellValueByColumnAndRow(3, 15, 0);
+            $sheet->setCellValueByColumnAndRow(3, 15, 'de donde sale esta info');
             $sheet->setCellValueByColumnAndRow(2, 16, "Broker/No invoice./marcacion/piezas");
             $sheet->setCellValueByColumnAndRow(3, 16, "LUXUS BLUMEN");
-            $sheet->setCellValueByColumnAndRow(4, 16, "Nx-h");
-            $sheet->setCellValueByColumnAndRow(5, 16, 0);
-            $sheet->setCellValueByColumnAndRow(6, 16, 0);
+            $sheet->setCellValueByColumnAndRow(4, 16, "Nx-h" . $object->number_invoice . ' de donde viene esos caracteres?');
+            $sheet->setCellValueByColumnAndRow(5, 16, $object->marking->name_marking);
+            $sheet->setCellValueByColumnAndRow(6, 16, 'de donde sale estas piezas?');
 
             $sheet->setCellValueByColumnAndRow(2, 18, "Nombre del tipo de flor");
             $sheet->setCellValueByColumnAndRow(3, 18, "Largo");

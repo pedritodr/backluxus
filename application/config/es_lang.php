@@ -823,3 +823,4 @@ $config['qty_stems_lang'] = "Cantidad de tallos";
 $config['add_item_credit_lang'] = "Agregar";
 $config['udapte_item_credit_lang'] = "Actualizar";
 $config['create_credit_lang'] = "Crear crédito";
+$config['airline_lang'] = "Aerolínea";

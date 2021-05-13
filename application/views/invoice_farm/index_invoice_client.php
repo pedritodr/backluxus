@@ -108,8 +108,13 @@
                                             </td>
                                             <td>
                                                 <p><strong><?= translate("invoice_number_lang"); ?> : </strong><?= $item->number_invoice; ?></p>
-                                                <p><strong><?= translate("dispatch_day_lang"); ?> : </strong><?= $item->details[0]->farm->dispatch_day; ?></p>
+                                                <p><strong><?= translate("dispatch_day_lang"); ?> : </strong><?php if (isset($item->date_awb)) {
+                                                                                                                    echo $item->date_awb;
+                                                                                                                } ?></p>
                                                 <p><strong><?= translate("awb_lang"); ?> : </strong><?= $item->awb; ?></p>
+                                                <p><strong><?= translate("airline_lang"); ?> : </strong><?php if (isset($item->airline)) {
+                                                                                                            echo $item->airline;
+                                                                                                        } ?></p>
                                             </td>
                                             <td>
                                                 <div class="btn-group mb-4 mr-2" role="group">
@@ -166,7 +171,7 @@
     </div>
 </div>
 <div class="modal fade" id="modalAwb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="titleModalAwb"><?= translate('edit_awb_lang') ?></h5>
@@ -179,14 +184,25 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="col-6">
                         <label id="lblNumberAwb"><?= translate("awb_lang"); ?></label>
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="awbEdit">
                             <input id="invoiceId" type="hidden">
                         </div>
                     </div>
-
+                    <div class="col-6">
+                        <label><?= translate('fecha_lang') ?></label>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="date" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label><?= translate('airline_lang') ?></label>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="airline" />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -206,9 +222,6 @@
                 [0, "desc"]
             ],
         });
-        $("#awbEdit").inputmask({
-            mask: "999-9999-9999"
-        })
     });
 
     const encodeB64Utf8 = (str) => {
@@ -502,15 +515,24 @@
         $('#titleModalAwb').text('<?= translate("invoice_number_lang"); ?>: ' + objInvoice.number_invoice);
         $('#lblNumberAwb').text('<?= translate("awb_lang"); ?>: ' + objInvoice.awb);
         $('#invoiceId').val(objInvoice.invoice);
-
+        $("#awbEdit").val(objInvoice.awb);
         $('#modalAwb').modal({
             backdrop: false
         });
+        $("#awbEdit").inputmask({
+            mask: "999-9999-9999"
+        })
+        let until = flatpickr(document.getElementById('date'), {
+            defaultDate: objInvoice.date_awb ? objInvoice.date_awb : 'today'
+        });
+        $('#airline').val(objInvoice.airline ? objInvoice.airline : '');
     }
 
     const handleSubmitUpdateAwb = () => {
         let invoice = $('#invoiceId').val();
         let awb = $('#awbEdit').val().trim();
+        let airline = $('#airline').val().trim();
+        let dateAwb = $('#date').val().trim();
         let awbDividido = awb.split('-');
         let format = true;
         for (let i = 0; i < awbDividido.length; i++) {
@@ -528,6 +550,22 @@
                 showConfirmButton: true,
                 padding: '2em'
             })
+        } else if (airline == '') {
+            swal({
+                title: '¡Información!',
+                text: "La Aerolínea es un campo obligatorio",
+                type: 'info',
+                showConfirmButton: true,
+                padding: '2em'
+            })
+        } else if (dateAwb == '') {
+            swal({
+                title: '¡Información!',
+                text: "La fecha es un campo obligatorio",
+                type: 'info',
+                showConfirmButton: true,
+                padding: '2em'
+            })
         } else {
             $('#modalAwb').modal('hide');
             Swal.fire({
@@ -541,7 +579,9 @@
             });
             let data = {
                 invoice,
-                awb
+                awb,
+                dateAwb,
+                airline
             }
             setTimeout(function() {
                 $.ajax({
