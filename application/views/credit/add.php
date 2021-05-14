@@ -210,7 +210,6 @@
 <script>
     let uploadImages;
     $(() => {
-
         $("#markings").select2({
             tags: false,
             placeholder: '<?= translate('select_opction_lang') ?>',
@@ -247,6 +246,7 @@
         invoices = [];
         let marking = $('select[id=markings] option').filter(':selected').val();
         marking !== '0' ? marking = JSON.parse(decodeB64Uft8(marking)) : marking = '0';
+        handleLoadDetail();
         if (marking !== '0') {
             Swal.fire({
                 title: 'Completando operación',
@@ -336,6 +336,8 @@
         invoice !== '0' ? invoice = JSON.parse(decodeB64Uft8(invoice)) : invoice = '0';
         $('#selectFarms').empty();
         farms = [];
+        handleLoadDetail();
+        arrItemsCredit = [];
         if (invoice !== '0') {
             Swal.fire({
                 title: 'Completando operación',
@@ -397,6 +399,7 @@
         let farm = $('select[id=selectFarms] option').filter(':selected').val();
         farm !== '0' ? farm = JSON.parse(decodeB64Uft8(farm)) : farm = '0';
         invoiceSelected = [];
+        arrItemsCredit = [];
         if (farm !== '0') {
             handleLoadDetail(farm);
             Swal.fire({
@@ -440,7 +443,7 @@
         }
     }
 
-    const handleLoadDetail = (details = {}) => {
+    const handleLoadDetail = (details = false) => {
         let qtyBox = 0;
         let qtyStems = 0;
         let qtyBouquets = 0;
@@ -451,12 +454,14 @@
         let acumQb = 0;
         let acumEb = 0;
         invoiceSelected = details;
+        $("#zoneContents").empty();
         if (details) {
             let texto_tabla = '';
             texto_tabla +=
                 '<table id="datatablesVarieties" class="table table-striped table-no-bordered" cellspacing="0" width="100%" style="width:100%">';
             texto_tabla += '<thead>';
             texto_tabla += '<tr>';
+            texto_tabla += '<th>NRO FACTURA</th>';
             texto_tabla += '<th>NRO BOX</th>';
             texto_tabla += '<th>BOX TYPE</th>';
             texto_tabla += '<th>VARIETIES</th>';
@@ -466,7 +471,7 @@
             texto_tabla += '<th>TOTAL STM</th>';
             texto_tabla += '<th>PRICE</th>';
             texto_tabla += '<th>TOTAL</th>';
-            texto_tabla += '<th>Acciones</th>';
+            texto_tabla += '<th>ACCIONES</th>';
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
             texto_tabla += '<tbody id="bodyTableDetails">';
@@ -485,6 +490,11 @@
                     acumEb += parseInt(box.boxNumber);
                 }
                 let textBox = '<tr>';
+
+                textBox += '<td bgcolor= "#f1f2f3">';
+                textBox += invoiceSelected.farm.invoice_number;
+                textBox += '</td>';
+
                 textBox += '<td bgcolor= "#f1f2f3">';
                 textBox += box.boxNumber;
                 qtyBox += parseInt(box.boxNumber);
@@ -529,6 +539,9 @@
                     box.varieties.forEach((element, indice, varieties) => {
                         element.invoceFarm = box.invoice_farm;
                         let textVariety = '<tr>';
+
+                        textVariety += '<td>';
+                        textVariety += '</td>';
 
                         textVariety += '<td>';
                         textVariety += '</td>';
@@ -609,6 +622,9 @@
                 textFooterBox += '</td>';
 
                 textFooterBox += '<td bgcolor= "#b9e0f1">';
+                textFooterBox += '</td>';
+
+                textFooterBox += '<td bgcolor= "#b9e0f1">';
                 textFooterBox += acumBoxBunches;
                 textFooterBox += '</td>';
 
@@ -633,6 +649,9 @@
 
             let textFooter = '<tfoot>';
             textFooter += '<tr>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
 
             textFooter += '<td>';
             textFooter += qtyBox;
@@ -696,6 +715,9 @@
     const handleModalAddCredit = (indexBox, indiceVarieties) => {
         $('#indexBox').val(indexBox);
         $('#indiceVarieties').val(indiceVarieties);
+        $('#qtyStems').val('');
+        $('[id=reasonCredit]').val(0);
+        $('#reasonCredit').trigger('change');
         $('#btnModalItemCredit').text('<?= translate('add_item_credit_lang') ?>').attr('onclick', 'handleAddItemCredit()');
         $('#modalItem').modal({
             backdrop: false
@@ -1014,23 +1036,214 @@
         })
     }
 
-    const handleImages = () => {
+    const handleImages = async () => {
         $('#modalImages').modal({
             backdrop: false
         })
     }
+    window.addEventListener("fileUploadWithPreview:imagesAdded", function(e) {
+        e.detail.cachedFileArray
+        createImages(e.detail.cachedFileArray);
+    });
 
 
-    const handleSubmitCreateCredit = () => {
+    const createImages = async (arr) => {
+        for (let i = 0; i < arr.length; i++) {
+            let objectURL = URL.createObjectURL(arr[i]);
+            let result = fetchAsBlob(objectURL)
+                .then(convertBlobToBase64)
+                .then(arrCallback);
+        }
+    }
 
-        let arrImages = [];
-        uploadImages.cachedFileArray.forEach(element => {
-            let img = $('.custom-file-container__image-multi-preview').attr('data-upload-token', element.token).css('background-image');
-            img = img.slice(5, -2);
-            arrImages.push({
-                img
+    const fetchAsBlob = url => fetch(url)
+        .then(response => response.blob());
+
+    const convertBlobToBase64 = blob => new Promise((resolve, reject) => {
+        const reader = new FileReader;
+        reader.onerror = reject;
+        reader.onload = () => {
+            resolve(reader.result);
+        };
+        reader.readAsDataURL(blob);
+    });
+
+    const arrCallback = (img) => {
+        arrImages.push({
+            img
+        })
+    }
+    let arrImages = [];
+
+    const handleSubmitCreateCredit = async () => {
+
+        let marking = $('select[id=markings] option').filter(':selected').val();
+        marking !== '0' ? marking = JSON.parse(decodeB64Uft8(marking)) : marking = '0';
+        let invoice = $('select[id=selectInvoice] option').filter(':selected').val();
+        invoice !== '0' ? invoice = JSON.parse(decodeB64Uft8(invoice)) : invoice = '0';
+        let farm = $('select[id=selectFarms] option').filter(':selected').val();
+        farm !== '0' ? farm = JSON.parse(decodeB64Uft8(farm)) : farm = '0';
+        if (marking == '0') {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
             });
-        });
-        console.log(arrImages);
+
+            toast({
+                type: 'info',
+                title: 'Seleccione la marcación para continuar',
+                padding: '2em',
+            })
+        } else if (invoice == '0') {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+
+            toast({
+                type: 'info',
+                title: 'Seleccione la factura para continuar',
+                padding: '2em',
+            })
+        } else if (farm == '0') {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+
+            toast({
+                type: 'info',
+                title: 'Seleccione una finca para continuar',
+                padding: '2em',
+            })
+        } else if (arrItemsCredit.length == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+
+            toast({
+                type: 'info',
+                title: 'No tiene items para crear el crédito',
+                padding: '2em',
+            })
+        } else if (arrImages.length == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+
+            toast({
+                type: 'info',
+                title: 'Para continuar tiene que cargar las imagenes',
+                padding: '2em',
+            })
+        } else {
+            Swal.fire({
+                title: 'Completando operación',
+                html: '<h5 id="textCreateCredit">Creando crédito...</h5>',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            arrItemsCredit.forEach(item => {
+                delete(item.itemSelected.credit);
+            });
+            delete(marking._id);
+            marking = JSON.stringify(marking);
+            arrItemsCredit = JSON.stringify(arrItemsCredit);
+            invoice = JSON.stringify(invoice);
+            farm = JSON.stringify(farm);
+            let data = {
+                invoice,
+                arrItemsCredit,
+                marking,
+                farm,
+                description
+            };
+
+            setTimeout(async () => {
+                let response = await createCredit(data);
+                response = JSON.parse(response);
+                if (response.status == 200) {
+                    $('#textCreateCredit').text('Creando imagenes');
+                    let chunkedArray = await chunkedFunctionArray(arrImages, 5);
+                    for (let i = 0; i < chunkedArray.length; i++) {
+                        let responseUpdate = await createImagen(response.data, JSON.stringify(chunkedArray[i]));
+                    }
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Crédito creado correctamente',
+                        showConfirmButton: false
+                    });
+                    setTimeout(() => {
+                        window.location = '<?= site_url('credit/index') ?>';
+                    }, 1000);
+                } else {
+                    Swal.close();
+                    swal({
+                        title: '¡Error!',
+                        text: result.msj,
+                        padding: '2em'
+                    });
+                }
+            }, 1500)
+        }
+    }
+
+    const createImagen = async (id, images) => {
+        return $.ajax({
+            type: 'POST',
+            url: "<?= site_url('credit/add_images') ?>",
+            data: {
+                id,
+                images
+            },
+            success: function(result) {
+                result = JSON.parse(result);
+            }
+        })
+    }
+
+    const createCredit = async (data) => {
+        return $.ajax({
+            type: 'POST',
+            url: "<?= site_url('credit/add') ?>",
+            data: data,
+            success: function(result) {
+                result = JSON.parse(result);
+            }
+        })
+    }
+
+    const chunkedFunctionArray = async (files, number) => {
+        let size = number;
+        const chunked_arr = [];
+        for (let i = 0; i < files.length; i++) {
+            const last = chunked_arr[chunked_arr.length - 1];
+            if (!last || last.length === size) {
+                chunked_arr.push([files[i]]);
+            } else {
+                last.push(files[i]);
+            }
+        }
+        return chunked_arr;
     }
 </script>

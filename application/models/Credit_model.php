@@ -51,5 +51,10 @@ class Credit_model extends CI_Model
         $result = $this->mongo_db->where(['credit_id' => $id])->delete('credits');
         return $result;
     }
+    function create_images($id = 0, $data = [])
+    {
+        $newId = $this->mongo_db->where('credit_id', $id)->push('images', $data)->update('credits');
+        return $newId;
+    }
     //------------------------------------------------------------------------------------------------------------------------------------------
 }

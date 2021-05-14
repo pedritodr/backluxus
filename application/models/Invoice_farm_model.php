@@ -121,6 +121,11 @@ class Invoice_farm_model extends CI_Model
             return false;
         }
     }
+    function create_credit_farm($farm_id = 0, $data = [])
+    {
+        $newId = $this->mongo_db->where('invoice_farm', $farm_id)->push('credits', $data)->update('invoice_farm');
+        return $newId;
+    }
     //------------------------------------------------------------------------------------------------------------invoice cliente
 
     function create_invoice_client($data)
@@ -246,5 +251,10 @@ class Invoice_farm_model extends CI_Model
         } else {
             return false;
         }
+    }
+    function create_credit_invoice_client($invoice = 0, $data = [])
+    {
+        $newId = $this->mongo_db->where('invoice', $invoice)->push('credits', $data)->update('invoice_cliente');
+        return $newId;
     }
 }

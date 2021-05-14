@@ -45,25 +45,48 @@ class Credit extends CI_Controller
 
     public function add()
     {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
-            $this->log_out();
-            redirect('login/index');
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
         }
-
-        $reason = $this->input->post('reason');
-
-        $this->form_validation->set_rules('reason', translate('reason_lang'), 'required');
-
-        if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
-            $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
-            redirect("reason_credit/add_index");
-        } else {
-            $reason_credit_id = 'reason_credit_' . uniqid();
-            $data = ['reason_credit_id' => $reason_credit_id, 'reason' => $reason, 'is_active' => 1];
-            $this->reason_credit->create($data);
-            $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
-            redirect("reason_credit/index", "location", 301);
+        $this->load->model('Invoice_farm_model', 'invoice_farm');
+        $invoice = json_decode($this->input->post('invoice'));
+        $arrItemsCredit = json_decode($this->input->post('arrItemsCredit'));
+        $marking = json_decode($this->input->post('marking'));
+        $farm = json_decode($this->input->post('farm'));
+        $description = $this->input->post('description');
+        $credit_id = 'credit_' . uniqid();
+        $date_create = date("Y-m-d H:i:s");
+        $dataCredit = [
+            'credit_id' => $credit_id,
+            'date_create' => $date_create,
+            'timestamp' => strtotime($date_create),
+            'inovice' => $invoice,
+            'items' => $arrItemsCredit,
+            'farm' => $farm,
+            'marking' => $marking,
+            'description' => $description
+        ];
+        $dataCreditMinClient = [
+            'credit_id' => $credit_id,
+            'date_create' => $date_create,
+            'timestamp' => strtotime($date_create),
+            'invoice' => $invoice,
+            'items' => $arrItemsCredit,
+            'farm' => $farm,
+            'description' => $description
+        ];
+        $this->credit->create($dataCredit);
+        $this->invoice_farm->create_credit_invoice_client($invoice->invoice, $dataCreditMinClient);
+        foreach ($arrItemsCredit as $item) {
+            $this->invoice_farm->create_credit_farm($item->itemSelected->invoceFarm, $item);
         }
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $credit_id]);
+        exit();
     }
 
     function update_index($id = 0)
@@ -133,6 +156,30 @@ class Credit extends CI_Controller
                     $this->reason_credit->create($data);
                 }
             }
+        }
+    }
+    public function add_images()
+    {
+        ini_set('max_execution_time', '0');
+        define('UPLOAD_DIR', './uploads/credit/');
+        $id = $this->input->post('id');
+        $images = json_decode($_POST['images']);
+        if (count($images) > 0) {
+            foreach ($images as $item) {
+                $img =  $item->img;
+                $img = str_replace('data:image/png;base64,', '', $img);
+                $img = str_replace(' ', '+', $img);
+                $data = base64_decode($img);
+                $file = UPLOAD_DIR . uniqid() . '.png';
+                $success = file_put_contents($file, $data);
+                $img_id = 'img_' . uniqid();
+                $this->credit->create_images($id, ['img_id' => $img_id, 'img' => $file, 'credit_id' => $id]);
+            }
+            echo json_encode(['status' => 200]);
+            exit();
+        } else {
+            echo json_encode(['status' => 200]);
+            exit();
         }
     }
 }
