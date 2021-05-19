@@ -484,6 +484,7 @@ class Farm extends CI_Controller
         $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);
         $this->load_view_admin_g("farm/index_balance", $data);
     }
+
     public function loadInvoiceRangeDate()
     {
         if (!$this->session->userdata('user_id')) {
@@ -510,9 +511,21 @@ class Farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
+        $this->load->model('Payments_model', 'payments');
+
+        $data['payments'] = $this->payments->get_all_payments();
+
+        $this->load_view_admin_g("farm/index_payments", $data);
+    }
+    public function add_payments()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
 
         $data['farms'] = $this->farm->get_min_providers();
-        $this->load_view_admin_g("farm/index_payments", $data);
+        $this->load_view_admin_g("farm/add_payments", $data);
     }
     public function loadInvoicePayment()
     {

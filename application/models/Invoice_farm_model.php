@@ -126,6 +126,25 @@ class Invoice_farm_model extends CI_Model
         $newId = $this->mongo_db->where('invoice_farm', $farm_id)->push('credits', $data)->update('invoice_farm');
         return $newId;
     }
+    function delete_credit_farm($farm_id = 0, $data = [])
+    {
+        $newId = $this->mongo_db->where('invoice_farm', $farm_id)->set('credits', $data)->update('invoice_farm');
+        return $newId;
+    }
+    function update_box_variety($invoice_id, $box_id, $variety_id, $data)
+    {
+        $query = $this->mongodb->luxus->invoice_farm->updateOne(
+            ['invoice_farm' => ['$eq' => $invoice_id]],
+            ['$set' => [
+                'details.$[d].varieties.$[v].credit' => $data,
+            ]],
+            ['arrayFilters' => [
+                ['d.id' => ['$eq' => $box_id]],
+                ['v.id' => ['$eq' => $variety_id]]
+            ]]
+        );
+        return $query;
+    }
     //------------------------------------------------------------------------------------------------------------invoice cliente
 
     function create_invoice_client($data)
@@ -256,5 +275,34 @@ class Invoice_farm_model extends CI_Model
     {
         $newId = $this->mongo_db->where('invoice', $invoice)->push('credits', $data)->update('invoice_cliente');
         return $newId;
+    }
+    function update_box_variety_invoice_cliente($invoice_id, $detail, $box_id, $variety_id, $data)
+    {
+        $query = $this->mongodb->luxus->invoice_cliente->updateOne(
+            ['invoice' => ['$eq' => $invoice_id]],
+            ['$set' => [
+                'details.$[detail].boxs.$[box].varieties.$[variety].credit' => $data,
+            ]],
+            ['arrayFilters' => [
+                ['detail.id' => ['$eq' => $detail]],
+                ['box.id' => ['$eq' => $box_id]],
+                ['variety.id' => ['$eq' => $variety_id]]
+            ]]
+        );
+        return $query;
+    }
+    function update_credit_invoice_client($invoice_id, $credit_id, $items, $description)
+    {
+        $query = $this->mongodb->luxus->invoice_cliente->updateOne(
+            ['invoice' => ['$eq' => $invoice_id]],
+            ['$set' => [
+                'credits.$[credit].items' => $items,
+                'credits.$[credit].description' => $description,
+            ]],
+            ['arrayFilters' => [
+                ['credit.credit_id' => ['$eq' => $credit_id]]
+            ]]
+        );
+        return $query;
     }
 }

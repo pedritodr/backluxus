@@ -14,6 +14,10 @@
     #modalImages {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
+
+    #modalInfoCredit {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
 </style>
 
 <link href="<?= base_url() ?>admin_template/plugins/file-upload/file-upload-with-preview.min.css" rel="stylesheet" type="text/css" />
@@ -30,8 +34,6 @@
                     <h6 class="text-simple"> <?= translate('add_credit_lang') ?></h6>
                 </div>
                 <div class="widget-content widget-content-area">
-                    <?= get_message_from_operation(); ?>
-                    <?= form_open_multipart("reason_credit/add"); ?>
                     <div class="row">
                         <div class="col-lg-4">
                             <label><?= translate("markings_lang"); ?></label>
@@ -72,9 +74,6 @@
                             </div>
                         </div>
                     </div>
-                    <?= form_close(); ?>
-
-
                 </div><!-- /.box-body -->
             </div><!-- /.box -->
             <div class="statbox widget box box-shadow" style="margin-top: 25px;">
@@ -92,10 +91,8 @@
                     </div>
                 </div><!-- /.box-body -->
             </div><!-- /.box -->
-
         </div><!-- /.col -->
     </div><!-- /.row -->
-
 </div><!-- /.content-wrapper -->
 
 <div class="modal fadeInDown" id="modalItem" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -197,6 +194,25 @@
                             </label>
                             <div class="custom-file-container__image-preview"></div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fadeInDown" id="modalInfoCredit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><?= translate('credito_lang') ?></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12" id="bodyInfoCredit">
+
                     </div>
                 </div>
             </div>
@@ -538,6 +554,8 @@
                 if (box.varieties.length > 0) {
                     box.varieties.forEach((element, indice, varieties) => {
                         element.invoceFarm = box.invoice_farm;
+                        element.boxId = box.id;
+                        element.detailId = invoiceSelected.id;
                         let textVariety = '<tr>';
 
                         textVariety += '<td>';
@@ -593,11 +611,32 @@
                         textVariety += '</td>';
 
                         textVariety += '<td>';
-                        textVariety += '<div class="edit-item-invoices">';
-                        textVariety += '<button class="btn btn-primary" id="btnAddCredit' + element.id + '" onclick=handleModalAddCredit("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>';
-                        textVariety += '<button class="btn btn-warning" style="display:none" id="editBtnCredit' + element.id + '" onclick=handleModalEditItemCredit("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>';
-                        textVariety += '<button class="btn btn-danger" style="display:none" id="cancelBtnCredit' + element.id + '" onclick=handleCancelDeleteItem("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
-                        textVariety += '</div>';
+                        if (element.credit === undefined) {
+                            if (element.credit) {
+                                textVariety += '<div class="edit-item-invoices">';
+                                textVariety += '<button class="btn btn-primary" id="btnAddCredit' + element.id + '" onclick=handleModalAddCredit("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>';
+                                textVariety += '<button class="btn btn-warning" style="display:none" id="editBtnCredit' + element.id + '" onclick=handleModalEditItemCredit("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>';
+                                textVariety += '<button class="btn btn-danger" style="display:none" id="cancelBtnCredit' + element.id + '" onclick=handleCancelDeleteItem("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
+                                textVariety += '</div>';
+                            } else {
+                                textVariety += '<div class="edit-item-invoices">';
+                                textVariety += '<button class="btn btn-primary" id="btnAddCredit' + element.id + '" onclick=handleModalAddCredit("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>';
+                                textVariety += '<button class="btn btn-warning" style="display:none" id="editBtnCredit' + element.id + '" onclick=handleModalEditItemCredit("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>';
+                                textVariety += '<button class="btn btn-danger" style="display:none" id="cancelBtnCredit' + element.id + '" onclick=handleCancelDeleteItem("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
+                                textVariety += '</div>'
+                            }
+                        } else {
+                            if (element.credit) {
+                                textVariety += '<button class="btn btn-outline-info"  onclick=handleGetInfoCredit("' + encodeB64Uft8(JSON.stringify(element.credit)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>';
+                            } else {
+                                textVariety += '<div class="edit-item-invoices">';
+                                textVariety += '<button class="btn btn-primary" id="btnAddCredit' + element.id + '" onclick=handleModalAddCredit("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>';
+                                textVariety += '<button class="btn btn-warning" style="display:none" id="editBtnCredit' + element.id + '" onclick=handleModalEditItemCredit("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>';
+                                textVariety += '<button class="btn btn-danger" style="display:none" id="cancelBtnCredit' + element.id + '" onclick=handleCancelDeleteItem("' + index + '","' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
+                                textVariety += '</div>'
+                            }
+
+                        }
                         textVariety += '</td>';
 
                         textVariety += '</tr>';
@@ -1041,11 +1080,17 @@
             backdrop: false
         })
     }
+
     window.addEventListener("fileUploadWithPreview:imagesAdded", function(e) {
-        e.detail.cachedFileArray
+        e.detail.cachedFileArray;
+        arrImages = [];
         createImages(e.detail.cachedFileArray);
     });
-
+    window.addEventListener("fileUploadWithPreview:imageDeleted", function(e) {
+        e.detail.cachedFileArray;
+        arrImages = [];
+        createImages(e.detail.cachedFileArray);
+    });
 
     const createImages = async (arr) => {
         for (let i = 0; i < arr.length; i++) {
@@ -1245,5 +1290,19 @@
             }
         }
         return chunked_arr;
+    }
+
+    const handleGetInfoCredit = (obj) => {
+        obj = JSON.parse(decodeB64Uft8(obj));
+        $("#bodyInfoCredit").empty();
+        let stringInfoCredit = '<h4 class="text-center">' + obj.reasonCredit.reason + '</h4>';
+        stringInfoCredit += '<h6 class="text-center">' + obj.itemSelected.products.name + ' ' + obj.itemSelected.measures.name + '</h6>';
+        stringInfoCredit += '<p class="text-center">CANTIDAD DE TALLOS: ' + obj.qtyStems + '</p>';
+        stringInfoCredit += '<p class="text-center">PRECIO: ' + parseFloat(obj.itemSelected.price).toFixed(2) + '</p>';
+        stringInfoCredit += '<p class="text-center">Total: ' + (parseFloat(obj.itemSelected.price) * parseInt(obj.qtyStems)).toFixed(2) + '</p>';
+        $("#bodyInfoCredit").append(stringInfoCredit);
+        $('#modalInfoCredit').modal({
+            backdrop: false
+        })
     }
 </script>

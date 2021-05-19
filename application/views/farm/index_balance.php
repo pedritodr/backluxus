@@ -184,7 +184,15 @@
 
 						stringTable += '<td>';
 						let amountCredit = 0;
-						item.credit !== undefined ? amountCredit = item.credit.amount : amountCredit = 0;
+						if (item.credits !== undefined) {
+							if (item.credits) {
+								if (item.credits.length > 0) {
+									item.credits.forEach(credit => {
+										amountCredit += parseFloat(parseFloat(parseFloat(credit.itemSelected.price) * parseInt(credit.qtyStems)).toFixed(2));
+									});
+								}
+							}
+						}
 						stringTable += parseFloat(amountCredit).toFixed(2);
 						stringTable += '</td>';
 

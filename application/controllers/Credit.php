@@ -69,7 +69,8 @@ class Credit extends CI_Controller
             'items' => $arrItemsCredit,
             'farm' => $farm,
             'marking' => $marking,
-            'description' => $description
+            'description' => $description,
+            'is_active' => 1
         ];
         $dataCreditMinClient = [
             'credit_id' => $credit_id,
@@ -78,12 +79,16 @@ class Credit extends CI_Controller
             'invoice' => $invoice,
             'items' => $arrItemsCredit,
             'farm' => $farm,
-            'description' => $description
+            'description' => $description,
+            'is_active' => 1
         ];
         $this->credit->create($dataCredit);
         $this->invoice_farm->create_credit_invoice_client($invoice->invoice, $dataCreditMinClient);
         foreach ($arrItemsCredit as $item) {
+            $item->credit_id = $credit_id;
             $this->invoice_farm->create_credit_farm($item->itemSelected->invoceFarm, $item);
+            $this->invoice_farm->update_box_variety($item->itemSelected->invoceFarm, $item->itemSelected->boxId, $item->itemSelected->id, $item);
+            $this->invoice_farm->update_box_variety_invoice_cliente($invoice->invoice, $item->itemSelected->detailId, $item->itemSelected->boxId, $item->itemSelected->id, $item);
         }
         echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $credit_id]);
         exit();
@@ -95,35 +100,57 @@ class Credit extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
+        $this->load->model('Reason_credit_model', 'reason_credit');
+        $this->load->model('User_model', 'user');
+        $reason_credits = $this->reason_credit->get_all(['is_active' => 1]);
+        $data['reason_credits'] = $reason_credits;
+        $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
 
-        $reason_object = $this->reason_credit->get_by_id($id);
+        $object = $this->credit->get_by_id($id);
 
-        if ($reason_object) {
-            $data['reason_object'] = $reason_object;
-            $this->load_view_admin_g('reason_credit/update', $data);
+        if ($object) {
+            $data['credit'] = $object;
+            $this->load_view_admin_g('credit/update', $data);
         } else {
             show_404();
         }
     }
-
     public function update()
     {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
-            $this->log_out();
-            redirect('login/index');
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
         }
-        $reason = $this->input->post('reason');
-        $reason_credit_id = $this->input->post('reason_credit_id');
-        $this->form_validation->set_rules('reason', translate('reason_lang'), 'required');
-        if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
-            $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
-            redirect("reason_credit/update_index/" . $reason_credit_id);
-        } else {
-            $data = ['reason' => $reason];
-            $row =  $this->reason_credit->update($reason_credit_id, $data);
-            $this->response->set_message(translate("data_saved_ok"), ResponseMessage::SUCCESS);
-            redirect("reason_credit/index", "location", 301);
+        $this->load->model('Invoice_farm_model', 'invoice_farm');
+        $items = json_decode($this->input->post('items'));
+        $arrItemsCredit = json_decode($this->input->post('arrItemsCredit'));
+        $description = $this->input->post('description');
+        $creditId = $this->input->post('creditId');
+        $invoiceId = $this->input->post('invoiceId');
+        $dataCredit = [
+            'items' => $arrItemsCredit,
+            'description' => $description,
+            'images' => []
+        ];
+        $this->credit->update($creditId, $dataCredit);
+        $this->invoice_farm->update_credit_invoice_client($invoiceId, $creditId, $arrItemsCredit, $description);
+        foreach ($items as $item) {
+            $this->invoice_farm->delete_credit_farm($item->itemSelected->invoceFarm, []);
+            $this->invoice_farm->update_box_variety_invoice_cliente($invoiceId, $item->itemSelected->detailId, $item->itemSelected->boxId, $item->itemSelected->id, false);
+            $this->invoice_farm->update_box_variety($item->itemSelected->invoceFarm, $item->itemSelected->boxId, $item->itemSelected->id, false);
         }
+        foreach ($arrItemsCredit as $item) {
+            $item->credit_id = $creditId;
+            $this->invoice_farm->create_credit_farm($item->itemSelected->invoceFarm, $item);
+            $this->invoice_farm->update_box_variety($item->itemSelected->invoceFarm, $item->itemSelected->boxId, $item->itemSelected->id, $item);
+            $this->invoice_farm->update_box_variety_invoice_cliente($invoiceId, $item->itemSelected->detailId, $item->itemSelected->boxId, $item->itemSelected->id, $item);
+        }
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $creditId]);
+        exit();
     }
 
     public function delete($id = 0)
@@ -133,12 +160,24 @@ class Credit extends CI_Controller
             redirect('login/index');
         }
 
-        $reason_object = $this->reason_credit->get_by_id($id);
-
-        if ($reason_object) {
-            $this->reason_credit->update($id, ['is_active' => 0]);
+        $object = $this->credit->get_by_id($id);
+        if ($object) {
+            $this->load->model('Invoice_farm_model', 'invoice_farm');
+            $this->credit->update($id, ['is_active' => 0]);
+            if (count($object->images) > 0) {
+                foreach ($object->images as $item) {
+                    $item->img;
+                    if (file_exists($item->img))
+                        unlink($item->img);
+                }
+            }
+            foreach ($object->items as $item) {
+                $this->invoice_farm->delete_credit_farm($item->itemSelected->invoceFarm, []);
+                $this->invoice_farm->update_box_variety_invoice_cliente($object->inovice->invoice, $item->itemSelected->detailId, $item->itemSelected->boxId, $item->itemSelected->id, false);
+                $this->invoice_farm->update_box_variety($item->itemSelected->invoceFarm, $item->itemSelected->boxId, $item->itemSelected->id, false);
+            }
             $this->response->set_message(translate('data_deleted_ok'), ResponseMessage::SUCCESS);
-            redirect("reason_credit/index");
+            redirect("credit/index");
         } else {
             show_404();
         }
@@ -174,6 +213,23 @@ class Credit extends CI_Controller
                 $success = file_put_contents($file, $data);
                 $img_id = 'img_' . uniqid();
                 $this->credit->create_images($id, ['img_id' => $img_id, 'img' => $file, 'credit_id' => $id]);
+            }
+            echo json_encode(['status' => 200]);
+            exit();
+        } else {
+            echo json_encode(['status' => 200]);
+            exit();
+        }
+    }
+
+    public function delete_images()
+    {
+        $images = json_decode($_POST['images']);
+        if (count($images) > 0) {
+            foreach ($images as $item) {
+                $item->img;
+                if (file_exists($item->img))
+                    unlink($item->img);
             }
             echo json_encode(['status' => 200]);
             exit();
