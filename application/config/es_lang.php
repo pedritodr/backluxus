@@ -826,3 +826,21 @@ $config['udapte_item_credit_lang'] = "Actualizar";
 $config['create_credit_lang'] = "Crear crédito";
 $config['airline_lang'] = "Aerolínea";
 $config['update_credit_lang'] = "Actualizar crédito";
+$config['management_credit_lang'] = "Gestión de créditos";
+
+$config['manage_fixed_orders_lang'] = "Gestionar ordenes fijas";
+$config['management_fixed_orders_lang'] = "Gestión ordenes fijas";
+$config['list_fixed_orders_lang'] = "Lista de ordenes fijas";
+$config['add_fixed_orderslang'] = "Adicionar orden fija";
+$config['edit_fixed_orders_lang'] = "Editar orden fija";
+$config['delete_fixed_orders_lang'] = "Eliminar orden fija";
+$config['number_order_lang'] = "Número de orden";
+$config['day_create_order_lang'] = "Día para la autogeneración";
+
+$config['monday_lang'] = "Lunes";
+$config['tuesday_lang'] = "Martes";
+$config['wednesday_lang'] = "Miercoles";
+$config['thursdaylang'] = "Jueves";
+$config['friday_lang'] = "Viernes";
+$config['saturday_lang'] = "Sábado";
+$config['sunday_lang'] = "Domingo";

@@ -745,7 +745,6 @@ class Invoice_farm extends CI_Controller
         exit();
     }
 
-
     public function export_invoice($invoiceId)
     {
         $object = $this->invoice_farm->get_by_id_invoice_client($invoiceId);

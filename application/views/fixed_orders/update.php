@@ -202,7 +202,7 @@
 <div class="main-container" id="container">
     <div class="layout-px-spacing" style="width:100%">
         <h3>
-            <?= translate('manage_invoice_farms_lang') ?> | <a href="<?= site_url('invoice_farm/index'); ?>" class="btn btn-default"><i class="fa fa-arrow-circle-left"></i> <?= translate('back_lang'); ?>
+            <?= translate('management_fixed_orders_lang') ?> | <a href="<?= site_url('fixed_orders/index'); ?>" class="btn btn-default"><i class="fa fa-arrow-circle-left"></i> <?= translate('back_lang'); ?>
             </a>
         </h3>
         <div class="col-lg-12 layout-spacing">
@@ -210,7 +210,7 @@
                 <div class="widget-header">
                     <div class="row">
                         <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                            <h4><?= translate('update_invoice_farm_lang') ?></h4>
+                            <h4><?= translate('edit_fixed_orders_lang') ?></h4>
                         </div>
                     </div>
                 </div>
@@ -277,28 +277,38 @@
                                     <div class="form-card">
                                         <div class="row">
                                             <div class="col-lg-4">
-                                                <label><?= translate("invoice_number_lang"); ?></label>
+                                                <label><?= translate("number_order_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <input type="number" class="form-control input-sm" onchange="validInvoice()" name="invoceNumber" id="invoceNumber" placeholder="<?= translate('invoice_number_lang'); ?>">
+                                                    <input type="number" class="form-control input-sm" onchange="validInvoice()" name="invoceNumber" id="invoceNumber" placeholder="<?= translate('number_order_lang'); ?>">
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
                                                 <label><?= translate("dispatch_day_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control input-sm" name="dispatchDay" id="dispatchDay" placeholder="<?= translate('dispatch_day_lang'); ?>">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <label><?= translate("awb_lang"); ?></label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control input-sm" id="awb" name="awb" placeholder="<?= translate('awb_lang'); ?>">
+                                                    <select id="dispatchDay" name="dispatchDay" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                                        <option value="1"><?= translate('monday_lang') ?></option>
+                                                        <option value="2"><?= translate('tuesday_lang') ?></option>
+                                                        <option value="3"><?= translate('wednesday_lang') ?></option>
+                                                        <option value="4"><?= translate('thursdaylang') ?></option>
+                                                        <option value="5"><?= translate('friday_lang') ?></option>
+                                                        <option value="6"><?= translate('saturday_lang') ?></option>
+                                                        <option value="7"><?= translate('sunday_lang') ?></option>
+                                                    </select>
                                                 </div>
                                             </div>
 
-                                            <div style="display:none" class="col-lg-3">
-                                                <label><?= translate("date2_lang"); ?></label>
+                                            <div class="col-lg-4">
+                                                <label><?= translate("day_create_order_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <input type="date" class="form-control input-sm" id="date" name="date" placeholder="<?= translate('date2_lang'); ?>">
+                                                    <select id="dayCreate" name="dayCreate" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                                        <option value="1"><?= translate('monday_lang') ?></option>
+                                                        <option value="2"><?= translate('tuesday_lang') ?></option>
+                                                        <option value="3"><?= translate('wednesday_lang') ?></option>
+                                                        <option value="4"><?= translate('thursdaylang') ?></option>
+                                                        <option value="5"><?= translate('friday_lang') ?></option>
+                                                        <option value="6"><?= translate('saturday_lang') ?></option>
+                                                        <option value="7"><?= translate('sunday_lang') ?></option>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div style="display:none" class="col-lg-6">
@@ -562,17 +572,16 @@
     let fulles = 0;
     let qtyBox = 0;
     let objectInvoice = JSON.parse('<?= json_encode($object) ?>');
-    let dateRu = objectInvoice.dispatch_day;
     const LoadInvoiceFarm = () => {
         $('[id=selectFarms]').val(objectInvoice.farms.farm_id);
         $('#selectFarms').trigger('change');
         $('[id=markings]').val(objectInvoice.markings.marking_id);
         $('#markings').trigger('change');
-        $("#awb").inputmask({
-            mask: "999-9999-9999"
-        })
-        $("#awb").inputmask("setvalue", objectInvoice.awb);
-        $('#invoceNumber').val(objectInvoice.invoice_number);
+        let numberInvoiceComplet = zFill(objectInvoice.invoice_number, 4);
+        $('#invoceNumber').val(numberInvoiceComplet);
+        $('#invoceNumber').prop('disabled', true);
+        $('#dispatchDay').val(objectInvoice.dispatch_day);
+        $('#dayCreate').val(objectInvoice.dayCreate);
         arrayRequest = objectInvoice.details;
         cargarDetails();
     }
@@ -613,9 +622,6 @@
             allowClear: false,
         });
 
-        let dateDispatch = flatpickr(document.getElementById('dispatchDay'), {
-            defaultDate: dateRu
-        });
 
         let current_fs, next_fs, previous_fs; //fieldsets
         let opacity;
@@ -665,18 +671,8 @@
                 $('#spanTallos').text(acumTotalStm);
                 $('#spanTotal').text(acumTotal);
                 validNext = false;
-                let awb = $('#awb').val().trim();
-                let awbDividido = awb.split('-');
-                let format = true;
-                for (let i = 0; i < awbDividido.length; i++) {
-                    let position = awbDividido[i].indexOf('_');
-                    if (position >= 0) {
-                        format = false
-                        break;
-                    }
-                }
                 let invoceNumber = $('#invoceNumber').val().trim();
-                let dispatchDay = $('#dispatchDay').val().trim();
+                let dispatchDay = $('#dispatchDay').val();
                 if (invoceNumber == "") {
                     const toast = swal.mixin({
                         toast: true,
@@ -703,19 +699,6 @@
                         title: `El campo <?= translate('dispatch_day_lang'); ?> es requerido`,
                         padding: '3em',
                     })
-                } else if (!format) {
-                    const toast = swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        padding: '2em'
-                    });
-                    toast({
-                        type: 'error',
-                        title: 'La Awb no cumple con el formato adecuado',
-                        padding: '3em',
-                    })
                 } else {
                     validNext = true;
                 }
@@ -733,24 +716,22 @@
                     markings = JSON.parse(decodeB64Utf8(markings));
                     farms = JSON.parse(decodeB64Utf8(farms));
                     delete farms.personal;
-                    let awb = $('#awb').val().trim();
-                    let invoceNumber = $('#invoceNumber').val().trim();
-                    let dispatchDay = $('#dispatchDay').val().trim();
-                    let invoiceId = objectInvoice.invoice_farm;
+                    let dispatchDay = $('#dispatchDay').val();
+                    let dayCreate = $('#dayCreate').val();
+                    let order = objectInvoice.fixed_orders;
                     arrayRequest = JSON.stringify(arrayRequest);
                     let data = {
                         farms,
                         dispatchDay,
-                        invoceNumber,
-                        awb,
                         arrayRequest,
                         markings,
-                        invoiceId
+                        order,
+                        dayCreate
                     }
                     setTimeout(function() {
                         $.ajax({
                             type: 'POST',
-                            url: "<?= site_url('invoice_farm/update') ?>",
+                            url: "<?= site_url('fixed_orders/update') ?>",
                             data: data,
                             success: function(result) {
                                 result = JSON.parse(result);
@@ -771,7 +752,7 @@
                                         $('#btnPrevius').prop('disabled', false);
                                         $('#spinnerFinalize').hide();
                                         $('#spanFinalize').text('<?= translate('finalize_lang') ?>');
-                                        window.location = '<?= site_url('invoice_farm/index') ?>';
+                                        window.location = '<?= site_url('fixed_orders/index') ?>';
                                     }, 1000);
                                 } else {
                                     swal({
@@ -887,7 +868,7 @@
             } else {
                 $.ajax({
                     type: 'POST',
-                    url: "<?= site_url('invoice_farm/search_number_invoice') ?>",
+                    url: "<?= site_url('fixed_orders/search_number_invoice') ?>",
                     data: {
                         invoiceNumber
                     },
@@ -961,7 +942,7 @@
             $('#categories').trigger('change');
             $.ajax({
                 type: 'POST',
-                url: "<?= site_url('invoice_farm/search_products') ?>",
+                url: "<?= site_url('fixed_orders/search_products') ?>",
                 data: {
                     categorie: 'category_5fea02c2aff96'
                 },
@@ -1014,7 +995,7 @@
                 $('select[name=categories]').val(object.categorie);
                 $.ajax({
                     type: 'POST',
-                    url: "<?= site_url('invoice_farm/search_products') ?>",
+                    url: "<?= site_url('fixed_orders/search_products') ?>",
                     data: {
                         categorie: object.categorie
                     },
@@ -1104,7 +1085,7 @@
         if (categorie != 0) {
             $.ajax({
                 type: 'POST',
-                url: "<?= site_url('invoice_farm/search_products') ?>",
+                url: "<?= site_url('fixed_orders/search_products') ?>",
                 data: {
                     categorie
                 },
@@ -2193,7 +2174,7 @@
         let categorie = obj.categorie;
         $.ajax({
             type: 'POST',
-            url: "<?= site_url('invoice_farm/search_products') ?>",
+            url: "<?= site_url('fixed_orders/search_products') ?>",
             data: {
                 categorie
             },
