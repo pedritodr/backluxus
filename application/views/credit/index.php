@@ -52,6 +52,7 @@
                                             </td>
                                             <td>
                                                 <a href="<?= site_url('credit/update_index/' . $item->credit_id); ?>" class="btn btn-warning"><i class="fa fa-edit"></i> <?= translate("edit_lang"); ?></a>
+                                                <a href="<?= site_url('credit/export_credit/' . $item->credit_id); ?>" class="btn btn-success"><i class="fa fa-edit"></i> <?= translate("export_credit_lang"); ?></a>
                                                 <a href="javascript:void(0)" onclick="handleDetails('<?= base64_encode(json_encode($item->items)) ?>')" class="btn btn-primary"><i class="fa fa-remove"></i> <?= translate("details_lang"); ?></a>
                                                 <a href="javascript:void(0)" onclick="handleImages('<?= base64_encode(json_encode($item->images)) ?>')" class="btn btn-info"><i class="fa fa-remove"></i> <?= translate("images_lang"); ?></a>
                                                 <a href="javascript:void(0)" onclick="deleteCredit('<?= $item->credit_id ?>')" class="btn btn-danger"><i class="fa fa-remove"></i> <?= translate("delete_lang"); ?></a>

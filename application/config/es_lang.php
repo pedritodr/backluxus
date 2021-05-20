@@ -827,6 +827,7 @@ $config['create_credit_lang'] = "Crear crédito";
 $config['airline_lang'] = "Aerolínea";
 $config['update_credit_lang'] = "Actualizar crédito";
 $config['management_credit_lang'] = "Gestión de créditos";
+$config['export_credit_lang'] = "Expotar crédito";
 
 $config['manage_fixed_orders_lang'] = "Gestionar ordenes fijas";
 $config['management_fixed_orders_lang'] = "Gestión ordenes fijas";

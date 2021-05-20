@@ -1,4 +1,13 @@
 <?php
+require 'vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class Credit extends CI_Controller
 {
@@ -236,6 +245,309 @@ class Credit extends CI_Controller
         } else {
             echo json_encode(['status' => 200]);
             exit();
+        }
+    }
+    public function export_credit($creditId)
+    {
+        $object = $this->credit->get_by_id($creditId);
+
+        if ($object) {
+
+
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+            $sheet->setTitle("Factura");
+            $styleArray = [
+                'alignment' => [
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT,
+                ],
+            ];
+            $styleImages = [
+                'alignment' => [
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                ],
+            ];
+            $styleLeft = [
+                'alignment' => [
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                ],
+            ];
+            $styleNota = [
+                'alignment' => [
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP,
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                ],
+            ];
+            $styleBoderBottom = [
+                'borders' => [
+                    'bottom' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                        'color' => ['argb' => '666699'],
+                    ],
+                ]
+            ];
+            $styleBoderBottom2 = [
+                'borders' => [
+                    'bottom' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    ],
+                ]
+            ];
+            $styleClientBorder = [
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                        'color' => ['argb' => '666699'],
+                    ],
+                    'left' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                        'color' => ['argb' => '666699'],
+                    ],
+                ]
+            ];
+            foreach (range('B', 'N') as $columnID) {
+                $sheet->getColumnDimension($columnID)->setAutoSize(true);
+            }
+
+
+            $sheet->mergeCells('C3:J3');
+            $sheet->setCellValueByColumnAndRow(3, 3, "LUXUS BLUMEN S.A");
+            $sheet->getStyle('C3')->getFont()->setSize(20);
+            $sheet->getStyle('C3')->getFont()->setBold(true);
+            $sheet->getStyle("C3")->getAlignment()->setWrapText(true);
+            $sheet->getRowDimension('3')->setRowHeight(40);
+            $sheet->getStyle('L3')->applyFromArray($styleNota);
+            $sheet->setCellValueByColumnAndRow(12, 3, "Nota de Crédito");
+            $sheet->getStyle('L3')->getFont()->setBold(true);
+            $sheet->getStyle('L3')->getFont()->setSize(10);
+
+            $sheet->getStyle('B3:O3')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B3:O3')->getFill()->getStartColor()->setARGB('ffffff');
+
+            $sheet->getStyle('B4:O4')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B4:O4')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->getStyle('B4:L4')->applyFromArray($styleBoderBottom);
+            $sheet->getStyle('B4:O4')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B4:O4')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->getStyle('M4:N4')->applyFromArray($styleClientBorder);
+            $sheet->setCellValueByColumnAndRow(13, 4, $object->marking->name_commercial);
+            $sheet->getStyle('M4')->getFont()->setBold(true);
+            $sheet->getStyle('M4')->getFont()->setSize(18);
+            $sheet->getRowDimension('4')->setRowHeight(30);
+            $sheet->getStyle('B5:N5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B5:N5')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->getStyle('B5:N5')->applyFromArray($styleBoderBottom2);
+            $sheet->getRowDimension('5')->setRowHeight(6);
+            $sheet->getStyle('B6:O6')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B6:O6')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->setCellValueByColumnAndRow(3, 6, "Facturar a:");
+            $sheet->setCellValueByColumnAndRow(4, 6, $object->farm->farm->name_commercial);
+            $sheet->getStyle('D6')->getFont()->setSize(16);
+            $sheet->getStyle('D6')->getFont()->setBold(true);
+            $sheet->getRowDimension('6')->setRowHeight(30);
+            $sheet->getStyle('B7:O7')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B7:O7')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->getStyle('C8')->getFont()->setSize(10);
+            $sheet->getStyle('C8')->getFont()->setBold(true);
+            $sheet->getStyle('E8:M8')->getFont()->setSize(10);
+            $sheet->getStyle('E8:M8')->getFont()->setBold(true);
+            $sheet->setCellValueByColumnAndRow(3, 8, "Cliente");
+            $sheet->setCellValueByColumnAndRow(4, 8, $object->marking->name_commercial);
+            $sheet->setCellValueByColumnAndRow(13, 8, "Varios");
+            $sheet->getStyle('B8:O8')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B8:O8')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->setCellValueByColumnAndRow(3, 9, "FACTURA");
+            $sheet->setCellValueByColumnAndRow(4, 9, "000");
+            $sheet->setCellValueByColumnAndRow(13, 9, "Fecha UIO");
+            $sheet->setCellValueByColumnAndRow(14, 9, "??");
+            $sheet->getStyle('B9:O9')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B9:O9')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->getStyle('B10:O10')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B11:O11')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->getStyle('B11:O11')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $sheet->getStyle('B10:O10')->getFill()->getStartColor()->setARGB('ffffff');
+            $sheet->getStyle('B11:O11')->getFont()->setSize(12);
+            $sheet->getStyle('B11:O11')->getFont()->setBold(true);
+            $sheet->setCellValueByColumnAndRow(3, 11, "Cant Rosas");
+            $sheet->setCellValueByColumnAndRow(4, 11, "Tamano");
+            $sheet->setCellValueByColumnAndRow(5, 11, "Variedad");
+            $sheet->mergeCells('F10:L10');
+            $sheet->setCellValueByColumnAndRow(6, 11, "Descripción");
+            $sheet->setCellValueByColumnAndRow(13, 11, "Precio");
+            $sheet->setCellValueByColumnAndRow(14, 11, "TOTAL");
+            $excel_row = 12;
+
+            if (count($object->items) > 0) {
+                $acumTotalStems = 0;
+                $acumTotalPrice = 0;
+                foreach ($object->items as $item) {
+                    $acumTotalStems += (int)$item->qtyStems;
+                    $priceTotal = (int)$item->qtyStems * (float) $item->itemSelected->price;
+                    $acumTotalPrice += $priceTotal;
+                    $sheet->getStyle('O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                    $sheet->getStyle('O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                    $sheet->getStyle('N' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                    $sheet->getStyle('N' . $excel_row)->getFill()->getStartColor()->setARGB('FFFFCC');
+                    $sheet->getStyle('B' . $excel_row . ':O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                    $sheet->getStyle('B' . $excel_row . ':O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                    $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->getFont()->setSize(10);
+                    $sheet->getStyle('C' . $excel_row . ':E' . $excel_row)->getFont()->setBold(true);
+                    $sheet->getStyle('L' . $excel_row . ':N' . $excel_row)->getFont()->setBold(true);
+                    $sheet->getStyle('B' . $excel_row . ':F' . $excel_row)->applyFromArray($styleLeft);
+                    $sheet->getStyle('L' . $excel_row . ':N' . $excel_row)->applyFromArray($styleArray);
+                    $sheet->setCellValueByColumnAndRow(3, $excel_row, $item->qtyStems);
+                    $separado = explode(' ', $item->itemSelected->measures->name);
+                    $size = $separado[0];
+                    $sheet->setCellValueByColumnAndRow(4, $excel_row, $size);
+                    $sheet->setCellValueByColumnAndRow(5, $excel_row, strtoupper($item->itemSelected->products->name));
+                    $sheet->mergeCells('F' . $excel_row . ':L' . $excel_row);
+                    $sheet->setCellValueByColumnAndRow(6, $excel_row, strtoupper($item->reasonCredit->reason));
+                    $sheet->setCellValueByColumnAndRow(13, $excel_row, '$ ' . number_format((float) $item->itemSelected->price, 2));
+                    $sheet->setCellValueByColumnAndRow(14, $excel_row, '$ ' . number_format($priceTotal));
+                    $excel_row++;
+                }
+                $sheet->getStyle('O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('N' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('N' . $excel_row)->getFill()->getStartColor()->setARGB('FFFFCC');
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->getFont()->setSize(10);
+                $sheet->getStyle('C' . $excel_row . ':E' . $excel_row)->getFont()->setBold(true);
+                $sheet->getStyle('L' . $excel_row . ':N' . $excel_row)->getFont()->setBold(true);
+                $sheet->getStyle('B' . $excel_row . ':F' . $excel_row)->applyFromArray($styleLeft);
+                $sheet->getStyle('L' . $excel_row . ':N' . $excel_row)->applyFromArray($styleArray);
+                $sheet->setCellValueByColumnAndRow(3, $excel_row, $acumTotalStems);
+                $sheet->setCellValueByColumnAndRow(4, $excel_row, '');
+                $sheet->setCellValueByColumnAndRow(5, $excel_row, '');
+                $sheet->mergeCells('F' . $excel_row . ':L' . $excel_row);
+                $sheet->setCellValueByColumnAndRow(6, $excel_row, '');
+                $sheet->setCellValueByColumnAndRow(13, $excel_row, 'Subtotal');
+                $sheet->setCellValueByColumnAndRow(14, $excel_row, '$ ' . number_format($acumTotalPrice));
+                $excel_row++;
+                $sheet->getStyle('O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('N' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('N' . $excel_row)->getFill()->getStartColor()->setARGB('FFFFCC');
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->getFont()->setSize(10);
+                $sheet->getStyle('C' . $excel_row . ':E' . $excel_row)->getFont()->setBold(true);
+                $sheet->getStyle('L' . $excel_row . ':N' . $excel_row)->getFont()->setBold(true);
+                $sheet->setCellValueByColumnAndRow(3, $excel_row, '');
+                $sheet->setCellValueByColumnAndRow(4, $excel_row, '');
+                $sheet->setCellValueByColumnAndRow(5, $excel_row, '');
+                $sheet->mergeCells('F' . $excel_row . ':L' . $excel_row);
+                $sheet->setCellValueByColumnAndRow(6, $excel_row, '');
+                $sheet->setCellValueByColumnAndRow(13, $excel_row, 'Envío  UIO-MOS');
+                $sheet->setCellValueByColumnAndRow(14, $excel_row, '');
+                $excel_row++;
+                $sheet->getStyle('O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('N' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('N' . $excel_row)->getFill()->getStartColor()->setARGB('FFFFCC');
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $excel_row++;
+                $sheet->getStyle('O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('N' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('N' . $excel_row)->getFill()->getStartColor()->setARGB('FFFFCC');
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $excel_row++;
+                $sheet->getStyle('O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('N' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('N' . $excel_row)->getFill()->getStartColor()->setARGB('FFFFCC');
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('B' . $excel_row . ':M' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->getFont()->setSize(10);
+                $sheet->getStyle('M' . $excel_row . ':N' . $excel_row)->getFont()->setBold(true);
+                $sheet->getStyle('L' . $excel_row . ':N' . $excel_row)->applyFromArray($styleArray);
+                $sheet->setCellValueByColumnAndRow(3, $excel_row, 'Comentarios');
+                $sheet->mergeCells('D' . $excel_row . ':L' . $excel_row);
+                $sheet->setCellValueByColumnAndRow(4, $excel_row, $object->description);
+                $sheet->setCellValueByColumnAndRow(13, $excel_row, 'TOTAL');
+                $sheet->setCellValueByColumnAndRow(14, $excel_row,  '$ ' . number_format($acumTotalPrice, 2));
+                $excel_row++;
+                $sheet->getStyle('O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getRowDimension($excel_row)->setRowHeight(50);
+                $excel_row++;
+                $sheet->getStyle('O' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('O' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->getFill()->getStartColor()->setARGB('ffffff');
+                $sheet->getStyle('B' . $excel_row . ':N' . $excel_row)->applyFromArray($styleBoderBottom);
+            }
+
+            //Segunda hoha
+            $spreadsheet->createSheet();
+            $sheet = $spreadsheet->getSheet(1);
+            $sheet->setTitle('FOTOS');
+            foreach (range('A', 'C') as $columnID) {
+                $sheet->getColumnDimension($columnID)->setAutoSize(true);
+            }
+            $excel_row = 1;
+            if (count($object->images) > 0) {
+                if (count($object->images) > 3) {
+                    $arrImges = array_chunk($object->images, 3, true);
+                } else {
+                    $arrImges = $object->images;
+                }
+                $Celdas = ['A', 'B', 'C'];
+                $y = 0;
+                foreach ($arrImges as $arr) {
+                    $pivote = 0;
+                    $x = 0;
+                    foreach ($arr as $item) {
+                        $celda = $Celdas[$pivote] . (string)$excel_row;
+                        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                        $drawing->setName('Luxus' . $item->img_id);
+                        $drawing->setDescription('Luxus' . $item->img_id);
+                        $drawing->setPath($item->img);
+                        $drawing->setCoordinates($celda);
+                        $drawing->setWorksheet($sheet);
+                        $drawing->setOffsetX($x);
+                        $drawing->setOffsetY($y);
+                        $drawing->setHeight(300);
+                        $x += 550;
+                        $pivote++;
+                    }
+                    $y += 300;
+                    $excel_row++;
+                }
+            }
+
+            $spreadsheet
+                ->getProperties()
+                ->setCreator("Luxus")
+                ->setLastModifiedBy('Luxus') // última vez modificado por
+                ->setTitle('Documento creado con PhpSpreadSheet Luxus')
+                ->setSubject('Invoice client')
+                ->setDescription('Este documento fue generado para luxusflowers.com')
+                ->setKeywords('etiquetas o palabras clave separadas por espacios')
+                ->setCategory('Invoice');
+
+            $nombreDelDocumento = "Credit-" . $object->credit_id . '-' . time() . ".xlsx";
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="' . $nombreDelDocumento . '"');
+            header('Cache-Control: max-age=0');
+
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+            exit;
+        } else {
+            show_404();
         }
     }
 }
