@@ -58,7 +58,14 @@
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
-                                                        <a class="dropdown-item" href="<?= site_url('invoice_farm/update_invoice_farm_index/' . $item->invoice_farm) ?>"><i class="fa fa-edit"></i> <?= translate("update_invoice_farm_lang"); ?></a>
+                                                        <?php
+                                                        $separado = explode(' ', $item->date_create);
+                                                        $dateCreate = $separado[0];
+                                                        $dateDays =  date("Y-m-d", strtotime($dateCreate . "+ 2 week"));
+                                                        if (strtotime(date('Y-m-d')) <= strtotime($dateDays)) {
+                                                            echo '<a class="dropdown-item" href="' . site_url('invoice_farm/update_invoice_farm_index/' . $item->invoice_farm) . '"><i class="fa fa-edit"></i>' . translate("update_invoice_farm_lang") . '</a>';
+                                                        }
+                                                        ?>
                                                     </div>
                                                 </div>
                                             </td>

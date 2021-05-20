@@ -131,7 +131,18 @@
                                                 <td><?= $item->dispatch_day ?></td>
                                                 <td><?= $item->markings->name_marking ?></td>
                                                 <td><?= $detail->boxNumber . $detail->typeBoxs->name ?></td>
-                                                <td><?= $item->invoice_number ?></td>
+                                                <td style="width:300px !important">
+                                                    <?php
+                                                    $separado = explode(' ', $item->date_create);
+                                                    $dateCreate = $separado[0];
+                                                    $dateDays =  date("Y-m-d", strtotime($dateCreate . "+ 3 days"));
+                                                    if (strtotime(date('Y-m-d')) > strtotime($dateDays)) {
+                                                        echo '<h1><span class="badge badge-warning"><b>factura con más de 4 dias de creada</b></span></h1>';
+                                                        echo '<span>' . $item->invoice_number . '</span>';
+                                                    } else {
+                                                        echo '<span>' . $item->invoice_number . '</span>';
+                                                    }
+                                                    ?></td>
                                                 <td><?= $item->farms->name_commercial ?></td>
                                                 <?php
                                                 $varieties = "";
@@ -227,6 +238,14 @@
                                                 }
                                                 ?>
                                                 <td><?= $item->markings->name_marking . '<b>/</b>' . $item->farms->name_commercial . '(' . $item->farms->name_legal . ')<b>/</b>' . $item->invoice_number . '<b>/</b>' . $item->dispatch_day . '<b>/</b>' . $fulles . '<b>/</b>' . $piezas . '<b>/</b>' . $item->awb ?>
+                                                    <?php
+                                                    $separado = explode(' ', $item->date_create);
+                                                    $dateCreate = $separado[0];
+                                                    $dateDays =  date("Y-m-d", strtotime($dateCreate . "+ 3 days"));
+                                                    if (strtotime(date('Y-m-d')) > strtotime($dateDays)) {
+                                                        echo '<h1><span class="badge badge-warning"><b>factura con más de 4 dias de creada</b></span></h1>';
+                                                    }
+                                                    ?>
                                                 </td>
                                                 <td class="text-center" style="width:10%">
                                                     <div class="n-chk" style="display:none">
