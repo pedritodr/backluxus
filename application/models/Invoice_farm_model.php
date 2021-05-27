@@ -305,4 +305,19 @@ class Invoice_farm_model extends CI_Model
         );
         return $query;
     }
+    function get_invoices_by_marking($id = 0)
+    {
+        $tuberia = [
+            ['$project' => ['invoice' => 1, 'awb' => 1, 'number_invoice' => 1, 'marking' => 1, 'status' => 1, 'details' => 1, 'date_create' => 1, '_id' => 0]],
+            ['$sort' => ['number_invoice' => 1]],
+            ['$match' => ['marking.marking_id' => $id, 'status' => ['$ne' => -1]]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('invoice_cliente', $tuberia);
+        if (count($query) > 0) {
+            return $query;
+        } else {
+            return false;
+        }
+    }
 }

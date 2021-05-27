@@ -1774,4 +1774,35 @@ class Invoice_farm extends CI_Controller
             show_404();
         }
     }
+
+    public function search_all_markings()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $this->load->model('User_model', 'user');
+        $response = $this->user->get_all_clients();
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $response]);
+        exit();
+    }
+
+    public function search_invoice_wait($id = 0)
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $response = $this->invoice_farm->get_invoices_by_marking($id);
+        echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $response]);
+        exit();
+    }
 }

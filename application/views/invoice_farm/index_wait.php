@@ -7,11 +7,29 @@
         border: 1px solid #dee2e6 !important;
     }
 
+    /* Important part */
+    .modal-dialog {
+        overflow-y: initial !important
+    }
+
+    .modal-body {
+        height: 80vh;
+        overflow-y: auto;
+    }
+
     #modalDetails {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
 
     #modalLoadInvoice {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+    #modalDetailsItems {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+    #modalListInvoices {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
 
@@ -84,7 +102,6 @@
                 </div><!-- /.box-header -->
                 <div class="widget-content widget-content-area">
                     <?= get_message_from_operation(); ?>
-
                     <div class="table-responsive" id="mode1">
                         <table id="example" class="table table-striped table-no-bordered table-hover non-hover dataTable" cellspacing="0" width="100%" style="width:100%">
                             <thead>
@@ -283,6 +300,22 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalListInvoices" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('details_lang') ?></h5>
+            </div>
+            <div class="modal-body table-responsive" id="bodyModalListInvoice">
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="handleCancelListInvoice()"><i class="flaticon-cancel-12"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="modalLoadInvoice" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
@@ -296,9 +329,16 @@
                 </button>
             </div>
             <div class="modal-body table-responsive" id="bodyModalLoadInvoice">
-                <div class="row">
-                    <div class="col-lg-6" id="bodySearchAwb">
-                        <label><?= translate("search_invoice_number_awb_lang"); ?></label>
+
+                <div class="row" id="bodySearchAwb">
+                    <div class="col-lg-6">
+                        <label><?= translate("markings_lang"); ?></label>
+                        <div class="input-group">
+                            <select class="form-control select2 input-sm" data-placeholder="Seleccione una opción" id="markingsInvoice" onchange="handleChangeMarking()" style="width: 100%">
+                            </select>
+                        </div>
+                    </div>
+                    <!--        <label><?= translate("search_invoice_number_awb_lang"); ?></label>
                         <div class="input-group">
                             <input id="searchAwb" type="text" class="form-control" placeholder="<?= translate('search_invoice_number_awb_lang') ?>" aria-label="<?= translate('search_awb_lang') ?>">
                             <div class="input-group-append">
@@ -307,9 +347,10 @@
                                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                     </svg></button>
                             </div>
-                        </div>
-                    </div>
+                        </div> -->
 
+                </div>
+                <div class="row" id="bodyAwb">
                     <div class="col-lg-6">
                         <label><?= translate("markings_lang"); ?></label>
                         <div class="input-group">
@@ -317,16 +358,14 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-6" id="bodyAwb">
+                    <div class="col-lg-6">
                         <label><?= translate("awb_lang"); ?></label>
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="awb" name="awb" onchange="validAwb()">
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
-
                     <div class="table-responsive col-lg-12">
                         <table class="table table-bordered" id="table-example-1">
                             <!--     <caption>Specification values: <b>Steel</b>, <b>Castings</b>,
@@ -371,7 +410,6 @@
                     </div>
 
                 </div>
-
             </div>
             <div class=" modal-footer">
                 <button class="btn" onclick="validSelectedItems()"><i class="flaticon-cancel-12"></i> Seleccionar items</button>
@@ -380,7 +418,28 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modalDetailsItems" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?= translate('details_lang') ?></h5>
+                <button onclick="handleCloseDetailsItems()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body table-responsive" id="bodyModalDetailsItems">
 
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="handleCloseDetailsItems()"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                <button class="btn btn-success" id="btnSelectedInvoice" onclick="handleSelectedInvoice()">Seleccionar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     let listInvoice = '<?= json_encode($all_invoice_farm) ?>';
     let arraySelectedInvoice = [];
@@ -453,6 +512,8 @@
         $('#markings').prop('disabled', false);
         $('#bodySearchAwb').hide();
         $('#bodyAwb').show();
+        $('#btnCancel').show();
+        $('#btnLoadInvoice').hide();
         printSelectedInvoice();
         $('#lblHeaderInvoice').text('<?= translate('mode_billing_lang') ?>');
         $('#modalLoadInvoice').modal({
@@ -487,6 +548,407 @@
             });
         }
 
+
+    }
+
+    const handleChangeMarking = () => {
+        arraySelectedInvoice = [];
+        printSelectedInvoice();
+        $('.n-chk').hide();
+        let marking = $('select[id=markingsInvoice] option').filter(':selected').attr('itemId');
+        marking !== '0' ? marking = JSON.parse(decodeB64Utf8(marking)) : marking = 0;
+        if (marking !== 0) {
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Buscando factura...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            setTimeout(() => {
+                let url = '<?= site_url('invoice_farm/search_invoice_wait/') ?>' + marking.marking_id;
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            Swal.close();
+                            if (result.data) {
+                                printInvoicesByMarkings(result.data);
+                            } else {
+                                Swal.fire({
+                                    title: '¡Error!',
+                                    text: 'No hay invoices asociados a esta marcación',
+                                    padding: '2em'
+                                });
+                            }
+                        } else {
+                            Swal.close();
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+                    }
+                });
+            }, 1500);
+
+        } else {
+            Swal.fire({
+                title: '¡Mensaje!',
+                text: 'Seleccione una marcación para continuar',
+                padding: '2em'
+            });
+        }
+
+    }
+
+    const handleCancelListInvoice = () => {
+        $('#modalLoadInvoice').modal({
+            backdrop: false
+        });
+        $('[id=markingsInvoice]').val('0');
+        $('#markingsInvoice').trigger('change');
+        $('#modalListInvoices').modal('hide');
+    }
+
+    const handleCloseDetailsItems = () => {
+        $('#modalListInvoices').modal({
+            backdrop: false
+        });
+        $('#modalDetailsItems').modal('hide');
+        $('#btnSelectedInvoice').attr('onclick', 'handleSelectedInvoice()');
+    }
+
+    const printInvoicesByMarkings = (data = []) => {
+        if (data.length > 0) {
+            let texto_tabla = '';
+            texto_tabla +=
+                '<table id="datatables-generales" class="table table-striped table-no-bordered" cellspacing="0" width="100%" style="width:100%">';
+            texto_tabla += '<thead>';
+            texto_tabla += '<tr>';
+            texto_tabla += '<th>Fecha</th>';
+            texto_tabla += '<th>Nro de invoice</th>';
+            texto_tabla += '<th>Awb</th>';
+            texto_tabla += '<th>Acciones</th>';
+            texto_tabla += '</tr>';
+            texto_tabla += '</thead>';
+
+            texto_tabla += '<tbody>';
+
+            data.forEach(function(item) {
+                texto_tabla += '<tr>';
+                texto_tabla += '<td>';
+                texto_tabla += item.date_create;
+                texto_tabla += '</td>';
+
+                texto_tabla += '<td>';
+                texto_tabla += item.number_invoice;
+                item.details[0].numberInvoice = item.number_invoice;
+                item.details[0].invoice = item.invoice;
+
+                texto_tabla += '</td>';
+
+
+                texto_tabla += '<td>';
+                texto_tabla += item.awb;
+                texto_tabla += '</td>';
+
+                texto_tabla += '<td>';
+
+                texto_tabla += '<button class="btn btn-outline-info mb-2" onclick=handleInfoItem("' + encodeB64Utf8(JSON.stringify(item.details)) + '")>Items</button>';
+
+                texto_tabla += '</td>';
+
+                texto_tabla += '</tr>';
+            });
+
+            texto_tabla += '</tbody>';
+            texto_tabla += '</table>'
+            $("#bodyModalListInvoice").empty();
+            $("#bodyModalListInvoice").html(texto_tabla);
+
+            $("#datatables-generales").DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                }
+            });
+            $('#modalListInvoices').modal({
+                backdrop: false
+            });
+            $('#modalLoadInvoice').modal('hide');
+        }
+    }
+
+    const handleInfoItem = (details) => {
+        $('#btnSelectedInvoice').attr('onclick', 'handleSelectedInvoice("' + details + '")');
+        details = decodeB64Utf8(details);
+        details = JSON.parse(details);
+        $('#modalListInvoices').modal('hide');
+        $('#modalDetailsItems').modal({
+            backdrop: false
+        });
+        $("#bodyModalDetailsItems").empty();
+        let qtyBox = 0;
+        let qtyStems = 0;
+        let qtyBouquets = 0;
+        let acumTotalStm = 0;
+        let acumPrice = 0;
+        let acumTotal = 0;
+        let acumHb = 0;
+        let acumQb = 0;
+        let acumEb = 0;
+        if (details.length > 0) {
+            let texto_tabla = '';
+            texto_tabla +=
+                '<table id="datatablesItems" class="table table-striped table-no-bordered" cellspacing="0" width="100%" style="width:100%">';
+            texto_tabla += '<thead>';
+            texto_tabla += '<tr>';
+            texto_tabla += '<th>FARM</th>';
+            texto_tabla += '<th>NRO BOX</th>';
+            texto_tabla += '<th>BOX TYPE</th>';
+            texto_tabla += '<th>VARIETIES</th>';
+            texto_tabla += '<th>CM</th>';
+            texto_tabla += '<th>STEMS</th>';
+            texto_tabla += '<th>BOUQUETS</th>';
+            texto_tabla += '<th>TOTAL STM</th>';
+            texto_tabla += '<th>PRICE</th>';
+            texto_tabla += '<th>TOTAL</th>';
+            texto_tabla += '<th>Acciones</th>';
+            texto_tabla += '</tr>';
+            texto_tabla += '</thead>';
+            texto_tabla += '<tbody id="bodyTableDetailsItems">';
+
+            texto_tabla += '</tbody>';
+            texto_tabla += '</table>';
+            $("#bodyModalDetailsItems").html(texto_tabla);
+
+            details.forEach((item, indice, array) => {
+                item.boxs.forEach((box, index, boxs) => {
+                    box.detailId = item.id;
+                    if (box.typeBoxs.name.toUpperCase().trim() === "HB") {
+                        acumHb += parseInt(box.boxNumber);
+                    } else if (box.typeBoxs.name.toUpperCase().trim() === "QB") {
+                        acumQb += parseInt(box.boxNumber);
+                    } else {
+                        acumEb += parseInt(box.boxNumber);
+                    }
+                    let textBox = '<tr>';
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += item.farm.name_commercial;
+                    textBox += '</td>';
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += box.boxNumber;
+                    qtyBox += parseInt(box.boxNumber);
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += box.typeBoxs.name;
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+
+                    textBox += '</td>';
+
+                    textBox += '</tr>';
+                    let acumBoxStems = 0;
+                    let acumBoxBunches = 0;
+                    let acumTotalBox = 0;
+                    let acumBoxTotalStems = 0;
+                    $('#bodyTableDetailsItems').append(textBox);
+                    if (box.varieties.length > 0) {
+                        box.varieties.forEach(element => {
+                            let textVariety = '<tr>';
+                            textVariety += '<td>';
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += element.products.name;
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += element.measures.name;
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += element.stems;
+                            acumBoxStems += parseInt(element.stems) * parseInt(box.boxNumber);
+                            qtyStems += parseInt(element.stems) * parseInt(box.boxNumber);
+
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += element.bunches;
+                            acumBoxBunches += parseInt(element.bunches) * parseInt(box.boxNumber);
+                            qtyBouquets += parseInt(element.bunches) * parseInt(box.boxNumber);
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += parseInt(element.stems) * parseInt(element.bunches);
+                            acumTotalStm += parseInt(element.stems) * parseInt(box.boxNumber) * parseInt(
+                                element.bunches);
+                            acumBoxTotalStems += parseInt(element.stems) * parseInt(element.bunches) *
+                                parseInt(box.boxNumber);
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += parseFloat(element.price).toFixed(2);
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            let totalBoxItem = parseFloat(element.price) * (parseInt(element.stems) *
+                                parseInt(element.bunches));
+                            let totalTable = parseFloat(element.price) * (parseInt(element.stems) *
+                                parseInt(box.boxNumber) * parseInt(element.bunches));
+                            acumTotal += totalTable;
+                            acumTotalBox += totalTable
+                            textVariety += totalBoxItem.toFixed(2);
+                            textVariety += '</td>';
+
+                            textVariety += '<td></td>';
+
+                            textVariety += '</tr>';
+                            $('#bodyTableDetailsItems').append(textVariety);
+                        });
+                    }
+                    let textFooterBox = '<tr>';
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += acumBoxBunches;
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += acumBoxTotalStems;
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += acumTotalBox.toFixed(2);
+                    textFooterBox += '</td>';
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '</tr>';
+                    $('#bodyTableDetailsItems').append(textFooterBox);
+
+                });
+
+            });
+            let textFooter = '<tfoot>';
+            textFooter += '<tr>';
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += qtyBox;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += qtyBouquets;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumTotalStm;
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumTotal.toFixed(2);
+            textFooter += '</td>';
+
+            textFooter += '</tr>';
+            textFooter += '</tfoot>';
+            $('#bodyTableDetailsItems').after(textFooter);
+            let fulles = (acumHb * 0.50) + (acumQb * 0.25) + (acumEb * 0.125);
+            if (acumEb > 0) {
+                fulles = fulles.toFixed(3);
+            } else {
+                fulles = fulles.toFixed(2);
+            }
+            let textResumen = '<div class="row">';
+            textResumen += '<div class="col-3" style="background:#f9f9c6">';
+            textResumen +=
+                '<p class="text-left"><b>FULLES= </b> <span id="spanFulles" style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
+                fulles + '</span></p>';
+            textResumen +=
+                '<p class="text-left"><b>PIEZAS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
+                qtyBox + '</span></p>';
+            textResumen +=
+                '<p class="text-left"><b>TALLOS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
+                acumTotalStm + '</span></p>';
+            textResumen +=
+                '<p class="text-left"><b>TOTAL= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">$ ' +
+                acumTotal.toFixed(2) + '</span></p>';
+            textResumen += '</div>';
+            textResumen += '</div>';
+            $('#datatablesItems').after(textResumen);
+        } else {
+            $('#bodyModalDetailsItems').append('<div class="alert alert-info">Se encuentra vacio</div>');
+        }
 
     }
 
@@ -611,6 +1073,70 @@
         }
         validBtnCancel();
     }
+
+    const handleSelectedInvoice = (ItemsSelected = []) => {
+        ItemsSelected = JSON.parse(decodeB64Utf8(ItemsSelected));
+        if (ItemsSelected.length > 0) {
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Buscando factura...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            $('#modalDetailsItems').modal('hide');
+            $('#modalLoadInvoice').modal({
+                backdrop: false
+            });
+            setTimeout(function() {
+                if (ItemsSelected.length > 0) {
+                    const details = ItemsSelected;
+                    arraySelectedInvoice = details;
+                    arrayInvoiceUpdate = 0;
+                    let countBoxs = 0;
+                    details.forEach(element => {
+                        countBoxs += element.boxs.length;
+                    })
+                    arrayInvoiceUpdate = countBoxs;
+                    invoiceClientUpdate = ItemsSelected[0].invoice;
+                    $('#lblHeaderInvoice').text('<?= translate("invoice_number_lang"); ?>: ' + ItemsSelected[0].numberInvoice);
+                    printSelectedInvoice();
+                    Swal.close();
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        padding: '2em'
+                    });
+                    toast({
+                        type: 'success',
+                        title: '¡Correcto!',
+                        padding: '2em',
+                    })
+                }
+            }, 2000)
+            $('.n-chk').show();
+            validBtnCancel();
+        } else {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000,
+                padding: '2em'
+            });
+            toast({
+                type: 'info',
+                title: 'No tiene items!',
+                padding: '2em',
+            })
+            $('.n-chk').hide();
+        }
+    }
+
 
     const encodeB64Utf8 = (str) => {
         return btoa(unescape(encodeURIComponent(str)));
@@ -1174,13 +1700,83 @@
     const showModalInvoiceClients = () => {
         $('#btnInvoice').attr('onclick', 'updateInvoice()');
         $('#btnInvoice').text('Adicionar items');
-        $('#markings').prop('disabled', true);
         $('#bodySearchAwb').show();
         $('#bodyAwb').hide();
-        printSelectedInvoice();
-        $('#modalLoadInvoice').modal({
-            backdrop: false
-        })
+        let marking = $('select[id=markingsInvoice] option').filter(':selected').attr('itemId');
+        if (marking !== undefined) {
+            marking !== '0' ? marking = JSON.parse(decodeB64Utf8(marking)) : marking = 0;
+        } else {
+            marking = 0
+        }
+        if (marking !== 0) {
+            printSelectedInvoice();
+            $('#modalLoadInvoice').modal({
+                backdrop: false
+            })
+        } else {
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Buscando factura...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            setTimeout(() => {
+                $.ajax({
+                    type: 'GET',
+                    url: "<?= site_url('invoice_farm/search_all_markings') ?>",
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            if (result.data) {
+                                let cadena = '<option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>';
+                                result.data.forEach(element => {
+                                    if (element.markings !== undefined) {
+                                        if (element.markings.length > 0) {
+                                            element.markings.forEach(item => {
+                                                cadena += '<option itemId="' + encodeB64Utf8(JSON.stringify(item)) + '" value="' + item.marking_id + '">' + item.name_marking + ' | ' + element.name_commercial + '</option>';
+                                            });
+                                        }
+                                    }
+
+                                });
+                                $('#markingsInvoice').html(cadena);
+                                $("#markingsInvoice").select2({
+                                    tags: false,
+                                    dropdownParent: $("#modalLoadInvoice"),
+                                    placeholder: '<?= translate('select_opction_lang') ?>',
+                                    allowClear: false,
+                                });
+                                //   $('#markings').trigger('change');
+                                Swal.close();
+                            } else {
+                                Swal.close();
+                                swal({
+                                    title: '¡Mensaje!',
+                                    text: 'Ocurrió un problema en el servidor',
+                                    padding: '2em'
+                                });
+                            }
+
+                        } else {
+                            Swal.close();
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+                    }
+                });
+                printSelectedInvoice();
+                $('#modalLoadInvoice').modal({
+                    backdrop: false
+                })
+            }, 1500);
+        }
+
     }
 
     let arrayInvoiceUpdate = [];
@@ -1284,21 +1880,19 @@
     }
 
     const validBtnCancel = () => {
-        if (arraySelectedInvoice.length > 0) {
-            $('#btnCancel').show();
-        } else {
-            $('#btnCancel').hide();
-        }
+        $('#btnCancel').show();
     }
 
     const validSelectedItems = () => {
         let markingS = $('select[id=markings] option').filter(':selected').attr('itemId');
+        let marking = $('select[id=markingsInvoice] option').filter(':selected').attr('itemId');
         let bodySearchAwb = $('#bodySearchAwb').css('display');
-        if (bodySearchAwb === 'block') {
+        console.log(bodySearchAwb)
+        if (bodySearchAwb === 'flex') {
             if (arrayInvoiceUpdate > 0) {
                 $('#modalLoadInvoice').modal('hide');
             } else {
-                swal({
+                Swal.fire({
                     title: '¡Mensaje!',
                     text: 'La factura no esta cargada para continuar',
                     padding: '2em'
@@ -1306,7 +1900,7 @@
             }
         } else {
             if (markingS == 0) {
-                swal({
+                Swal.fire({
                     title: '¡Mensaje!',
                     text: 'Seleccione una marcación para continuar con la selección de facturas',
                     padding: '2em'
