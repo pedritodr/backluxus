@@ -299,6 +299,19 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("ready_carguera_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="carguera" name="carguera" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
+                                <?php if ($cargueras) { ?>
+                                    <?php foreach ($cargueras as $item) { ?>
+                                        <option value="<?= $item->carguera_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                    <?php   } ?>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <input type="hidden" id="clienteMarking">
             </div>
@@ -352,6 +365,19 @@
                         <div class="input-group">
                             <select id="citysMarkingEdit" name="citysMarkingEdit" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
                                 <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <label><?= translate("ready_carguera_lang"); ?></label>
+                        <div class="input-group">
+                            <select id="cargueraEdit" name="cargueraEdit" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
+                                <?php if ($cargueras) { ?>
+                                    <?php foreach ($cargueras as $item) { ?>
+                                        <option value="<?= $item->carguera_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name ?></option>
+                                    <?php   } ?>
+                                <?php } ?>
                             </select>
                         </div>
                     </div>
@@ -619,6 +645,20 @@
         $("#functions").select2({
             tags: true,
             dropdownParent: $("#modalAddManagers"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: true,
+        });
+
+        $("#carguera").select2({
+            tags: true,
+            dropdownParent: $("#modalAddMarking"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: true,
+        });
+
+        $("#cargueraEdit").select2({
+            tags: true,
+            dropdownParent: $("#modalEditMarking"),
             placeholder: '<?= translate('select_opction_lang') ?>',
             allowClear: true,
         });
@@ -1027,6 +1067,9 @@
                 initQuill(objectMarking.comment);
             }
         }
+        if (objectMarking.carguera !== undefined) {
+            $('#cargueraEdit').val(objectMarking.carguera.carguera_id);
+        }
         $('#nameMarkingEdit').val(objectMarking.name_marking);
         $('#countryMarkingEdit').val(objectMarking.country.country_id);
         $('#markingId').val(objectMarking.marking_id);
@@ -1074,6 +1117,7 @@
         $('#btnCancelModalAddMarking').prop('disabled', true);
         let country = $('select[name=countryMarking] option').filter(':selected').attr('itemId');
         let city = $('select[name=citysMarking] option').filter(':selected').attr('itemId');
+        let carguera = $('select[name=carguera] option').filter(':selected').attr('itemId');
         let userIdAdd = $('#clienteMarking').val();
         let nameMarking = $('#nameMarking').val();
         let comment = $('#editor-container1').text();
@@ -1116,9 +1160,23 @@
                 title: 'Seleccione una ciudad',
                 padding: '3em',
             })
+        } else if (carguera == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una carguera',
+                padding: '3em',
+            })
         } else {
             country = JSON.parse(decodeB64Utf8(country));
             city = JSON.parse(decodeB64Utf8(city));
+            carguera = JSON.parse(decodeB64Utf8(carguera));
             $('#spinnerAddMarking').show();
             $('#spanAddMarking').text('<?= translate('processing_lang') ?>' + '...');
             let objectCity = {
@@ -1138,7 +1196,8 @@
                         objectCountry,
                         userIdAdd,
                         nameMarking,
-                        comment
+                        comment,
+                        carguera
                     },
                     success: function(result) {
                         result = JSON.parse(result);
@@ -1208,6 +1267,9 @@
                 texto_tabla += '<p><b><?= translate('marking_lang') ?>: </b> ' + item.name_marking + '</p>';
                 texto_tabla += '<p><b><?= translate('country_lang') ?>: </b> ' + item.country.name + '</p>';
                 texto_tabla += '<p><b><?= translate('ciudad_lang') ?>: </b> ' + item.country.city.name + '</p>';
+                if (item.carguera !== undefined) {
+                    texto_tabla += '<p><b><?= translate('carguera_lang') ?>: </b> ' + item.carguera.name + ' </p>';
+                }
                 texto_tabla += '</td>';
                 texto_tabla += '<td>';
                 if (typeof item.comment !== 'undefined') {
@@ -1291,6 +1353,7 @@
         $('#btnCancelModalEditMarking').prop('disabled', true);
         let country = $('select[name=countryMarkingEdit] option').filter(':selected').attr('itemId');
         let city = $('select[name=citysMarkingEdit] option').filter(':selected').attr('itemId');
+        let carguera = $('select[name=cargueraEdit] option').filter(':selected').attr('itemId');
         let userIdAdd = $('#clienteMarkingEdit').val();
         let nameMarking = $('#nameMarkingEdit').val();
         let comment = $('#editor-container1Edit').text();
@@ -1334,9 +1397,23 @@
                 title: 'Seleccione una ciudad',
                 padding: '3em',
             })
+        } else if (carguera == 0) {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+            toast({
+                type: 'error',
+                title: 'Seleccione una carguera',
+                padding: '3em',
+            })
         } else {
             country = JSON.parse(decodeB64Utf8(country));
             city = JSON.parse(decodeB64Utf8(city));
+            carguera = JSON.parse(decodeB64Utf8(carguera));
             $('#spinnerEditMarking').show();
             $('#spanEditMarking').text('<?= translate('processing_lang') ?>' + '...');
             let objectCity = {
@@ -1357,7 +1434,8 @@
                         userIdAdd,
                         nameMarking,
                         comment,
-                        markingId
+                        markingId,
+                        carguera
                     },
                     success: function(result) {
                         result = JSON.parse(result);

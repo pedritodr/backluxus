@@ -28,9 +28,31 @@ class Invoice_farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-
+        $this->load->model('Fixed_orders_model', 'fixed_orders');
+        $date = date('Y-m-d');
+        $dayNumber = date('l-d', strtotime($date));
+        $separado = explode('-', $dayNumber);
+        $day = $separado[0];
+        $numberDay = 0;
+        if ($day == 'Monday') {
+            $numberDay = 1;
+        } else if ($day == 'Tuesday') {
+            $numberDay = 2;
+        } else if ($day == 'Wednesday') {
+            $numberDay = 3;
+        } else if ($day == 'Thursday') {
+            $numberDay = 4;
+        } else if ($day == 'Friday') {
+            $numberDay = 5;
+        } else if ($day == 'Saturday') {
+            $numberDay = 6;
+        } else {
+            $numberDay = 7;
+        }
+        $all_fixed_orders = $this->fixed_orders->get_all(['is_active' => 1, 'dayCreate' => $numberDay]);
         $all_invoice_farm = $this->invoice_farm->get_all();
         $data['all_invoice_farm'] = $all_invoice_farm;
+        $data['all_fixed_orders'] = $all_fixed_orders;
         $this->load_view_admin_g("invoice_farm/index", $data);
     }
 
@@ -433,7 +455,7 @@ class Invoice_farm extends CI_Controller
             redirect('login/index');
         }
 
-        $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => $this->mongo_db->ne(-1)]);
+        $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => 0]);
         $data['all_invoice'] = $all_invoice;
         $this->load_view_admin_g("invoice_farm/index_invoice_client", $data);
     }
@@ -532,16 +554,18 @@ class Invoice_farm extends CI_Controller
         }
         die();
     }
-    function cancel_invoice_client($id = 0)
+    public function cancel_invoice_client($id = 0)
     {
         if (!in_array($this->session->userdata('role_id'), [1, 2])) {
             $this->log_out();
             redirect('login/index');
         }
-
+        $this->load->model('User_model', 'user');
         $invoice = $this->invoice_farm->get_by_id_invoice_client($id);
 
         if ($invoice) {
+            $all_invoice = $this->invoice_farm->get_all_invoice_client_desc(['status' => 0, 'marking.marking_id' => $invoice->marking->marking_id, 'invoice' => $this->mongo_db->ne($id)]);
+            $minMarking = $this->user->get_min_client_by_marking_id($invoice->marking->marking_id);
             foreach ($invoice->details as $item) {
                 foreach ($item->boxs as $box) {
                     $this->invoice_farm->update_invoice_farm_details($box->id, ['status' => 0]);
@@ -549,12 +573,28 @@ class Invoice_farm extends CI_Controller
                 }
             }
             $this->invoice_farm->update_invoice_client($id, ['status' => -1]);
+            if ($minMarking) {
+                $secuencial  = (int) $minMarking->secuencial - 1;
+                $secuencialTemp = (int) $minMarking->secuencial - 1;
+                if ($minMarking->secuencial !== $invoice->number_invoice) {
+                    if (count($all_invoice) > 0) {
+                        foreach ($all_invoice as $item) {
+                            $this->invoice_farm->update_invoice_client($item->invoice, ['number_invoice' => $secuencialTemp]);
+                            $secuencialTemp--;
+                        }
+                    }
+                }
+                if ($secuencial >= 0) {
+                    $this->user->update($minMarking->user_id, ['secuencial' => $secuencial]);
+                }
+            }
+            $this->response->set_message(translate("invoice_send_client_lang"), ResponseMessage::SUCCESS);
             redirect("invoice_farm/index_invoice_client");
         } else {
             show_404();
         }
     }
-    function arraysDift($arrayOLd, $arrayEdit)
+    public function arraysDift($arrayOLd, $arrayEdit)
     {
         $arrayBoxsDelete = [];
         $arrayBoxsNew = [];
@@ -1804,5 +1844,195 @@ class Invoice_farm extends CI_Controller
         $response = $this->invoice_farm->get_invoices_by_marking($id);
         echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $response]);
         exit();
+    }
+    public function send_invoice_client($id = 0)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $invoice = $this->invoice_farm->get_by_id_invoice_client($id);
+        if ($invoice) {
+            $this->invoice_farm->update_invoice_client($id, ['status' => 2]);
+            $this->response->set_message(translate("invoice_send_client_lang"), ResponseMessage::SUCCESS);
+            redirect("invoice_farm/index_invoice_client");
+        } else {
+            show_404();
+        }
+    }
+
+    public function index_invoice_client_send()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => 1]);
+        $data['all_invoice'] = $all_invoice;
+        $this->load_view_admin_g("invoice_farm/index_invoice_client_send", $data);
+    }
+    public function create_invoice_fixed()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $arrayRequest =  json_decode($_POST['arrayRequest']);
+        $date = date('Y-m-d');
+        $dayNumber = date('l-d', strtotime($date));
+        $separado = explode('-', $dayNumber);
+        $day = $separado[0];
+        $numberDay = 0;
+        if ($day == 'Monday') {
+            $numberDay = 1;
+        } else if ($day == 'Tuesday') {
+            $numberDay = 2;
+        } else if ($day == 'Wednesday') {
+            $numberDay = 3;
+        } else if ($day == 'Thursday') {
+            $numberDay = 4;
+        } else if ($day == 'Friday') {
+            $numberDay = 5;
+        } else if ($day == 'Saturday') {
+            $numberDay = 6;
+        } else {
+            $numberDay = 7;
+        }
+        foreach ($arrayRequest as $item) {
+            $awb = '';
+            $invoice_number = $item->invoice_number;
+            $dispatch = $this->dispatchDayDate($numberDay, $item->dispatch_day);
+            $farms = $item->farms;
+            $markings = $item->markings;
+            $arrayRequest =  $item->details;
+            $invoice_farm = 'invoice_farm' . uniqid();
+            $date_create = date("Y-m-d H:i:s");
+            $data_invoice = [
+                'invoice_farm' => $invoice_farm,
+                'invoice_number' => $invoice_number,
+                'dispatch_day' => $dispatch,
+                'awb' => $awb,
+                'markings' => $markings,
+                'farms' => $farms,
+                'details' => $arrayRequest,
+                'status' => 0,
+                'date_create' => $date_create,
+                'timestamp' => strtotime($date_create)
+            ];
+            $this->invoice_farm->create($data_invoice);
+        }
+
+        echo json_encode(['status' => 200, 'msj' => 'correcto']);
+        exit();
+    }
+    public function dispatchDayDate($numberDay, $dispatchDay)
+    {
+        $dateDispatchDay = '';
+        $date = date('Y-m-d');
+        if ($numberDay == 1 && $dispatchDay == 1) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 7 days"));
+        } else if ($numberDay == 1 && $dispatchDay == 2) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 1 days"));
+        } else if ($numberDay == 1 && $dispatchDay == 3) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 2 days"));
+        } else if ($numberDay == 1 && $dispatchDay == 4) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 3 days"));
+        } else if ($numberDay == 1 && $dispatchDay == 5) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 4 days"));
+        } else if ($numberDay == 1 && $dispatchDay == 6) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 5 days"));
+        } else if ($numberDay == 1 && $dispatchDay == 7) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 6 days"));
+        } else if ($numberDay == 2 && $dispatchDay == 1) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 6 days"));
+        } else if ($numberDay == 2 && $dispatchDay == 2) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 7 days"));
+        } else if ($numberDay == 2 && $dispatchDay == 3) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 1 days"));
+        } else if ($numberDay == 2 && $dispatchDay == 4) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 2 days"));
+        } else if ($numberDay == 2 && $dispatchDay == 5) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 3 days"));
+        } else if ($numberDay == 2 && $dispatchDay == 6) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 4 days"));
+        } else if ($numberDay == 2 && $dispatchDay == 7) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 5 days"));
+        } else if ($numberDay == 3 && $dispatchDay == 1) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 5 days"));
+        } else if ($numberDay == 3 && $dispatchDay == 2) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 6 days"));
+        } else if ($numberDay == 3 && $dispatchDay == 3) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 7 days"));
+        } else if ($numberDay == 3 && $dispatchDay == 4) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 1 days"));
+        } else if ($numberDay == 3 && $dispatchDay == 5) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 2 days"));
+        } else if ($numberDay == 3 && $dispatchDay == 6) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 3 days"));
+        } else if ($numberDay == 3 && $dispatchDay == 7) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 4 days"));
+        } else if ($numberDay == 4 && $dispatchDay == 1) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 4 days"));
+        } else if ($numberDay == 4 && $dispatchDay == 2) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 5 days"));
+        } else if ($numberDay == 4 && $dispatchDay == 3) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 6 days"));
+        } else if ($numberDay == 4 && $dispatchDay == 4) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 7 days"));
+        } else if ($numberDay == 4 && $dispatchDay == 5) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 1 days"));
+        } else if ($numberDay == 4 && $dispatchDay == 6) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 2 days"));
+        } else if ($numberDay == 4 && $dispatchDay == 7) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 3 days"));
+        } else if ($numberDay == 5 && $dispatchDay == 1) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 3 days"));
+        } else if ($numberDay == 5 && $dispatchDay == 2) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 4 days"));
+        } else if ($numberDay == 5 && $dispatchDay == 3) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 5 days"));
+        } else if ($numberDay == 5 && $dispatchDay == 4) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 6 days"));
+        } else if ($numberDay == 5 && $dispatchDay == 5) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 7 days"));
+        } else if ($numberDay == 5 && $dispatchDay == 6) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 1 days"));
+        } else if ($numberDay == 5 && $dispatchDay == 7) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 2 days"));
+        } else if ($numberDay == 6 && $dispatchDay == 1) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 2 days"));
+        } else if ($numberDay == 6 && $dispatchDay == 2) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 3 days"));
+        } else if ($numberDay == 6 && $dispatchDay == 3) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 4 days"));
+        } else if ($numberDay == 6 && $dispatchDay == 4) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 5 days"));
+        } else if ($numberDay == 6 && $dispatchDay == 5) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 6 days"));
+        } else if ($numberDay == 6 && $dispatchDay == 6) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 7 days"));
+        } else if ($numberDay == 6 && $dispatchDay == 7) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 1 days"));
+        } else if ($numberDay == 7 && $dispatchDay == 1) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 1 days"));
+        } else if ($numberDay == 7 && $dispatchDay == 2) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 2 days"));
+        } else if ($numberDay == 7 && $dispatchDay == 3) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 3 days"));
+        } else if ($numberDay == 7 && $dispatchDay == 4) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 4 days"));
+        } else if ($numberDay == 7 && $dispatchDay == 5) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 5 days"));
+        } else if ($numberDay == 7 && $dispatchDay == 6) {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 6 days"));
+        } else {
+            $dateDispatchDay = date("d-m-Y", strtotime($date . "+ 7 days"));
+        }
+
+        return $dateDispatchDay;
     }
 }

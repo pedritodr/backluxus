@@ -161,9 +161,26 @@ class Invoice_farm_model extends CI_Model
     function get_all_invoice_client($conditions = [], $get_as_row = FALSE)
     {
         if (count($conditions) > 0) {
-            $result = $this->mongo_db->where($conditions)->get('invoice_cliente');
+            $result = $this->mongo_db->where($conditions)->sort('number_invoice', 'asc')->get('invoice_cliente');
         } else {
-            $result = $this->mongo_db->get('invoice_cliente');
+            $result = $this->mongo_db->sort('number_invoice', 'asc')->get('invoice_cliente');
+        }
+        if ($get_as_row) {
+            if (count($result) > 0) {
+                return (object) $result[0];
+            } else {
+                return false;
+            }
+        } else {
+            return $result;
+        }
+    }
+    function get_all_invoice_client_desc($conditions = [], $get_as_row = FALSE)
+    {
+        if (count($conditions) > 0) {
+            $result = $this->mongo_db->where($conditions)->sort('number_invoice', 'desc')->get('invoice_cliente');
+        } else {
+            $result = $this->mongo_db->sort('number_invoice', 'desc')->get('invoice_cliente');
         }
         if ($get_as_row) {
             if (count($result) > 0) {

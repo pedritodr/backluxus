@@ -288,6 +288,7 @@ $config['nombre_pedido_lang'] = "Nombre del Pedido";
 $config['tipo_gestion_lang'] = "Tipo gestión";
 $config['monto_lang'] = "Monto";
 $config['actions_lang'] = "Acciones";
+$config['name_carguera_lang'] = "Nombre de la carguera";
 
 $config['debito_lang'] = "Débito";
 $config['manual_lang'] = "Manual";
@@ -793,6 +794,9 @@ $config['list_payment_farm_lang'] = "Lista de pagos fincas";
 $config['resumen_selected_invoice_lang'] = "Resumen total de facturas seleccionadas";
 $config['selected_all_invoice_lang'] = "Seleccionar todas las facturas";
 $config['selected_invoice_lang'] = "Seleccionar factura";
+$config['selected_order_fixed_lang'] = "Seleccionar Orden fija";
+$config['quit_order_fixed_lang'] = "Quitar Orden fija";
+$config['generate_order_fixed_lang'] = "Generar Orden fija";
 $config['quit_invoice_lang'] = "Quitar factura";
 $config['quit_invoice_all_lang'] = "Quitar todas las factura";
 $config['register_payment_lang'] = "Registrar pago";
@@ -812,6 +816,18 @@ $config['delete_reason_credit_lang'] = "Eliminar motivo de crédito";
 $config['ready_reason_credit_lang'] = "Lista motivos de crédito";
 $config['reason_lang'] = "Motivos";
 
+$config['management_carguera_lang'] = "Gestión de carguera";
+$config['manage_carguera_lang'] = "Gestionar carguera";
+$config['add_carguera_lang'] = "Adicionar carguera";
+$config['edit_carguera_lang'] = "Editar carguera";
+$config['delete_carguera_lang'] = "Eliminar carguera";
+$config['ready_carguera_lang'] = "Lista de cargueras";
+$config['cargueras_lang'] = "Cargueras";
+$config['carguera_lang'] = "Carguera";
+$config['person_lang'] = "Persona de contacto";
+$config['msg_fixed_order_lang'] = "Hay ordenes fijas pendientes el dia de hoy.";
+$config['eye_fixed_order_lang'] = "Ver ordenes fijas del dia";
+
 $config['management_credit_lang'] = "Gestión de créditos";
 $config['manage_credit_lang'] = "Gestionar créditos";
 $config['add_credit_lang'] = "Adicionar crédito";
@@ -828,6 +844,9 @@ $config['airline_lang'] = "Aerolínea";
 $config['update_credit_lang'] = "Actualizar crédito";
 $config['management_credit_lang'] = "Gestión de créditos";
 $config['export_credit_lang'] = "Expotar crédito";
+$config['send_invoice_client_lang'] = "Enviar invoice al cliente";
+$config['invoice_send_client_lang'] = "Invoice enviado al cliente correctamente";
+$config['List_invoice_send_client_lang'] = "Invoices enviado a los cliente";
 
 $config['manage_fixed_orders_lang'] = "Gestionar ordenes fijas";
 $config['management_fixed_orders_lang'] = "Gestión ordenes fijas";

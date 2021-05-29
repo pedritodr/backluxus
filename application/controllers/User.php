@@ -35,9 +35,12 @@ class User extends CI_Controller
         }
         $this->load->model('Country_model', 'country');
         $this->load->model('role_model', 'rol');
+        $this->load->model('Carguera_model', 'carguera');
         $roles = $this->rol->get_all(['is_active' => 1]);
         $all_users = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
         $users_luxus = $this->user->get_all(['role_id' => 2, 'is_delete' => 0]);
+        $cargueras = $this->carguera->get_all(['is_active' => 1]);
+        $data['cargueras'] = $cargueras;
         $data['countrys'] = $this->country->get_all_countrys();
         $data['all_users'] = $all_users;
         $data['users_luxus'] = $users_luxus;
@@ -447,8 +450,9 @@ class User extends CI_Controller
         $userIdAdd = $this->input->post('userIdAdd');
         $objectCountry = $this->input->post('objectCountry');
         $comment = $this->input->post('comment');
+        $carguera = $this->input->post('carguera');
         $marking = 'mk_' . uniqid();
-        $data = ['marking_id' => $marking, 'name_marking' => $nameMarking, 'is_active' => 1, 'comment' => $comment, 'country' => $objectCountry];
+        $data = ['marking_id' => $marking, 'name_marking' => $nameMarking, 'is_active' => 1, 'comment' => $comment, 'country' => $objectCountry, 'carguera' => $carguera];
         $response = $this->user->create_marking($userIdAdd, $data);
         $user_object = $this->user->get_by_id($userIdAdd);
         if ($response) {
@@ -474,7 +478,8 @@ class User extends CI_Controller
         $objectCountry = $this->input->post('objectCountry');
         $comment = $this->input->post('comment');
         $marking =  $this->input->post('markingId');
-        $data = ['markings.$.name_marking' => $nameMarking, 'markings.$.comment' => $comment, 'markings.$.country' => $objectCountry];
+        $carguera = $this->input->post('carguera');
+        $data = ['markings.$.name_marking' => $nameMarking, 'markings.$.comment' => $comment, 'markings.$.country' => $objectCountry, 'markings.$.carguera' => $carguera];
         $response = $this->user->update_marking($marking, $data);
         $user_object = $this->user->get_by_id($userIdAdd);
         if ($response) {
