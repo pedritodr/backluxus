@@ -84,6 +84,30 @@
         width: 100%;
         border-radius: 6px;
     }
+
+    .dot-yellow {
+        height: 15px;
+        width: 15px;
+        background-color: yellow;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dot-green {
+        height: 15px;
+        width: 15px;
+        background-color: green;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dot-red {
+        height: 15px;
+        width: 15px;
+        background-color: red;
+        border-radius: 50%;
+        display: inline-block;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">
@@ -145,20 +169,37 @@
                                         if ($detail->status == 0) {
                                     ?>
                                             <tr>
-                                                <td><?= $item->dispatch_day ?></td>
+                                                <td>
+                                                    <?php
+                                                    $dateActual = date("Y-m-d");
+                                                    $date1 = new DateTime($dateActual);
+                                                    $date2 = new DateTime($item->dispatch_day);
+                                                    $diff = $date1->diff($date2);
+                                                    if ($diff->days > 0 && $diff->days <= 2) {
+                                                        echo ' <span class="dot-green"></span> <span>' . $item->dispatch_day . '</span>';
+                                                    } else if ($diff->days >= 3 && $diff->days <= 4) {
+                                                        echo ' <span class="dot-yellow"></span> <span>' . $item->dispatch_day . '</span>';
+                                                    } else {
+                                                        echo ' <span class="dot-red"></span> <span>' . $item->dispatch_day . '</span>';
+                                                    }
+
+                                                    //  echo $diff->days . ' days ';
+                                                    ?>
+                                                </td>
                                                 <td><?= $item->markings->name_marking ?></td>
                                                 <td><?= $detail->boxNumber . $detail->typeBoxs->name ?></td>
                                                 <td style="width:300px !important">
                                                     <?php
-                                                    $separado = explode(' ', $item->date_create);
+                                                    /*    $separado = explode(' ', $item->date_create);
                                                     $dateCreate = $separado[0];
-                                                    $dateDays =  date("Y-m-d", strtotime($dateCreate . "+ 3 days"));
-                                                    if (strtotime(date('Y-m-d')) > strtotime($dateDays)) {
+                                                    $dateDays =  date("Y-m-d", strtotime($dateCreate . "+ 3 days")); */
+                                                    /*   if (strtotime(date('Y-m-d')) > strtotime($dateDays)) {
                                                         echo '<h1><span class="badge badge-warning"><b>factura con más de 4 dias de creada</b></span></h1>';
                                                         echo '<span>' . $item->invoice_number . '</span>';
                                                     } else {
                                                         echo '<span>' . $item->invoice_number . '</span>';
-                                                    }
+                                                    } */
+                                                    echo '<span>' . $item->invoice_number . '</span>';
                                                     ?></td>
                                                 <td><?= $item->farms->name_commercial ?></td>
                                                 <?php
