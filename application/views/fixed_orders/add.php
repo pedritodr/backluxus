@@ -210,7 +210,7 @@
                 <div class="widget-header">
                     <div class="row">
                         <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                            <h4><?= translate('add_fixed_orderslang') ?></h4>
+                            <h4 id="farmText"><?= translate('add_fixed_orderslang') ?></h4>
                         </div>
                     </div>
                 </div>
@@ -231,7 +231,7 @@
                                             <div class="col-lg-8">
                                                 <label><?= translate("farms_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <select id="selectFarms" name="farms" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                                    <select id="selectFarms" name="farms" class="form-control select2 input-sm" onchange="handleSelectedFarm()" data-placeholder="Seleccione una opción" style="width: 100%">
                                                         <option value="0"><?= translate('select_opction_lang') ?></option>
                                                         <?php if ($farms) { ?>
                                                             <?php foreach ($farms as $item) { ?>
@@ -577,7 +577,15 @@
         dateToday.setDate(dateToday.getDate() - 1);
         return dateToday.getFullYear() + '-' + (dateToday.getMonth() + 1) + '-' + dateToday.getDate();
     }
-
+    const handleSelectedFarm = () => {
+        let farms = $('select[name=farms] option').filter(':selected').val();
+        if (farms == 0) {
+            $('#farmText').text('<?= translate('add_fixed_orderslang') ?>');
+        } else {
+            farms = JSON.parse(decodeB64Utf8(farms));
+            $('#farmText').text('<?= translate('add_fixed_orderslang') ?>: ' + farms.name_legal + ' | ' + farms.name_commercial);
+        }
+    }
     $(document).ready(function() {
 
         $("#selectFarms").select2({
@@ -2434,6 +2442,7 @@
     }
 
     const cancelAddItem = () => {
+
         // $('#bunches').val('');
         // $('#price').val('');
         //$('#stems').val('');
@@ -2442,8 +2451,8 @@
         $('#btnAddVarietyBox').attr('onclick', 'addVarietyBox()')
         $('#btnAddVarietyBox').text(textAddItem);
         $('#indiceTempObj').val('');
-        $('#totalStm').text(0);
-        $('#total').text(0);
+        //    $('#totalStm').text(0);
+        //  $('#total').text(0);
         $('#btnCancelEdit').hide();
     }
 

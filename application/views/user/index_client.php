@@ -1055,6 +1055,11 @@
         quillEdit.setContents(delta, 'silent');
     }
 
+    const initQuillAdd = (html) => {
+        let delta = quill.clipboard.convert(html);
+        quill.setContents(delta, 'silent');
+    }
+
     const editMarking = (objectMarking) => {
 
         objectMarking = decodeB64Utf8(objectMarking);
@@ -1111,6 +1116,18 @@
         $('#modalEditMarking').modal({
             backdrop: false
         })
+    }
+
+    const clearFields = () => {
+        $('[name=countryMarking]').val('0');
+        $('#countryMarking').trigger('change');
+        $('[name=citysMarking]').val('0');
+        $('#citysMarking').trigger('change');
+        $('[name=carguera]').val('0');
+        $('#carguera').trigger('change');
+        $('#clienteMarking').val('');
+        $('#nameMarking').val('');
+        initQuillAdd('');
     }
 
     const submitAddMarking = () => {
@@ -1215,6 +1232,7 @@
                                 title: '¡Correcto!',
                                 padding: '2em',
                             })
+                            clearFields();
                             setTimeout(function() {
                                 $('#btnCancelModalAddMarking').prop('disabled', false);
                                 $('#spinnerAddMarking').hide();
@@ -1241,13 +1259,17 @@
         }
     }
 
+    let loadAddress;
     const loadMarkings = (user_id, markings = [], type = 0, address = null) => {
+        if (address) {
+            loadAddress = address;
+        }
         if (type == "1") {
             markings = decodeB64Utf8(markings);
             markings = JSON.parse(markings);
         }
         $("#modalMarings").modal('show');
-        $('#btnAddMarking').attr('onclick', 'addMarking("' + user_id + '","' + address + '")');
+        $('#btnAddMarking').attr('onclick', 'addMarking("' + user_id + '","' + loadAddress + '")');
         $("#bodyModalMarkings").empty();
         if (markings.length > 0) {
             let texto_tabla = '';

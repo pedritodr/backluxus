@@ -210,7 +210,7 @@
                 <div class="widget-header">
                     <div class="row">
                         <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                            <h4><?= translate('edit_fixed_orders_lang') ?></h4>
+                            <h4 id="farmText"><?= translate('edit_fixed_orders_lang') ?></h4>
                         </div>
                     </div>
                 </div>
@@ -231,7 +231,7 @@
                                             <div class="col-lg-8">
                                                 <label><?= translate("farms_lang"); ?></label>
                                                 <div class="input-group">
-                                                    <select id="selectFarms" name="farms" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
+                                                    <select id="selectFarms" name="farms" class="form-control select2 input-sm" onchange="handleSelectedFarm()" data-placeholder="Seleccione una opción" style="width: 100%">
                                                         <option itemId="0" value="0"><?= translate('select_opction_lang') ?></option>
                                                         <?php if ($farms) { ?>
                                                             <?php foreach ($farms as $item) { ?>
@@ -573,6 +573,7 @@
     let qtyBox = 0;
     let objectInvoice = JSON.parse('<?= json_encode($object) ?>');
     const LoadInvoiceFarm = () => {
+        $('#farmText').text('<?= translate('edit_fixed_orders_lang') ?>: ' + objectInvoice.farms.name_legal + ' | ' + objectInvoice.farms.name_commercial);
         $('[id=selectFarms]').val(objectInvoice.farms.farm_id);
         $('#selectFarms').trigger('change');
         $('[id=markings]').val(objectInvoice.markings.marking_id);
@@ -584,6 +585,16 @@
         $('#dayCreate').val(objectInvoice.dayCreate);
         arrayRequest = objectInvoice.details;
         cargarDetails();
+    }
+
+    const handleSelectedFarm = () => {
+        let farms = $('select[name=farms] option').filter(':selected').attr('itemId');
+        if (farms == 0) {
+            $('#farmText').text('<?= translate('edit_fixed_orders_lang') ?>');
+        } else {
+            farms = JSON.parse(decodeB64Utf8(farms));
+            $('#farmText').text('<?= translate('edit_fixed_orders_lang') ?>: ' + farms.name_legal + ' | ' + farms.name_commercial);
+        }
     }
 
     $(document).ready(function() {
@@ -2425,8 +2436,8 @@
         $('#btnAddVarietyBox').attr('onclick', 'addVarietyBox()')
         $('#btnAddVarietyBox').text(textAddItem);
         $('#indiceTempObj').val('');
-        $('#totalStm').text(0);
-        $('#total').text(0);
+        //  $('#totalStm').text(0);
+        //  $('#total').text(0);
         $('#btnCancelEdit').hide();
     }
 
