@@ -864,3 +864,10 @@ $config['thursdaylang'] = "Jueves";
 $config['friday_lang'] = "Viernes";
 $config['saturday_lang'] = "Sábado";
 $config['sunday_lang'] = "Domingo";
+
+$config['manage_areoline_lang'] = "Gestionar de aerolineas";
+$config['management_areoline_lang'] = "Gestión de aerolineas";
+$config['add_aeroline_lang'] = "Adicionar aerolina";
+$config['edit_aeroline_lang'] = "Editar aerolina";
+$config['list_aeroline_lang'] = "Listar aerolina";
+$config['code_lang'] = "Código";
