@@ -1873,7 +1873,7 @@ class Invoice_farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-        $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => 1]);
+        $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => 2]);
         $data['all_invoice'] = $all_invoice;
         $this->load_view_admin_g("invoice_farm/index_invoice_client_send", $data);
     }
