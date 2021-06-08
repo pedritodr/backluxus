@@ -337,4 +337,19 @@ class Invoice_farm_model extends CI_Model
             return false;
         }
     }
+    function update_box_variety_invoice_cliente_price($invoice_id, $detail, $box_id, $variety_id, $data)
+    {
+        $query = $this->mongodb->luxus->invoice_cliente->updateOne(
+            ['invoice' => ['$eq' => $invoice_id]],
+            ['$set' => [
+                'details.$[detail].boxs.$[box].varieties.$[variety].priceClient' => $data,
+            ]],
+            ['arrayFilters' => [
+                ['detail.id' => ['$eq' => $detail]],
+                ['box.id' => ['$eq' => $box_id]],
+                ['variety.id' => ['$eq' => $variety_id]]
+            ]]
+        );
+        return $query;
+    }
 }

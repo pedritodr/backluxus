@@ -175,15 +175,13 @@
                                                     $date1 = new DateTime($dateActual);
                                                     $date2 = new DateTime($item->dispatch_day);
                                                     $diff = $date1->diff($date2);
-                                                    if ($diff->days > 0 && $diff->days <= 2) {
+                                                    if ($diff->days >= 0 && $diff->days <= 2) {
                                                         echo ' <span class="dot-green"></span> <span>' . $item->dispatch_day . '</span>';
                                                     } else if ($diff->days >= 3 && $diff->days <= 4) {
                                                         echo ' <span class="dot-yellow"></span> <span>' . $item->dispatch_day . '</span>';
                                                     } else {
                                                         echo ' <span class="dot-red"></span> <span>' . $item->dispatch_day . '</span>';
                                                     }
-
-                                                    //  echo $diff->days . ' days ';
                                                     ?>
                                                 </td>
                                                 <td><?= $item->markings->name_marking ?></td>
@@ -277,6 +275,7 @@
                                                 $acumHB = 0;
                                                 $acumEB = 0;
                                                 $piezas = 0;
+
                                                 $item->farms->invoice_farm = $item->invoice_farm;
                                                 $item->farms->dispatch_day = $item->dispatch_day;
                                                 $item->farms->invoice_number = $item->invoice_number;
@@ -295,15 +294,20 @@
                                                     $fulles = number_format($fulles, 2);
                                                 }
                                                 ?>
-                                                <td><?= $item->markings->name_marking . '<b>/</b>' . $item->farms->name_commercial . '(' . $item->farms->name_legal . ')<b>/</b>' . $item->invoice_number . '<b>/</b>' . $item->dispatch_day . '<b>/</b>' . $fulles . '<b>/</b>' . $piezas . '<b>/</b>' . $item->awb ?>
-                                                    <?php
-                                                    $separado = explode(' ', $item->date_create);
-                                                    $dateCreate = $separado[0];
-                                                    $dateDays =  date("Y-m-d", strtotime($dateCreate . "+ 3 days"));
-                                                    if (strtotime(date('Y-m-d')) > strtotime($dateDays)) {
-                                                        echo '<h1><span class="badge badge-warning"><b>factura con más de 4 dias de creada</b></span></h1>';
-                                                    }
-                                                    ?>
+                                                <td> <?php
+                                                        $dateActual = date("Y-m-d");
+                                                        $date1 = new DateTime($dateActual);
+                                                        $date2 = new DateTime($item->dispatch_day);
+                                                        $diff = $date1->diff($date2);
+                                                        if ($diff->days >= 0 && $diff->days <= 2) {
+                                                            echo ' <span class="dot-green"></span> <span> ';
+                                                        } else if ($diff->days >= 3 && $diff->days <= 4) {
+                                                            echo ' <span class="dot-yellow"></span> <span> ';
+                                                        } else {
+                                                            echo ' <span class="dot-red"></span> <span> ';
+                                                        }
+                                                        ?><?= $item->markings->name_marking . '<b>/</b>' . $item->farms->name_commercial . '(' . $item->farms->name_legal . ')<b>/</b>' . $item->invoice_number . '<b>/</b>' . $item->dispatch_day . '<b>/</b>' . $fulles . '<b>/</b>' . $piezas . '<b>/</b>' . $item->awb ?>
+
                                                 </td>
                                                 <td class="text-center" style="width:10%">
                                                     <div class="n-chk" style="display:none">
@@ -1117,6 +1121,12 @@
 
     const handleSelectedInvoice = (ItemsSelected = []) => {
         ItemsSelected = JSON.parse(decodeB64Utf8(ItemsSelected));
+        table.column(1)
+            .search(ItemsSelected[0].marking.name_marking ? '^' + ItemsSelected[0].marking.name_marking + '$' : ItemsSelected[0].marking.name_marking, true, false)
+            .draw();
+        $('.n-chk').show();
+        table2.search(ItemsSelected[0].marking.name_marking).draw();
+        console.log(ItemsSelected);
         if (ItemsSelected.length > 0) {
             Swal.fire({
                 title: 'Completando operación',
@@ -1647,7 +1657,7 @@
         }
 
     }
-
+    const aerolines = <?= json_encode($aerolines) ?>;
     const generateInvoice = () => {
 
         if (arraySelectedInvoice.length > 0) {
@@ -1682,11 +1692,19 @@
                     allowOutsideClick: false,
                     footer: '<a href>No realice acciones sobre la página</a>',
                 });
+                let airline = '';
+                if (aerolines.length > 0) {
+                    const aerolineEncontrada = aerolines.find(item => item.code === awbDividido[0]);
+                    if (aerolineEncontrada) {
+                        airline = aerolineEncontrada.name;
+                    }
+                }
                 let arrayRequest = JSON.stringify(arraySelectedInvoice);
                 let data = {
                     awb,
                     arrayRequest,
-                    marking
+                    marking,
+                    airline
                 }
                 setTimeout(function() {
                     $.ajax({

@@ -487,6 +487,12 @@
                         </div>
                     </div>
                     <div class="col-lg-12">
+                        <label><?= translate("observations_lang"); ?></label>
+                        <div class="input-group">
+                            <textarea class="form-control" id="textObservation" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
                         <div class="row">
                             <div class="col-lg-6">
                                 <br>
@@ -1332,6 +1338,7 @@
         let bunches = $('#bunches').val().trim();
         let price = $('#price').val().trim();
         let stems = $('#stems').val().trim();
+        let textObservation = $('#textObservation').val();
         let boxNumber = $('#boxNumber').val().trim();
         if (products == 0) {
             const toast = swal.mixin({
@@ -1434,7 +1441,8 @@
                 price,
                 bunches,
                 stems,
-                categorie
+                categorie,
+                textObservation
             };
             addTempObject(typeBoxs, boxNumber, objTemp)
         }
@@ -2173,6 +2181,7 @@
                     texto_tabla += totalTable.toFixed(2);
                     texto_tabla += '</td>';
                     texto_tabla += '<td>';
+                    // texto_tabla += '<button class="btn btn-primary mb-2 mr-2 rounded-circle" onclick=editItemBoxObservation("' + encodeB64Utf8(JSON.stringify(item)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></button>';
                     texto_tabla += '<button class="btn btn-info mb-2 mr-2 rounded-circle" onclick=editItemBox("' + encodeB64Utf8(JSON.stringify(item)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>';
                     texto_tabla += '<button class="btn btn-danger mb-2 mr-2 rounded-circle" onclick=deleteItemBox("' + indice + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>';
                     texto_tabla += '</td>';
@@ -2253,6 +2262,7 @@
         $('#bunches').val(obj.bunches);
         $('#price').val(obj.price);
         $('#stems').val(obj.stems);
+        $('#textObservation').val(obj.textObservation ? obj.textObservation : '');
         $('#boxNumber').val(tempObject.boxNumber);
         $('#typeBox').val(tempObject.typeBoxs.box_id);
         $('#btnAddVarietyBox').attr('onclick', 'updateItemBox()')
@@ -2266,6 +2276,7 @@
         $('#modalAddVarieties').modal('show');
         $('#btnCancelEdit').show();
     }
+
 
     const deleteItemBox = (indice) => {
         swal({
@@ -2292,6 +2303,7 @@
         let typeBoxs = $('select[name=typeBox] option').filter(':selected').attr('itemId');
         let measures = $('select[name=measures] option').filter(':selected').attr('itemId');
         let categorie = $('select[name=categories] option').filter(':selected').val();
+        let textObservation = $('#textObservation').val();
         let bunches = $('#bunches').val().trim();
         let price = $('#price').val().trim();
         let stems = $('#stems').val().trim();
@@ -2398,7 +2410,8 @@
                 price,
                 bunches,
                 stems,
-                categorie
+                categorie,
+                textObservation
             };
             updateTempObject(typeBoxs, boxNumber, objTemp, indice)
         }
@@ -2406,12 +2419,15 @@
     }
 
     const updateTempObject = (typeBoxs, boxNumber, objTemp, indice) => {
+        $('#textObservation').val('');
         tempObject.varieties[indice].products = objTemp.products;
         tempObject.varieties[indice].measures = objTemp.measures;
         tempObject.varieties[indice].categorie = objTemp.categorie;
         tempObject.varieties[indice].price = objTemp.price;
         tempObject.varieties[indice].bunches = objTemp.bunches;
         tempObject.varieties[indice].stems = objTemp.stems;
+        textObservation
+        tempObject.varieties[indice].textObservation = objTemp.textObservation;
         tempObject.typeBoxs = typeBoxs;
         tempObject.boxNumber = boxNumber;
         const toast = swal.mixin({
@@ -2439,6 +2455,7 @@
         $('#bunches').val('');
         $('#price').val('');
         $('#stems').val('');
+        $('#textObservation').val('');
         $('#btnAddVarietyBox').attr('onclick', 'addVarietyBox()')
         $('#btnAddVarietyBox').text(textAddItem);
         $('#indiceTempObj').val('');
@@ -2451,6 +2468,7 @@
         // $('#bunches').val('');
         // $('#price').val('');
         //$('#stems').val('');
+        $('#textObservation').val('');
         $('#measures').val(0);
         $('#measures').trigger('change');
         $('#btnAddVarietyBox').attr('onclick', 'addVarietyBox()')
@@ -2472,6 +2490,7 @@
         $('#indiceTempObj').val('');
         $('#totalStm').text(0);
         $('#total').text(0);
+        $('#textObservation').val('');
         $('#indiceRequest').val('')
         $('#btnCancelEdit').hide();
         $('#btnCancelEditRequest').hide();

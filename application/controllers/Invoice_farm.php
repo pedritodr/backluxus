@@ -376,7 +376,9 @@ class Invoice_farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-
+        $this->load->model('Aeroline_model', 'aeroline');
+        $all_aerolines = $this->aeroline->get_all(['is_active' => 1]);
+        $data['aerolines'] = $all_aerolines;
         $all_invoice_farm = $this->invoice_farm->get_all(['status' => 0]);
         $data['all_invoice_farm'] = $all_invoice_farm;
         $this->load_view_admin_g("invoice_farm/index_wait", $data);
@@ -393,6 +395,7 @@ class Invoice_farm extends CI_Controller
         }
         $this->load->model('User_model', 'user');
         $awb = trim(($this->input->post('awb')));
+        $airline = $this->input->post('airline');
         $marking = ($_POST['marking']);
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         foreach ($arrayRequest as $item) {
@@ -420,7 +423,8 @@ class Invoice_farm extends CI_Controller
             'status' => 0,
             'date_create' => $date_create,
             'timestamp' => strtotime($date_create),
-            'number_invoice' => $numberSecuencial
+            'number_invoice' => $numberSecuencial,
+            'airline' => $airline
         ];
         $resquest =  $this->invoice_farm->create_invoice_client($data_invoice);
         if ($resquest) {
@@ -454,7 +458,9 @@ class Invoice_farm extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-
+        $this->load->model('Aeroline_model', 'aeroline');
+        $all_aerolines = $this->aeroline->get_all(['is_active' => 1]);
+        $data['aerolines'] = $all_aerolines;
         $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => 0]);
         $data['all_invoice'] = $all_invoice;
         $this->load_view_admin_g("invoice_farm/index_invoice_client", $data);
@@ -511,7 +517,7 @@ class Invoice_farm extends CI_Controller
         $arrayRequest =  json_decode($_POST['arrayRequest']);
         $invoice = $this->input->post('invoice');
         $data_invoice = [
-            'details' => $arrayRequest,
+            'details' => $arrayRequest
         ];
         $resquest =  $this->invoice_farm->update_invoice_client($invoice, $data_invoice);
         if ($resquest) {
@@ -2034,5 +2040,30 @@ class Invoice_farm extends CI_Controller
         }
 
         return $dateDispatchDay;
+    }
+
+    public function update_price()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $idInvoice = $this->input->post('idInvoice');
+        $priceClient = $this->input->post('priceClient');
+        $id = $this->input->post('id');
+        $idBox = $this->input->post('idBox');
+        $idDetail = $this->input->post('idDetail');
+        $resquest =  $this->invoice_farm->update_box_variety_invoice_cliente_price($idInvoice, $idDetail, $idBox, $id, $priceClient);
+        if ($resquest) {
+            $data = $this->invoice_farm->get_by_id_invoice_client($idInvoice);
+            echo json_encode(['status' => 200, 'msj' => 'correcto', 'data' => $data]);
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'No se actualizo el precio del cliente']);
+        }
+        exit();
     }
 }

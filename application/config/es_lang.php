@@ -557,6 +557,7 @@ $config['edicion_lang'] = "Edición Libro";
 $config['fecha_salida_lang'] = "Fecha Salida";
 $config['resumen_lang'] = "Resumen";
 $config['precio_lang'] = "Precio";
+$config['edit_precio_lang'] = "Editar precio";
 $config['add_pages'] = "Adicionar Páginas";
 $config['manage_pages_lang'] = "Gestionar Páginas";
 $config['pages_lang'] = "Páginas";

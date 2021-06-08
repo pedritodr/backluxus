@@ -11,6 +11,10 @@
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
 
+    #modalEditPrice {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
     #modalAwb {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
@@ -188,7 +192,7 @@
                     <div class="col-6">
                         <label id="lblNumberAwb"><?= translate("awb_lang"); ?></label>
                         <div class="input-group">
-                            <input type="text" class="form-control input-sm" id="awbEdit">
+                            <input type="text" class="form-control input-sm" id="awbEdit" onkeyup="handleChangeAwbEdit()">
                             <input id="invoiceId" type="hidden">
                         </div>
                     </div>
@@ -213,9 +217,38 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modalEditPrice" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><?= translate('edit_precio_lang') ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <label><?= translate('precio_lang') ?></label>
+                        <div class="form-group">
+                            <input type="number" class="form-control" id="priceClient" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                <button class="btn btn-success" onclick="handleSubmitUpdatePrice()">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+    const aerolines = <?= json_encode($aerolines) ?>;
     let activeEdit = false;
     $(() => {
         let table = $('#example1').DataTable({
@@ -239,6 +272,7 @@
     const verDetails = (details, id) => {
         details = decodeB64Utf8(details);
         details = JSON.parse(details);
+        console.log(details);
         idInvoice = id;
         arrayDetails = details;
         arrayDeleteItems = [];
@@ -341,6 +375,8 @@
                     $('#bodyTableDetails').append(textBox);
                     if (box.varieties.length > 0) {
                         box.varieties.forEach(element => {
+                            element.idBox = box.id;
+                            element.detailId = item.id;
                             let textVariety = '<tr>';
                             textVariety += '<td>';
                             textVariety += '</td>';
@@ -381,7 +417,14 @@
                             textVariety += '</td>';
 
                             textVariety += '<td>';
-                            textVariety += parseFloat(element.price).toFixed(2);
+                            let priceCliente = 0;
+                            if (element.priceClient !== undefined) {
+                                priceCliente = element.priceClient;
+                            } else {
+                                priceCliente = element.price;
+                            }
+
+                            textVariety += '<span id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
                             textVariety += '</td>';
 
                             textVariety += '<td>';
@@ -509,6 +552,81 @@
         }
 
     }
+    let ObjElementItem = null;
+    handleEditPrice = (objElement) => {
+        objElement = JSON.parse(decodeB64Utf8(objElement));
+        ObjElementItem = objElement;
+        $('#priceClient').val('');
+        $('#modalEditPrice').modal({
+            backdrop: false
+        });
+    }
+
+    const handleSubmitUpdatePrice = () => {
+        const priceClient = $('#priceClient').val() !== '' ? parseFloat($('#priceClient').val()) : 0;
+        if (priceClient <= 0) {
+            swal({
+                title: '¡Información!',
+                text: "El precio no puede ser 0",
+                type: 'info',
+                showConfirmButton: true,
+                padding: '2em'
+            })
+        } else {
+            $('#modalEditPrice').modal('hide');
+            $('#modalDetails').modal('hide');
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Actualizando de precio...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+            let data = {
+                priceClient,
+                id: ObjElementItem.id,
+                idBox: ObjElementItem.idBox,
+                idDetail: ObjElementItem.detailId,
+                idInvoice
+            }
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('invoice_farm/update_price') ?>",
+                    data: data,
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            $('#btneyeDetails_' + idInvoice).attr('onclick', 'verDetails("' + encodeB64Utf8(JSON.stringify(result.data.details)) + '","' + idInvoice + '")');
+                            verDetails(encodeB64Utf8(JSON.stringify(result.data.details)), idInvoice);
+                        } else {
+                            Swal.close();
+                            swal({
+                                title: '¡Error!',
+                                text: `problemas con la actualización de la factura: ${idInvoice}`,
+                                padding: '2em'
+                            });
+                        }
+                    }
+                });
+            }, 1500)
+
+        }
+    }
 
     const updateAwb = (objInvoice) => {
         objInvoice = decodeB64Utf8(objInvoice);
@@ -527,6 +645,21 @@
             defaultDate: objInvoice.date_awb ? objInvoice.date_awb : 'today'
         });
         $('#airline').val(objInvoice.airline ? objInvoice.airline : '');
+    }
+
+    const handleChangeAwbEdit = () => {
+        let awb = $('#awbEdit').val().trim();
+        let awbDividido = awb.split('-');
+        if (aerolines.length > 0) {
+            const aerolineEncontrada = aerolines.find(item => item.code === awbDividido[0]);
+            if (aerolineEncontrada) {
+                $('#airline').val(aerolineEncontrada.name);
+            } else {
+                $('#airline').val('');
+            }
+        } else {
+            $('#airline').val('');
+        }
     }
 
     const handleSubmitUpdateAwb = () => {
