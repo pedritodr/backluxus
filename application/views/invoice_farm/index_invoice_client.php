@@ -184,7 +184,7 @@
                                             </td>
                                             <td>
                                                 <p><strong><?= translate("packing_lang"); ?> : </strong>
-                                                    <?php $n = 5;
+                                                    <?php
                                                     echo  printf('%02d', $item->number_invoice) . ' - ' . $fulles . ' (' . $acumHb . 'HB, ' . $acumQb . 'QB, ' . $acumEb . 'EB)';
                                                     ?>
                                                 </p>
@@ -207,11 +207,13 @@
                                                             <polyline points="6 9 12 15 18 9"></polyline>
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
-                                                        <a class="dropdown-item" id="<?= 'btneyeDetails_' . $item->invoice ?>" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
+                                                        <a class="dropdown-item" id="<?= 'btneyeDetails_' . $item->invoice ?>" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>','<?= $item->status ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="updateAwb('<?= base64_encode(json_encode($item)) ?>')"><?= translate("edit_awb_lang"); ?></a>
-                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><?= translate("cancel_invoice_lang"); ?></a>
-                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="handleSendClient('<?= $item->invoice ?>')"> <?= translate("send_invoice_client_lang"); ?></a>
-                                                        <a class="dropdown-item" href="<?= site_url('invoice_farm/export_invoice/' . $item->invoice) ?>"><?= translate("export_invoice_lang"); ?></a>
+                                                        <?php if (!$item->status == 2) { ?>
+                                                            <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><?= translate("cancel_packing_lang"); ?></a>
+                                                            <a class="dropdown-item" href="javascript:void(0)" onclick="handleSendClient('<?= $item->invoice ?>')"> <?= translate("create_invoice_lang"); ?></a>
+                                                        <?php } ?>
+                                                        <a class="dropdown-item" href="<?= site_url('invoice_farm/export_invoice/' . $item->invoice) ?>"><?= translate("export_packing_lang"); ?></a>
                                                     </div>
                                                 </div>
                                             </td>
@@ -239,7 +241,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel"><?= translate('details_lang') ?></h5>
-                <button type="button" class="close" onclick="handleActiveEdit()">
+                <button id="btnActiveEdit" type="button" class="close" onclick="handleActiveEdit()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -260,7 +262,7 @@
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="titleModalAwb"><?= translate('edit_awb_lang') ?></h5>
+                <h5 class="modal-title" id="titleModalAwbNo"><?= translate('picture_logistic_lang') ?></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -293,7 +295,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
-                <button class="btn btn-success" onclick="handleSubmitUpdateAwb()">Actualizar</button>
+                <button id="btnUpdateAwb" class="btn btn-success" onclick="handleSubmitUpdateAwb()">Actualizar</button>
             </div>
         </div>
     </div>
@@ -350,13 +352,19 @@
     let arrayDetails = [];
     let idInvoice = null;
 
-    const verDetails = (details, id) => {
+    const verDetails = (details, id, status = '0') => {
         details = decodeB64Utf8(details);
         details = JSON.parse(details);
         idInvoice = id;
         arrayDetails = details;
         arrayDeleteItems = [];
         activeEdit = false;
+        if (status === '2') {
+            $('#btnUpdateInvoice').hide();
+            $('#btnActiveEdit').hide();
+        } else {
+            $('#btnActiveEdit').show();
+        }
         $('#modalDetails').modal({
             backdrop: false
         });
@@ -391,7 +399,9 @@
             texto_tabla += '<th>Total</th>';
             texto_tabla += '<th>Cliente</th>';
             texto_tabla += '<th>Total Cliente</th>';
-            texto_tabla += '<th>Acciones</th>';
+            if (status !== '2') {
+                texto_tabla += '<th>Acciones</th>';
+            }
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
             texto_tabla += '<tbody id="bodyTableDetails">';
@@ -452,14 +462,14 @@
 
                     textBox += '<td bgcolor= "#f1f2f3">';
                     textBox += '</td>';
-
-                    textBox += '<td bgcolor= "#f1f2f3">';
-                    textBox += '<div class="edit-item-invoices" style="display:none">';
-                    textBox += '<button class="btn btn-primary" id="delete_' + item.id + '" onclick=deleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>';
-                    textBox += '<button class="btn btn-danger" style="display:none" id="cancel_' + item.id + '" onclick=cancelDeleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
-                    textBox += '</div>';
-                    textBox += '</td>';
-
+                    if (status !== '2') {
+                        textBox += '<td bgcolor= "#f1f2f3">';
+                        textBox += '<div class="edit-item-invoices" style="display:none">';
+                        textBox += '<button class="btn btn-primary" id="delete_' + item.id + '" onclick=deleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>';
+                        textBox += '<button class="btn btn-danger" style="display:none" id="cancel_' + item.id + '" onclick=cancelDeleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
+                        textBox += '</div>';
+                        textBox += '</td>';
+                    }
                     textBox += '</tr>';
                     let acumBoxStems = 0;
                     let acumBoxBunches = 0;
@@ -535,12 +545,20 @@
                             let spanTotalCliente = '';
                             if (element.priceClient !== undefined) {
                                 priceCliente = element.priceClient;
-                                textVariety += '<span class="text-success" id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
+                                if (status !== '2') {
+                                    textVariety += '<span class="text-success" id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
+                                } else {
+                                    textVariety += '<span class="text-success" id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span>';
+                                }
                                 totalPriceCliente = parseFloat(priceCliente) * (parseInt(element.stems) * parseInt(element.bunches));
                                 spanTotalCliente = '<span class="text-success">' + totalPriceCliente.toFixed(2) + '</span>';
                             } else {
                                 priceCliente = element.price;
-                                textVariety += '<span id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
+                                if (status !== '2') {
+                                    textVariety += '<span id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
+                                } else {
+                                    textVariety += '<span id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span>';
+                                }
                                 totalPriceCliente = parseFloat(priceCliente) * (parseInt(element.stems) * parseInt(element.bunches));
                                 spanTotalCliente = '<span>' + totalPriceCliente.toFixed(2) + '</span>';
 
@@ -553,9 +571,9 @@
 
                             textVariety += spanTotalCliente
                             textVariety += '</td>';
-
-                            textVariety += '<td></td>';
-
+                            if (status !== '2') {
+                                textVariety += '<td></td>';
+                            }
                             textVariety += '</tr>';
                             $('#bodyTableDetails').append(textVariety);
                         });
@@ -604,9 +622,10 @@
                     textFooterBox += '<td bgcolor= "#b9e0f1">';
                     textFooterBox += acumTotalBox.toFixed(2);
                     textFooterBox += '</td>';
-                    textFooterBox += '<td bgcolor= "#b9e0f1">';
-                    textFooterBox += '</td>';
-
+                    if (status !== '2') {
+                        textFooterBox += '<td bgcolor= "#b9e0f1">';
+                        textFooterBox += '</td>';
+                    }
                     textFooterBox += '</tr>';
                     $('#bodyTableDetails').append(textFooterBox);
 
@@ -819,6 +838,17 @@
             defaultDate: objInvoice.date_awb ? objInvoice.date_awb : 'today'
         });
         $('#airline').val(objInvoice.airline ? objInvoice.airline : '');
+        if (objInvoice.status === 2) {
+            $("#awbEdit").prop('disabled', true);
+            $('#airline').prop('disabled', true);
+            $('#date').prop('disabled', true);
+            $('#btnUpdateAwb').hide();
+        } else {
+            $("#awbEdit").prop('disabled', false);
+            $('#airline').prop('disabled', false);
+            $('#date').prop('disabled', false);
+            $('#btnUpdateAwb').show();
+        }
     }
 
     const handleChangeAwbEdit = () => {

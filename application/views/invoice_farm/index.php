@@ -73,20 +73,59 @@
                             </thead>
                             <tbody>
                                 <?php if ($all_invoice_farm) { ?>
-                                    <?php foreach ($all_invoice_farm as $item) { ?>
+                                    <?php foreach ($all_invoice_farm as $item) {
+                                        if (count($item->details) > 0) {
+                                            $acumHb = 0;
+                                            $acumQb = 0;
+                                            $acumEb = 0;
+                                            foreach ($item->details as $element) {
+
+                                                if (trim(strtoupper($element->typeBoxs->name)) === "HB") {
+                                                    $acumHb += (int)$element->boxNumber;
+                                                } else if (trim(strtoupper($element->typeBoxs->name)) === "QB") {
+                                                    $acumQb += (int)$element->boxNumber;
+                                                } else {
+                                                    $acumEb += (int)$element->boxNumber;
+                                                }
+                                            }
+                                            $fulles = ($acumHb * 0.50) + ($acumQb * 0.25) + ($acumEb * 0.125);
+                                            if ($acumEb > 0) {
+                                                $fulles = number_format($fulles, 3);
+                                            } else {
+                                                $fulles = number_format($fulles, 2);
+                                            }
+                                        }
+                                    ?>
                                         <tr>
                                             <td>
                                                 <p><?= $item->markings->name_company . ' | ' . $item->markings->name_commercial ?></p>
                                                 <p><b><?= translate("marking_lang"); ?>: <?= $item->markings->name_marking ?></b></p>
+                                                <?php
+                                                if (property_exists($item, 'packing')) {
+                                                    echo '<b>' . translate("packing_lang") . ':</b> ';
+                                                    printf('%02d', $item->packing);
+                                                } else {
+                                                    echo '<span class="badge outline-badge-warning">' . translate('invoice_wait_lang') . ' </span>';
+                                                }
+                                                ?>
                                             </td>
                                             <td>
-                                                <p><strong><?= translate("invoice_number_lang"); ?> : </strong><?= $item->invoice_number; ?></p>
-                                                <p><strong><?= translate("dispatch_day_lang"); ?> : </strong><?= $item->dispatch_day; ?></p>
+                                                <p><strong><?= translate("invoice_number_lang"); ?> : </strong>
+                                                    <?php
+                                                    echo  $item->invoice_number . ' - ' . $fulles . ' (' . $acumHb . 'HB, ' . $acumQb . 'QB, ' . $acumEb . 'EB)';
+                                                    ?>
+                                                </p>
+                                                <p><strong><?= translate("dispatch_lang"); ?> : </strong>
+                                                    <?php if (isset($item->dispatch_day)) {
+                                                        $newDate = date("d.m.y", strtotime($item->dispatch_day));
+                                                        echo  $newDate;
+                                                    } ?>
+                                                </p>
                                                 <p><strong><?= translate("awb_lang"); ?> : </strong><?= $item->awb; ?></p>
                                             </td>
                                             <td>
                                                 <p><?= $item->farms->name_commercial; ?></p>
-                                                <p><?= $item->farms->address_farm; ?></p>
+                                                <p><?= $item->farms->name_legal; ?></p>
                                             </td>
                                             <td>
                                                 <div class="btn-group mb-4 mr-2" role="group">
@@ -260,7 +299,8 @@
         $("#example1").DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-            }
+            },
+            "ordering": false
         });
         $("#example2").DataTable({
             "language": {

@@ -33,9 +33,9 @@ class Invoice_farm_model extends CI_Model
     function get_all($conditions = [], $get_as_row = FALSE)
     {
         if (count($conditions) > 0) {
-            $result = $this->mongo_db->where($conditions)->get('invoice_farm');
+            $result = $this->mongo_db->where($conditions)->sort('timestamp', 'asc')->get('invoice_farm');
         } else {
-            $result = $this->mongo_db->get('invoice_farm');
+            $result = $this->mongo_db->sort('timestamp', 'asc')->get('invoice_farm');
         }
         if ($get_as_row) {
             if (count($result) > 0) {

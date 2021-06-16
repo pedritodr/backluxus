@@ -750,6 +750,28 @@ class Invoice_farm extends CI_Controller
         $awb = $this->input->post('awb');
         $date = $this->input->post('dateAwb');
         $airline = $this->input->post('airline');
+        $invoiceObject = $this->invoice_farm->get_by_id_invoice_client($invoice);
+        $arrInvoiceFarms = [];
+        if ($invoiceObject) {
+            if (count($invoiceObject->details)) {
+                foreach ($invoiceObject->details as $item) {
+                    if (count($item->boxs) > 0) {
+                        foreach ($item->boxs as $box) {
+                            if (!in_array($box->invoice_farm, $arrInvoiceFarms)) {
+                                $arrInvoiceFarms[] = $box->invoice_farm;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach ($arrInvoiceFarms as $item) {
+                if ($awb == '') {
+                    $this->invoice_farm->update($item, ['dispatch_day' => $date, 'packing' => $invoiceObject->number_invoice, 'invoice' => $invoiceObject->invoice]);
+                } else {
+                    $this->invoice_farm->update($item, ['awb' => $awb, 'dispatch_day' => $date, 'packing' => $invoiceObject->number_invoice, 'invoice' => $invoiceObject->invoice]);
+                }
+            }
+        }
         $resquest =  $this->invoice_farm->get_all_invoice_client(['awb' => $awb, 'invoice' => $this->mongo_db->ne($invoice), 'status' => $this->mongo_db->ne(-1)], true);
         if ($resquest) {
             echo json_encode(['status' => 404, 'msj' => 'correcto', 'data' => $resquest]);
@@ -2065,5 +2087,23 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 404, 'msj' => 'No se actualizo el precio del cliente']);
         }
         exit();
+    }
+
+    public function update_invoice_farm_packing()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $invoices = $this->invoice_farm->get_all_invoice_client(['status' => $this->mongo_db->ne(-1)]);
+        if ($invoices) {
+            foreach ($invoices as $item) {
+                if (count($item->details) > 0) {
+                    foreach ($item->details as $detail) {
+                        $this->invoice_farm->update($detail->farm->invoice_farm, ['packing' => $item->number_invoice, 'invoice' => $item->invoice]);
+                    }
+                }
+            }
+        }
     }
 }
