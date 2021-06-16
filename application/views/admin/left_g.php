@@ -295,7 +295,7 @@
             </div>
             <div class="submenu" id="invoice_farm">
                 <div class="category-info">
-                    <h5>Facturas</h5>
+                    <h5>Facturación</h5>
                     <p>Gestión de facturas de fincas y clientes en la plataforma.</p>
                 </div>
                 <ul class="submenu-list" data-parent-element="#invoice_farm">
@@ -312,7 +312,7 @@
                     <li>
                         <a href="<?= site_url('invoice_farm/index_invoice_client') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                     <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span> <?= translate('invoice_client_lang') ?> </a>
+                                </svg></span> <?= translate('packings_lang') ?> </a>
                     </li>
                     <li>
                         <a href="<?= site_url('invoice_farm/index_invoice_client_send') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">

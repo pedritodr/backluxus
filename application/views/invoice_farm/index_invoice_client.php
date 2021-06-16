@@ -79,17 +79,48 @@
         width: 28px;
         color: #acb0c3;
     }
+
+    .dot-yellow {
+        height: 15px;
+        width: 15px;
+        background-color: yellow;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dot-green {
+        height: 15px;
+        width: 15px;
+        background-color: green;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dot-red {
+        height: 15px;
+        width: 15px;
+        background-color: red;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .table>tbody>tr>td {
+        border: 1px solid #ebedf2;
+        color: #888ea8;
+        font-size: 13px;
+        letter-spacing: 1px;
+    }
 </style>
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
 <div class="main-container" id="container">
     <div class="layout-px-spacing" style="width:100%">
         <p class="titulo">
-            <?= translate('invoice_client_lang'); ?>
+            <?= translate('packings_lang'); ?>
         </p>
         <div class="col-xs-12">
             <div class="statbox widget box box-shadow">
                 <div class="widget-header">
-                    <h3 class="text-simple"><?= translate('listar_invoice_clients_lang'); ?></h3>
+                    <h3 class="text-simple"><?= translate('listar_packings_lang'); ?></h3>
                 </div><!-- /.box-header -->
                 <div class="widget-content widget-content-area">
                     <?= get_message_from_operation(); ?>
@@ -104,21 +135,71 @@
                             </thead>
                             <tbody>
                                 <?php if ($all_invoice) { ?>
-                                    <?php foreach ($all_invoice as $item) { ?>
+                                    <?php foreach ($all_invoice as $item) {
+                                        if (count($item->details) > 0) {
+                                            $acumHb = 0;
+                                            $acumQb = 0;
+                                            $acumEb = 0;
+                                            foreach ($item->details as $element) {
+                                                if (count($element->boxs) > 0) {
+                                                    foreach ($element->boxs as $box) {
+                                                        if (trim(strtoupper($box->typeBoxs->name)) === "HB") {
+                                                            $acumHb += (int)$box->boxNumber;
+                                                        } else if (trim(strtoupper($box->typeBoxs->name)) === "QB") {
+                                                            $acumQb += (int)$box->boxNumber;
+                                                        } else {
+                                                            $acumEb += (int)$box->boxNumber;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            $fulles = ($acumHb * 0.50) + ($acumQb * 0.25) + ($acumEb * 0.125);
+                                            if ($acumEb > 0) {
+                                                $fulles = number_format($fulles, 3);
+                                            } else {
+                                                $fulles = number_format($fulles, 2);
+                                            }
+                                        }
+                                    ?>
                                         <tr>
                                             <td>
+                                                <?php
+                                                if ($item->status === 2) {
+                                                    echo ' <span class="dot-green"></span>';
+                                                } else {
+                                                    $newDate = date("Y-m-d", strtotime($item->date_create));
+                                                    $dateActual = date("Y-m-d");
+                                                    $date1 = new DateTime($dateActual);
+                                                    $date2 = new DateTime($newDate);
+                                                    $diff = $date1->diff($date2);
+                                                    if ($diff->days === 0) {
+                                                        echo ' <span class="dot-yellow"></span>';
+                                                    } else {
+                                                        echo ' <span class="dot-red"></span>';
+                                                    }
+                                                }
+                                                ?>
                                                 <p><?= $item->marking->name_company . ' | ' . $item->marking->name_commercial ?></p>
                                                 <p><b><?= translate("marking_lang"); ?>: <?= $item->marking->name_marking ?></b></p>
                                             </td>
                                             <td>
-                                                <p><strong><?= translate("invoice_number_lang"); ?> : </strong><?= $item->number_invoice; ?></p>
-                                                <p><strong><?= translate("dispatch_day_lang"); ?> : </strong><?php if (isset($item->date_awb)) {
-                                                                                                                    echo $item->date_awb;
-                                                                                                                } ?></p>
+                                                <p><strong><?= translate("packing_lang"); ?> : </strong>
+                                                    <?php $n = 5;
+                                                    echo  printf('%02d', $item->number_invoice) . ' - ' . $fulles . ' (' . $acumHb . 'HB, ' . $acumQb . 'QB, ' . $acumEb . 'EB)';
+                                                    ?>
+                                                </p>
+                                                <p><strong><?= translate("dispatch_day_lang"); ?> : </strong>
+                                                    <?php if (isset($item->date_awb)) {
+                                                        $newDate = date("d.m.y", strtotime($item->date_awb));
+                                                        echo  $newDate;
+                                                    } ?>
+                                                </p>
                                                 <p><strong><?= translate("awb_lang"); ?> : </strong><?= $item->awb; ?></p>
-                                                <p><strong><?= translate("airline_lang"); ?> : </strong><?php if (isset($item->airline)) {
-                                                                                                            echo $item->airline;
-                                                                                                        } ?></p>
+                                                <p><strong><?= translate("airline_lang"); ?> : </strong>
+                                                    <?php if (isset($item->airline)) {
+                                                        echo $item->airline;
+                                                    } ?>
+                                                </p>
                                             </td>
                                             <td>
                                                 <div class="btn-group mb-4 mr-2" role="group">
@@ -272,7 +353,6 @@
     const verDetails = (details, id) => {
         details = decodeB64Utf8(details);
         details = JSON.parse(details);
-        console.log(details);
         idInvoice = id;
         arrayDetails = details;
         arrayDeleteItems = [];
@@ -288,25 +368,29 @@
         let acumTotalStm = 0;
         let acumPrice = 0;
         let acumTotal = 0;
+        let acumTotalCliente = 0;
         let acumHb = 0;
         let acumQb = 0;
         let acumEb = 0;
         if (details.length > 0) {
             let texto_tabla = '';
             texto_tabla +=
-                '<table id="datatablesVarieties" class="table table-striped table-no-bordered" cellspacing="0" width="100%" style="width:100%">';
+                '<table id="datatablesVarieties" class="table table-bordered" cellspacing="0" width="100%" style="width:100%">';
             texto_tabla += '<thead>';
             texto_tabla += '<tr>';
-            texto_tabla += '<th>FARM</th>';
-            texto_tabla += '<th>NRO BOX</th>';
-            texto_tabla += '<th>BOX TYPE</th>';
-            texto_tabla += '<th>VARIETIES</th>';
-            texto_tabla += '<th>CM</th>';
-            texto_tabla += '<th>STEMS</th>';
-            texto_tabla += '<th>BOUQUETS</th>';
-            texto_tabla += '<th>TOTAL STM</th>';
-            texto_tabla += '<th>PRICE</th>';
-            texto_tabla += '<th>TOTAL</th>';
+            texto_tabla += '<th>Finca</th>';
+            texto_tabla += '<th>No</th>';
+            texto_tabla += '<th>Tipo</th>';
+            texto_tabla += '<th>Cat</th>';
+            texto_tabla += '<th>Variedad</th>';
+            texto_tabla += '<th>Prop</th>';
+            texto_tabla += '<th>Emp</th>';
+            texto_tabla += '<th>Ramos</th>';
+            texto_tabla += '<th>Tallos</th>';
+            texto_tabla += '<th>Finca</th>';
+            texto_tabla += '<th>Total</th>';
+            texto_tabla += '<th>Cliente</th>';
+            texto_tabla += '<th>Total Cliente</th>';
             texto_tabla += '<th>Acciones</th>';
             texto_tabla += '</tr>';
             texto_tabla += '</thead>';
@@ -361,6 +445,15 @@
                     textBox += '</td>';
 
                     textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
+                    textBox += '</td>';
+
+                    textBox += '<td bgcolor= "#f1f2f3">';
                     textBox += '<div class="edit-item-invoices" style="display:none">';
                     textBox += '<button class="btn btn-primary" id="delete_' + item.id + '" onclick=deleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>';
                     textBox += '<button class="btn btn-danger" style="display:none" id="cancel_' + item.id + '" onclick=cancelDeleteItem("' + encodeB64Utf8(JSON.stringify(box)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-up-left"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button>';
@@ -385,6 +478,10 @@
                             textVariety += '</td>';
 
                             textVariety += '<td>';
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            textVariety += element.products.categoria.name;
                             textVariety += '</td>';
 
                             textVariety += '<td>';
@@ -417,15 +514,9 @@
                             textVariety += '</td>';
 
                             textVariety += '<td>';
-                            let priceCliente = 0;
-                            if (element.priceClient !== undefined) {
-                                priceCliente = element.priceClient;
-                            } else {
-                                priceCliente = element.price;
-                            }
-
-                            textVariety += '<span id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
+                            textVariety += element.price;
                             textVariety += '</td>';
+
 
                             textVariety += '<td>';
                             let totalBoxItem = parseFloat(element.price) * (parseInt(element.stems) *
@@ -434,7 +525,33 @@
                                 parseInt(box.boxNumber) * parseInt(element.bunches));
                             acumTotal += totalTable;
                             acumTotalBox += totalTable
-                            textVariety += totalBoxItem.toFixed(2);
+                            let totalPriceFarm = parseFloat(element.price) * (parseInt(element.stems) * parseInt(element.bunches));
+                            textVariety += totalPriceFarm.toFixed(2);
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+                            let priceCliente = 0;
+                            let totalPriceCliente = 0;
+                            let spanTotalCliente = '';
+                            if (element.priceClient !== undefined) {
+                                priceCliente = element.priceClient;
+                                textVariety += '<span class="text-success" id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
+                                totalPriceCliente = parseFloat(priceCliente) * (parseInt(element.stems) * parseInt(element.bunches));
+                                spanTotalCliente = '<span class="text-success">' + totalPriceCliente.toFixed(2) + '</span>';
+                            } else {
+                                priceCliente = element.price;
+                                textVariety += '<span id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
+                                totalPriceCliente = parseFloat(priceCliente) * (parseInt(element.stems) * parseInt(element.bunches));
+                                spanTotalCliente = '<span>' + totalPriceCliente.toFixed(2) + '</span>';
+
+                            }
+                            acumTotalCliente += totalPriceCliente;
+
+                            textVariety += '</td>';
+
+                            textVariety += '<td>';
+
+                            textVariety += spanTotalCliente
                             textVariety += '</td>';
 
                             textVariety += '<td></td>';
@@ -463,11 +580,22 @@
                     textFooterBox += '</td>';
 
                     textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
                     textFooterBox += acumBoxBunches;
                     textFooterBox += '</td>';
 
                     textFooterBox += '<td bgcolor= "#b9e0f1">';
                     textFooterBox += acumBoxTotalStems;
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+
                     textFooterBox += '</td>';
 
                     textFooterBox += '<td bgcolor= "#b9e0f1">';
@@ -507,6 +635,9 @@
             textFooter += '</td>';
 
             textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
             textFooter += qtyBouquets;
             textFooter += '</td>';
 
@@ -515,10 +646,18 @@
             textFooter += '</td>';
 
             textFooter += '<td>';
+
             textFooter += '</td>';
 
             textFooter += '<td>';
             textFooter += acumTotal.toFixed(2);
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += '</td>';
+
+            textFooter += '<td>';
+            textFooter += acumTotalCliente.toFixed(2);
             textFooter += '</td>';
 
             textFooter += '</tr>';
@@ -531,19 +670,54 @@
                 fulles = fulles.toFixed(2);
             }
             let textResumen = '<div class="row">';
-            textResumen += '<div class="col-3" style="background:#f9f9c6">';
-            textResumen +=
-                '<p class="text-left"><b>FULLES= </b> <span id="spanFulles" style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
-                fulles + '</span></p>';
-            textResumen +=
-                '<p class="text-left"><b>PIEZAS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
-                qtyBox + '</span></p>';
-            textResumen +=
-                '<p class="text-left"><b>TALLOS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
-                acumTotalStm + '</span></p>';
-            textResumen +=
-                '<p class="text-left"><b>TOTAL= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">$ ' +
-                acumTotal.toFixed(2) + '</span></p>';
+            textResumen += '<div class="col-6">';
+            textResumen += '<div class="table-responsive">';
+            textResumen += '<table class="table table-bordered mb-4">';
+            textResumen += '<tbody>';
+            textResumen += '<tr>';
+            textResumen += '<td class="text-right">Fulles</td>';
+            textResumen += '<td class="text-right">' + fulles + '</td>';
+            textResumen += '<td class="text-right">Total finca</td>';
+            textResumen += '<td class="text-right">' + acumTotal.toFixed(2) + '</td>';
+            textResumen += '</tr>';
+            textResumen += '<tr>';
+            textResumen += '<td class="text-right">Piezas</td>';
+            textResumen += '<td class="text-right">' + qtyBox + '</td>';
+            textResumen += '<td class="text-right">Total Cliente</td>';
+            textResumen += '<td class="text-right">' + acumTotalCliente.toFixed(2) + '</td>';
+            textResumen += '</tr>';
+            textResumen += '<tr>';
+            textResumen += '<td class="text-right">Tallos</td>';
+            textResumen += '<td class="text-right">' + acumTotalStm + '</td>';
+            textResumen += '<td class="text-right">Diferencia</td>';
+            const diferencia = acumTotalCliente - acumTotal;
+            if (diferencia > 0) {
+                textResumen += '<td class="text-right">' + diferencia.toFixed(2) + '</td>';
+            } else {
+                textResumen += '<td class="text-right text-danger">' + diferencia.toFixed(2) + '</td>';
+            }
+            textResumen += '</tr>';
+            textResumen += '<tr>';
+            textResumen += '<td></td>';
+            textResumen += '<td></td>';
+            textResumen += '<td class="text-right">Comision</td>';
+            textResumen += '<td class="text-right"></td>';
+            textResumen += '</tr>';
+            textResumen += '</tbody>';
+            textResumen += '</table>';
+            textResumen += '</div>';
+            /*    textResumen +=
+                   '<p class="text-left"><b>FULLES= </b> <span id="spanFulles" style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
+                   fulles + '</span></p>';
+               textResumen +=
+                   '<p class="text-left"><b>PIEZAS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
+                   qtyBox + '</span></p>';
+               textResumen +=
+                   '<p class="text-left"><b>TALLOS= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">' +
+                   acumTotalStm + '</span></p>';
+               textResumen +=
+                   '<p class="text-left"><b>TOTAL= </b> <span style="color: #fd6a6a;font-size: 16px;font-weight: bold;">$ ' +
+                   acumTotal.toFixed(2) + '</span></p>'; */
             textResumen += '</div>';
             textResumen += '</div>';
             $('#datatablesVarieties').after(textResumen);

@@ -461,7 +461,7 @@ class Invoice_farm extends CI_Controller
         $this->load->model('Aeroline_model', 'aeroline');
         $all_aerolines = $this->aeroline->get_all(['is_active' => 1]);
         $data['aerolines'] = $all_aerolines;
-        $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => 0]);
+        $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => $this->mongo_db->ne(-1)]);
         $data['all_invoice'] = $all_invoice;
         $this->load_view_admin_g("invoice_farm/index_invoice_client", $data);
     }
