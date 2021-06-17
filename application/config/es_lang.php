@@ -112,6 +112,7 @@ $config['listar_invoice_wait_lang'] = "Listar facturas en espera";
 $config['manage_invoice_farms_lang'] = "Facturas";
 $config['listar_invoice_farms_lang'] = "Listar facturas de fincas";
 $config['add_invoice_farm_lang'] = "Adicionar factura finca";
+$config['add_invoice_lang'] = "Adicionar factura";
 $config['update_invoice_farm_lang'] = "Editar factura";
 $config['invoice_wait_lang'] = "Facturas en espera";
 $config['invoice_client_lang'] = "Packings";

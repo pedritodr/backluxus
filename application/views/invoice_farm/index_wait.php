@@ -130,6 +130,7 @@
                         <table id="example" class="table table-striped table-no-bordered table-hover non-hover dataTable" cellspacing="0" width="100%" style="width:100%">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Fecha</th>
                                     <th>Marcación</th>
                                     <th>Nro cajas</th>
@@ -146,6 +147,7 @@
 
                             <tfoot>
                                 <tr>
+                                    <th></th>
                                     <th>Fecha</th>
                                     <th>Marcación</th>
                                     <th>Nro cajas</th>
@@ -169,20 +171,22 @@
                                         if ($detail->status == 0) {
                                     ?>
                                             <tr>
+                                                <td> <?php
+                                                        $dateActual = date("Y-m-d");
+                                                        $date1 = new DateTime($dateActual);
+                                                        $date2 = new DateTime($item->dispatch_day);
+                                                        $diff = $date1->diff($date2);
+                                                        if ($diff->days >= 0 && $diff->days <= 2) {
+                                                            echo ' <span class="dot-green"></span>';
+                                                        } else if ($diff->days >= 3 && $diff->days <= 4) {
+                                                            echo ' <span class="dot-yellow"></span>';
+                                                        } else {
+                                                            echo ' <span class="dot-red"></span>';
+                                                        }
+                                                        ?>
+                                                </td>
                                                 <td>
-                                                    <?php
-                                                    $dateActual = date("Y-m-d");
-                                                    $date1 = new DateTime($dateActual);
-                                                    $date2 = new DateTime($item->dispatch_day);
-                                                    $diff = $date1->diff($date2);
-                                                    if ($diff->days >= 0 && $diff->days <= 2) {
-                                                        echo ' <span class="dot-green"></span> <span>' . $item->dispatch_day . '</span>';
-                                                    } else if ($diff->days >= 3 && $diff->days <= 4) {
-                                                        echo ' <span class="dot-yellow"></span> <span>' . $item->dispatch_day . '</span>';
-                                                    } else {
-                                                        echo ' <span class="dot-red"></span> <span>' . $item->dispatch_day . '</span>';
-                                                    }
-                                                    ?>
+                                                    <?= $item->dispatch_day ?>
                                                 </td>
                                                 <td><?= $item->markings->name_marking ?></td>
                                                 <td><?= $detail->boxNumber . $detail->typeBoxs->name ?></td>
@@ -233,7 +237,7 @@
                                                 <td><?= number_format($total, 2) ?></td>
                                                 <td class="text-center" style="width:10%">
                                                     <div class="n-chk" style="display:none">
-                                                        <label id="<?= $detail->id ?>" onclick="addItemBox((this),'<?= base64_encode(json_encode($item->markings)) ?>','<?= base64_encode(json_encode($item->farms)) ?>','<?= base64_encode(json_encode($detail)) ?>')" class="new-control new-checkbox new-checkbox-rounded checkbox-primary">
+                                                        <label id="<?= $detail->id ?>" onclick="addItemBox((this),'<?= base64_encode(json_encode($item->markings)) ?>','<?= base64_encode(json_encode($item->farms)) ?>','<?= base64_encode(json_encode($detail)) ?>','<?= base64_encode(json_encode($item)) ?>')" class="new-control new-checkbox new-checkbox-rounded checkbox-primary">
                                                             <input id="input_<?= $detail->id ?>" type="checkbox" class="new-control-input">
                                                             <span class="new-control-indicator"></span><?= translate('add_box_lang') ?>
                                                         </label>
@@ -250,76 +254,120 @@
                         <table id="example2" class="table table-striped table-no-bordered table-hover non-hover dataTable" cellspacing="0" width="100%" style="width:100%">
                             <thead>
                                 <tr>
-                                    <th>Marcación / Finca (nombre comercial y jurídico) / No de factura / Dia de
-                                        despacho / Total fulles / Total piezas</th>
-                                    <th>Acciones</th>
+                                    <th></th>
+                                    <th>MARCACIÓN</th>
+                                    <th>FINCA</th>
+                                    <th>FACTURA</th>
+                                    <th>DESPACHO</th>
+                                    <th>FULLES</th>
+                                    <th>HB</th>
+                                    <th>QB</th>
+                                    <th>EB</th>
+                                    <th></th>
                                 </tr>
                             </thead>
 
                             <tfoot>
                                 <tr>
-                                    <th>Marcación / Finca (nombre comercial y jurídico) / No de factura / Dia de
-                                        despacho / Total fulles / Total piezas</th>
-                                    <th>Acciones</th>
+                                    <th></th>
+                                    <th>MARCACIÓN</th>
+                                    <th>FINCA</th>
+                                    <th>FACTURA</th>
+                                    <th>DESPACHO</th>
+                                    <th>FULLES</th>
+                                    <th>HB</th>
+                                    <th>QB</th>
+                                    <th>EB</th>
+                                    <th></th>
                                 </tr>
                             </tfoot>
 
                             <tbody>
-                                <?php foreach ($all_invoice_farm as $item) { ?>
-                                    <?php foreach ($item->details as $detail) {
+                                <?php foreach ($all_invoice_farm as $item) {
+
+                                    $acumQB = 0;
+                                    $acumHB = 0;
+                                    $acumEB = 0;
+                                    $piezas = 0;
+
+                                    $item->farms->invoice_farm = $item->invoice_farm;
+                                    $item->farms->dispatch_day = $item->dispatch_day;
+                                    $item->farms->invoice_number = $item->invoice_number;
+                                    foreach ($item->details as $detail) {
                                         if ($detail->status == 0) {
-                                    ?>
-                                            <tr>
-                                                <?php
-                                                $acumQB = 0;
-                                                $acumHB = 0;
-                                                $acumEB = 0;
-                                                $piezas = 0;
+                                            if ($detail->typeBoxs->name == 'QB') {
+                                                $acumQB += (int)$detail->boxNumber;
+                                            } elseif ($detail->typeBoxs->name == 'HB') {
+                                                $acumHB += (int)$detail->boxNumber;
+                                            } else {
+                                                $acumEB += (int)$detail->boxNumber;
+                                            }
+                                            $piezas += (int)$detail->boxNumber;
+                                        }
+                                    }
 
-                                                $item->farms->invoice_farm = $item->invoice_farm;
-                                                $item->farms->dispatch_day = $item->dispatch_day;
-                                                $item->farms->invoice_number = $item->invoice_number;
-                                                if ($detail->typeBoxs->name == 'QB') {
-                                                    $acumQB += (int)$detail->boxNumber;
-                                                } elseif ($detail->typeBoxs->name == 'HB') {
-                                                    $acumHB += (int)$detail->boxNumber;
-                                                } else {
-                                                    $acumEB += (int)$detail->boxNumber;
-                                                }
-                                                $piezas += (int)$detail->boxNumber;
-                                                $fulles = ($acumHB * 0.50) + ($acumQB * 0.25) + ($acumEB * 0.125);
-                                                if ($acumEB > 0) {
-                                                    $fulles = number_format($fulles, 3);
-                                                } else {
-                                                    $fulles = number_format($fulles, 2);
-                                                }
-                                                ?>
-                                                <td> <?php
-                                                        $dateActual = date("Y-m-d");
-                                                        $date1 = new DateTime($dateActual);
-                                                        $date2 = new DateTime($item->dispatch_day);
-                                                        $diff = $date1->diff($date2);
-                                                        if ($diff->days >= 0 && $diff->days <= 2) {
-                                                            echo ' <span class="dot-green"></span> <span> ';
-                                                        } else if ($diff->days >= 3 && $diff->days <= 4) {
-                                                            echo ' <span class="dot-yellow"></span> <span> ';
-                                                        } else {
-                                                            echo ' <span class="dot-red"></span> <span> ';
-                                                        }
-                                                        ?><?= $item->markings->name_marking . '<b>/</b>' . $item->farms->name_commercial . '(' . $item->farms->name_legal . ')<b>/</b>' . $item->invoice_number . '<b>/</b>' . $item->dispatch_day . '<b>/</b>' . $fulles . '<b>/</b>' . $piezas . '<b>/</b>' . $item->awb ?>
+                                    $fulles = ($acumHB * 0.50) + ($acumQB * 0.25) + ($acumEB * 0.125);
+                                    if ($acumEB > 0) {
+                                        $fulles = number_format($fulles, 3);
+                                    } else {
+                                        $fulles = number_format($fulles, 2);
+                                    }
 
-                                                </td>
-                                                <td class="text-center" style="width:10%">
-                                                    <div class="n-chk" style="display:none">
-                                                        <label id="mode_<?= $detail->id ?>" onclick="addItemBox((this),'<?= base64_encode(json_encode($item->markings)) ?>','<?= base64_encode(json_encode($item->farms)) ?>','<?= base64_encode(json_encode($detail)) ?>')" class="new-control new-checkbox new-checkbox-rounded checkbox-primary">
-                                                            <input id="input_mode_<?= $detail->id ?>" type="checkbox" class="new-control-input">
-                                                            <span class="new-control-indicator"></span><?= translate('add_box_lang') ?>
-                                                        </label>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                    <?php }
-                                    } ?>
+                                ?>
+                                    <tr>
+                                        <td>
+                                            <?php
+                                            $dateActual = date("Y-m-d");
+                                            $date1 = new DateTime($dateActual);
+                                            $date2 = new DateTime($item->dispatch_day);
+                                            $diff = $date1->diff($date2);
+                                            if ($diff->days >= 0 && $diff->days <= 2) {
+                                                echo ' <span class="dot-green"></span> <span> ';
+                                            } else if ($diff->days >= 3 && $diff->days <= 4) {
+                                                echo ' <span class="dot-yellow"></span> <span> ';
+                                            } else {
+                                                echo ' <span class="dot-red"></span> <span> ';
+                                            }
+                                            ?>
+                                        </td>
+
+                                        <td>
+                                            <?= $item->markings->name_marking   ?>
+                                        </td>
+
+                                        <td>
+                                            <?= $item->farms->name_legal ?>
+                                        </td>
+
+                                        <td>
+                                            <?= $item->invoice_number ?>
+                                        </td>
+                                        <td>
+                                            <?= $item->dispatch_day ?>
+                                        </td>
+
+                                        <td>
+                                            <?= $fulles  ?>
+                                        </td>
+                                        <td>
+                                            <?= $acumHB ?>
+                                        </td>
+                                        <td>
+                                            <?= $acumQB ?>
+                                        </td>
+                                        <td>
+                                            <?= $acumEB ?>
+                                        </td>
+                                        <td class="text-center" style="width:10%">
+                                            <div class="n-chk" style="display:none">
+                                                <label id="mode_<?= $item->invoice_farm ?>" onclick="addItemInvoiceFarm((this),'<?= base64_encode(json_encode($item)) ?>')" class="new-control new-checkbox new-checkbox-rounded checkbox-primary">
+                                                    <input id="input_mode_<?= $item->invoice_farm ?>" type="checkbox" class="new-control-input">
+                                                    <span class="new-control-indicator"></span><?= translate('add_invoice_lang') ?>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+
                                 <?php } ?>
                             </tbody>
                         </table>
@@ -491,7 +539,7 @@
     $(() => {
         $('#awb').inputmask("999-9999-9999");
         if (change == 0) {
-            $('#mode2').hide();
+            $('#mode1').hide();
         }
         table = $('#example').DataTable({
             "order": [
@@ -505,6 +553,43 @@
         });
         $("#example thead th").each(function(i) {
 
+            if ($(this).text() !== '') {
+                let isStatusColumn = (($(this).text() == 'Status') ? true : false);
+                let select = $('<select class="selectedFilter"><option value="">' + $(this).text() +
+                        '</option></select>')
+                    .appendTo($(this).empty())
+                    .on('change', function() {
+                        let val = $(this).val();
+                        table.column(i)
+                            .search(val ? '^' + $(this).val() + '$' : val, true, false)
+                            .draw();
+                    });
+
+                // Get the Status values a specific way since the status is a anchor/image
+                if (isStatusColumn) {
+                    let statusItems = [];
+                    /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
+                    table.column(i).nodes().to$().each(function(d, j) {
+                        let thisStatus = $(j).attr("data-filter");
+                        if ($.inArray(thisStatus, statusItems) === -1) statusItems.push(thisStatus);
+                    });
+
+                    statusItems.sort();
+
+                    $.each(statusItems, function(i, item) {
+                        select.append('<option value="' + item + '">' + item + '</option>');
+                    });
+
+                }
+                // All other non-Status columns (like the example)
+                else {
+                    table.column(i).data().unique().sort().each(function(d, j) {
+                        select.append('<option value="' + d + '">' + d + '</option>');
+                    });
+                }
+            }
+        });
+        $("#example2 thead th").each(function(i) {
             if ($(this).text() !== '') {
                 let isStatusColumn = (($(this).text() == 'Status') ? true : false);
                 let select = $('<select class="selectedFilter"><option value="">' + $(this).text() +
@@ -1121,12 +1206,11 @@
 
     const handleSelectedInvoice = (ItemsSelected = []) => {
         ItemsSelected = JSON.parse(decodeB64Utf8(ItemsSelected));
-        table.column(1)
+        table.column(2)
             .search(ItemsSelected[0].marking.name_marking ? '^' + ItemsSelected[0].marking.name_marking + '$' : ItemsSelected[0].marking.name_marking, true, false)
             .draw();
         $('.n-chk').show();
-        table2.search(ItemsSelected[0].marking.name_marking).draw();
-        console.log(ItemsSelected);
+        table2.search(marking.name_marking).draw();
         if (ItemsSelected.length > 0) {
             Swal.fire({
                 title: 'Completando operación',
@@ -1197,12 +1281,13 @@
         return decodeURIComponent(escape(atob(str)));
     }
 
-    const addItemBox = (e, marking, farm, box) => {
+    const addItemBox = (e, marking, farm, box, object) => {
         let markingS = $('select[id=markings] option').filter(':selected').attr('itemId');
         markingS = JSON.parse(decodeB64Utf8(marking));
         marking = JSON.parse(decodeB64Utf8(marking));
         farm = JSON.parse(decodeB64Utf8(farm));
         box = JSON.parse(decodeB64Utf8(box));
+        object = JSON.parse(decodeB64Utf8(object));
         box.invoice_farm = farm.invoice_farm;
         if ($('#input_' + e.id).prop('checked')) {
             if (arraySelectedInvoice.length > 0) {
@@ -1212,10 +1297,16 @@
                         if (item.farm.farm_id == farm.farm_id) {
                             encontro = true;
                             item.boxs.push(box);
+                            if (item.boxs.length == object.details.length) {
+                                $('#input_mode_' + object.invoice_farm).prop('checked', true);
+                            }
                         }
                     });
                     if (!encontro) {
                         let arrayBoxs = [];
+                        if (object.details.length == 1) {
+                            $('#input_mode_' + object.invoice_farm).prop('checked', true);
+                        }
                         arrayBoxs.push(box);
                         let temp = {
                             farm: farm,
@@ -1263,6 +1354,9 @@
                                 $('#input_mode_' + e.id).prop('checked', false);
                                 $('#input_' + e.id).prop('checked', false);
                             }
+                            if (object.details.length == 1) {
+                                $('#input_mode_' + object.invoice_farm).prop('checked', false);
+                            }
                         }
                     })
                 }
@@ -1273,6 +1367,9 @@
                     farm: farm,
                     boxs: arrayBoxs,
                     marking: marking
+                }
+                if (object.details.length == 1) {
+                    $('#input_mode_' + object.invoice_farm).prop('checked', true);
                 }
                 arraySelectedInvoice.push(temp);
                 const toast = swal.mixin({
@@ -1301,9 +1398,13 @@
                 const index = element.boxs.findIndex(x => x.id === box.id);
                 if (index > -1) {
                     element.boxs.splice(index, 1);
+                    if (element.boxs.length != object.details.length) {
+                        $('#input_mode_' + object.invoice_farm).prop('checked', false);
+                    }
                 }
                 if (element.boxs.length == 0) {
                     arraySelectedInvoice.splice(indice, 1);
+                    $('#input_mode_' + object.invoice_farm).prop('checked', false);
                 }
             });
             const toast = swal.mixin({
@@ -1320,40 +1421,135 @@
             })
         }
         validBtnCancel();
-        /*   swal({
-              title: '¿ Quieres ir al detalle de la factura ?',
-              type: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Si',
-              cancelButtonText: 'No',
-              padding: '2em'
-          }).then(function(result) {
-              if (result.value) {
-                  if (arrayInvoiceUpdate.length > 0) {
-                      showModalInvoiceClients();
-                  } else {
-                      loadingInvoice();
-                  }
-              } else {
-                  if (arrayInvoiceUpdate.length > 0) {
-                      $('#btnInvoiceClient').hide();
-                      $('#btnLoadInvoice').show();
-                  } else {
-                      $('#btnInvoiceClient').show();
-                      $('#btnLoadInvoice').hide();
-                  }
-              }
-          }) */
+    }
 
+    const addItemInvoiceFarm = (ev, invoiceFarm) => {
+        invoiceFarm = JSON.parse(decodeB64Utf8(invoiceFarm));
+        if ($('#input_' + ev.id).prop('checked')) {
+            if (arraySelectedInvoice.length > 0) {
+                if (arraySelectedInvoice[0].marking.name_marking === invoiceFarm.markings.name_marking) {
+                    if (invoiceFarm.details.length > 0) {
+                        invoiceFarm.details.forEach(box => {
+                            let encontro = false;
+                            arraySelectedInvoice.forEach(item => {
+                                if (item.farm.farm_id == invoiceFarm.farms.farm_id) {
+                                    encontro = true;
+                                    item.boxs.push(box);
+                                }
+                            });
+                            if (!encontro) {
+                                let arrayBoxs = [];
+                                arrayBoxs.push(box);
+                                let temp = {
+                                    farm: invoiceFarm.farms,
+                                    boxs: arrayBoxs,
+                                    marking: invoiceFarm.markings
+                                }
+                                arraySelectedInvoice.push(temp);
+                            }
+                        });
+                    }
+                    const toast = swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        padding: '3em'
+                    });
+                    toast({
+                        type: 'success',
+                        title: 'item agregado correctamente',
+                        padding: '3em',
+                    })
+
+                    if (invoiceFarm.details.length > 0) {
+                        invoiceFarm.details.forEach(box => {
+                            $('#input_' + box.id).prop('checked', true);
+                        })
+                    }
+
+                } else {
+                    swal({
+                        title: 'Información',
+                        text: `${arraySelectedInvoice[0].marking.name_marking} es diferente de ${marking.name_marking}`,
+                        type: 'warning',
+                        showCancelButton: false,
+                        confirmButtonText: 'Continuar',
+                        padding: '2em',
+                        allowOutsideClick: false,
+                    }).then(function(result) {
+                        if (result.value) {
+                            if (invoiceFarm.details.length > 0) {
+                                invoiceFarm.details.forEach(box => {
+                                    $('#input_' + box.id).prop('checked', false);
+                                })
+                            }
+                        }
+                    })
+                }
+            } else {
+                let temp = {
+                    farm: invoiceFarm.farms,
+                    boxs: invoiceFarm.details,
+                    marking: invoiceFarm.markings
+                }
+                arraySelectedInvoice.push(temp);
+                const toast = swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    padding: '3em'
+                });
+                toast({
+                    type: 'success',
+                    title: 'item agregado correctamente',
+                    padding: '3em',
+                })
+
+                if (invoiceFarm.details.length > 0) {
+                    invoiceFarm.details.forEach(box => {
+                        $('#input_' + box.id).prop('checked', true);
+                    })
+                }
+            }
+        } else {
+            if (invoiceFarm.details.length > 0) {
+                invoiceFarm.details.forEach(box => {
+                    arraySelectedInvoice.forEach((element, indice, array) => {
+                        const index = element.boxs.findIndex(x => x.id === box.id);
+                        if (index > -1) {
+                            element.boxs.splice(index, 1);
+                        }
+                        if (element.boxs.length == 0) {
+                            arraySelectedInvoice.splice(indice, 1);
+                        }
+                    });
+                    $('#input_' + box.id).prop('checked', false);
+                })
+            }
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '3em'
+            });
+            toast({
+                type: 'success',
+                title: 'item removido correctamente',
+                padding: '3em',
+            })
+        }
+        validBtnCancel();
     }
 
     const changeMarking = () => {
         let marking = $('select[id=markings] option').filter(':selected').attr('itemId');
         marking !== '0' ? marking = JSON.parse(decodeB64Utf8(marking)) : marking = 0;
         if (marking !== 0) {
-
             $("#awb").inputmask("setvalue", marking.awb);
-            table.column(1)
+            table.column(2)
                 .search(marking.name_marking ? '^' + marking.name_marking + '$' : marking.name_marking, true, false)
                 .draw();
             $('.n-chk').show();
@@ -1403,12 +1599,12 @@
         setTimeout(() => {
             if (change == 0) {
                 change = 1;
-                $('#mode1').hide();
-                $('#mode2').show();
+                $('#mode2').hide();
+                $('#mode1').show();
             } else {
                 change = 0;
-                $('#mode1').show();
-                $('#mode2').hide();
+                $('#mode2').show();
+                $('#mode1').hide();
             }
             Swal.close();
         }, 1500);
