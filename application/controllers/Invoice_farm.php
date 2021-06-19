@@ -426,15 +426,20 @@ class Invoice_farm extends CI_Controller
             'number_invoice' => $numberSecuencial,
             'airline' => $airline
         ];
-        $resquest =  $this->invoice_farm->create_invoice_client($data_invoice);
+        $resquest = $this->invoice_farm->create_invoice_client($data_invoice);
+        $resquest = true;
         if ($resquest) {
             $this->user->update($objUser->user_id, ['secuencial' => $numberSecuencial]);
             foreach ($arrayRequest as $item) {
                 foreach ($item->boxs as $box) {
-                    $this->invoice_farm->update_invoice_farm_details($box->id, ['status' => 1]);
+                    $this->invoice_farm->update_status_box($item->invoice, $box->id, 1);
                     $response =   $this->invoice_farm->get_all_details_status($box->id, 0);
                     if (!$response) {
-                        $this->invoice_farm->update_invoice_farm($box->id, ['status' => 1]);
+                        if ($awb !== '') {
+                            $this->invoice_farm->update($item->invoice, ['status' => 1, 'packing' => $numberSecuencial, 'invoice' => $invoice]);
+                        } else {
+                            $this->invoice_farm->update($item->invoice, ['status' => 1, 'awb' => $awb, 'packing' => $numberSecuencial, 'invoice' => $invoice]);
+                        }
                     }
                 }
             }
@@ -520,13 +525,22 @@ class Invoice_farm extends CI_Controller
             'details' => $arrayRequest
         ];
         $resquest =  $this->invoice_farm->update_invoice_client($invoice, $data_invoice);
+        $object = $this->invoice_farm->get_by_id_invoice_client($invoice);
         if ($resquest) {
             foreach ($arrayRequest as $item) {
                 foreach ($item->boxs as $box) {
-                    $this->invoice_farm->update_invoice_farm_details($box->id, ['status' => 1]);
+                    $this->invoice_farm->update_status_box($item->invoice, $box->id, 1);
                     $response =   $this->invoice_farm->get_all_details_status($box->id, 0);
                     if (!$response) {
-                        $this->invoice_farm->update_invoice_farm($box->id, ['status' => 1]);
+                        if (property_exists($object, 'date_awb')) {
+                            if ($object->date_awb !== '') {
+                                $this->invoice_farm->update($item->invoice, ['status' => 1, 'awb' => $object->awb, 'dispatch_day' => $object->date_awb, 'packing' => $object->number_invoice, 'invoice' => $invoice]);
+                            } else {
+                                $this->invoice_farm->update($item->invoice, ['status' => 1, 'packing' => $object->number_invoice, 'invoice' => $invoice]);
+                            }
+                        } else {
+                            $this->invoice_farm->update($item->invoice, ['status' => 1, 'packing' => $object->number_invoice, 'invoice' => $invoice]);
+                        }
                     }
                 }
             }
@@ -751,24 +765,14 @@ class Invoice_farm extends CI_Controller
         $date = $this->input->post('dateAwb');
         $airline = $this->input->post('airline');
         $invoiceObject = $this->invoice_farm->get_by_id_invoice_client($invoice);
-        $arrInvoiceFarms = [];
         if ($invoiceObject) {
             if (count($invoiceObject->details)) {
                 foreach ($invoiceObject->details as $item) {
-                    if (count($item->boxs) > 0) {
-                        foreach ($item->boxs as $box) {
-                            if (!in_array($box->invoice_farm, $arrInvoiceFarms)) {
-                                $arrInvoiceFarms[] = $box->invoice_farm;
-                            }
-                        }
+                    if ($awb == '') {
+                        $this->invoice_farm->update($item->invoice, ['dispatch_day' => $date, 'packing' => $invoiceObject->number_invoice, 'invoice' => $invoiceObject->invoice]);
+                    } else {
+                        $this->invoice_farm->update($item->invoice, ['awb' => $awb, 'dispatch_day' => $date, 'packing' => $invoiceObject->number_invoice, 'invoice' => $invoiceObject->invoice]);
                     }
-                }
-            }
-            foreach ($arrInvoiceFarms as $item) {
-                if ($awb == '') {
-                    $this->invoice_farm->update($item, ['dispatch_day' => $date, 'packing' => $invoiceObject->number_invoice, 'invoice' => $invoiceObject->invoice]);
-                } else {
-                    $this->invoice_farm->update($item, ['awb' => $awb, 'dispatch_day' => $date, 'packing' => $invoiceObject->number_invoice, 'invoice' => $invoiceObject->invoice]);
                 }
             }
         }

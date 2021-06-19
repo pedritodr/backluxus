@@ -24,7 +24,9 @@ $config['edit_boxlang'] = "Actualizar caja";
 $config['add_boxlang'] = "Adicionar caja";
 $config['cancel_lang'] = "Cancelar";
 $config['add_items_invoice_clients_lang'] = "Agregar items facturas clientes";
-
+$config['complet_packing_lang'] = "Completar packing";
+$config['visulize_by_invoice_lang'] = "Visualizar por facturas";
+$config['visulize_by_box_lang'] = "Visualizar por cajas";
 
 $config['manage_measures_lang'] = "Gestionar medidas y pesos";
 $config['listar_measures_lang'] = "Listar medidas y pesos";

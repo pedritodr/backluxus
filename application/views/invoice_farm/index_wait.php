@@ -118,9 +118,8 @@
         <div class="col-xs-12">
             <div class="statbox widget box box-shadow">
                 <div class="widget-header">
-                    <h3 class="text-simple"><?= translate('listar_invoice_wait_lang'); ?> <span><button class="btn btn-info" onclick="changeVisualization()" type="button">Cambiar
-                                visualización</button></span><span><button class="btn btn-success" id="btnInvoiceClient" onclick="loadingInvoice()" type="button"><?= translate('mode_billing_lang') ?>
-                            </button></span><span><button class="btn btn-primary" id="btnLoadInvoice" onclick="showModalInvoiceClients()" type="button"><?= translate('add_items_invoice_clients_lang') ?>
+                    <h3 class="text-simple"><?= translate('listar_invoice_wait_lang'); ?> <span><button id="btnChangeVisualize" class="btn btn-info" onclick="changeVisualization()" type="button"><?= translate('visulize_by_box_lang') ?></button></span><span><button class="btn btn-success" id="btnInvoiceClient" onclick="loadingInvoice()" type="button"><?= translate('mode_billing_lang') ?>
+                            </button></span><span><button class="btn btn-primary" id="btnLoadInvoice" onclick="showModalInvoiceClients()" type="button"><?= translate('complet_packing_lang') ?>
                             </button></span><span><button class="btn btn-danger" id="btnCancel" onclick="cancel()" style="display:none" type="button"><?= translate('cancel_lang') ?>
                             </button></span></h3>
                 </div><!-- /.box-header -->
@@ -409,17 +408,12 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="modalLoadInvoice" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="lblHeaderInvoice"><?= translate('mode_billing_lang') ?></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
             </div>
             <div class="modal-body table-responsive" id="bodyModalLoadInvoice">
 
@@ -505,12 +499,14 @@
                 </div>
             </div>
             <div class=" modal-footer">
+                <button class="btn btn-primary" onclick="cancelSelectedItems()"><i class="flaticon-cancel-12"></i> Cancelar</button>
                 <button class="btn" onclick="validSelectedItems()"><i class="flaticon-cancel-12"></i> Seleccionar items</button>
                 <button class="btn btn-success" id="btnInvoice" onclick="generateInvoice()" type="button">generar invoice</button>
             </div>
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="modalDetailsItems" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
@@ -536,6 +532,7 @@
 <script>
     let listInvoice = '<?= json_encode($all_invoice_farm) ?>';
     let arraySelectedInvoice = [];
+    let completPacking = false;
     $(() => {
         $('#awb').inputmask("999-9999-9999");
         if (change == 0) {
@@ -636,14 +633,72 @@
     });
     let table;
     let table2;
+
+    const cancelSelectedItems = () => {
+        if (arraySelectedInvoice.length > 0) {
+            swal({
+                title: '¿ Estás seguro de realizar esta operación ?',
+                text: "Ya tiene facturas seleccionadas",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Cancelar todo',
+                padding: '2em',
+                allowOutsideClick: false,
+            }).then(function(result) {
+                if (result.value) {
+                    $('.n-chk').hide();
+                    table2
+                        .search('')
+                        .columns().search('')
+                        .draw();
+                    table
+                        .search('')
+                        .columns().search('')
+                        .draw();
+                    if (!completPacking) {
+                        $('#markings').val(0);
+                        $('#markings').trigger('change');
+                    } else {
+                        $('[id=markingsInvoice]').val('0');
+                        $('#markingsInvoice').trigger('change');
+                    }
+                    arraySelectedInvoice = [];
+                    $('#awb').val('');
+                    $('#modalLoadInvoice').modal('hide');
+                }
+            })
+        } else {
+            $('.n-chk').hide();
+            table2
+                .search('')
+                .columns().search('')
+                .draw();
+            table
+                .search('')
+                .columns().search('')
+                .draw();
+            if (!completPacking) {
+                $('#markings').val(0);
+                $('#markings').trigger('change');
+            } else {
+                $('[id=markingsInvoice]').val('0');
+                $('#markingsInvoice').trigger('change');
+            }
+            arraySelectedInvoice = [];
+            $('#awb').val('');
+            $('#modalLoadInvoice').modal('hide');
+        }
+    }
+
     const loadingInvoice = () => {
+        completPacking = false;
         $('#btnInvoice').attr('onclick', 'generateInvoice()');
         $('#btnInvoice').text('Generar invoice');
         $('#markings').prop('disabled', false);
         $('#bodySearchAwb').hide();
         $('#bodyAwb').show();
         $('#btnCancel').show();
-        $('#btnLoadInvoice').hide();
+        // $('#btnLoadInvoice').hide();
         printSelectedInvoice();
         $('#lblHeaderInvoice').text('<?= translate('mode_billing_lang') ?>');
         $('#modalLoadInvoice').modal({
@@ -727,12 +782,6 @@
                 });
             }, 1500);
 
-        } else {
-            Swal.fire({
-                title: '¡Mensaje!',
-                text: 'Seleccione una marcación para continuar',
-                padding: '2em'
-            });
         }
 
     }
@@ -1126,11 +1175,11 @@
         $('#bodyTableLoadInvoice').empty();
         if (arraySelectedInvoice.length > 0) {
             if (arrayInvoiceUpdate > 0) {
-                $('#btnInvoiceClient').hide();
-                $('#btnLoadInvoice').show();
+                // $('#btnInvoiceClient').hide();
+                //  $('#btnLoadInvoice').show();
             } else {
-                $('#btnInvoiceClient').show();
-                $('#btnLoadInvoice').hide();
+                //  $('#btnInvoiceClient').show();
+                //$('#btnLoadInvoice').hide();
             }
             let acumHb = 0;
             let acumQb = 0;
@@ -1210,7 +1259,7 @@
             .search(ItemsSelected[0].marking.name_marking ? '^' + ItemsSelected[0].marking.name_marking + '$' : ItemsSelected[0].marking.name_marking, true, false)
             .draw();
         $('.n-chk').show();
-        table2.search(marking.name_marking).draw();
+        table2.search(ItemsSelected[0].marking.name_marking).draw();
         if (ItemsSelected.length > 0) {
             Swal.fire({
                 title: 'Completando operación',
@@ -1236,7 +1285,7 @@
                     })
                     arrayInvoiceUpdate = countBoxs;
                     invoiceClientUpdate = ItemsSelected[0].invoice;
-                    $('#lblHeaderInvoice').text('<?= translate("invoice_number_lang"); ?>: ' + ItemsSelected[0].numberInvoice);
+                    $('#lblHeaderInvoice').text('<?= translate("complet_packing_lang"); ?>: ');
                     printSelectedInvoice();
                     Swal.close();
                     const toast = swal.mixin({
@@ -1294,7 +1343,7 @@
                 if (arraySelectedInvoice[0].marking.name_marking === markingS.name_marking) {
                     let encontro = false;
                     arraySelectedInvoice.forEach(item => {
-                        if (item.farm.farm_id == farm.farm_id) {
+                        if (item.invoice.invoice_farm == object.invoice_farm) {
                             encontro = true;
                             item.boxs.push(box);
                             if (item.boxs.length == object.details.length) {
@@ -1309,6 +1358,7 @@
                         }
                         arrayBoxs.push(box);
                         let temp = {
+                            invoice: object.invoice_farm,
                             farm: farm,
                             boxs: arrayBoxs,
                             marking: marking
@@ -1364,6 +1414,7 @@
                 let arrayBoxs = [];
                 arrayBoxs.push(box);
                 let temp = {
+                    invoice: object.invoice_farm,
                     farm: farm,
                     boxs: arrayBoxs,
                     marking: marking
@@ -1432,7 +1483,7 @@
                         invoiceFarm.details.forEach(box => {
                             let encontro = false;
                             arraySelectedInvoice.forEach(item => {
-                                if (item.farm.farm_id == invoiceFarm.farms.farm_id) {
+                                if (item.invoice.invoice_farm == invoiceFarm.invoice_farm) {
                                     encontro = true;
                                     item.boxs.push(box);
                                 }
@@ -1441,6 +1492,7 @@
                                 let arrayBoxs = [];
                                 arrayBoxs.push(box);
                                 let temp = {
+                                    invoice: invoiceFarm.invoice_farm,
                                     farm: invoiceFarm.farms,
                                     boxs: arrayBoxs,
                                     marking: invoiceFarm.markings
@@ -1489,6 +1541,7 @@
                 }
             } else {
                 let temp = {
+                    invoice: invoiceFarm.invoice_farm,
                     farm: invoiceFarm.farms,
                     boxs: invoiceFarm.details,
                     marking: invoiceFarm.markings
@@ -1581,6 +1634,18 @@
                     }
                 }
             });
+        } else {
+            $('.n-chk').hide();
+            table2
+                .search('')
+                .columns().search('')
+                .draw();
+            table
+                .search('')
+                .columns().search('')
+                .draw();
+
+            $('#awb').val('');
         }
     }
 
@@ -1601,10 +1666,12 @@
                 change = 1;
                 $('#mode2').hide();
                 $('#mode1').show();
+                $('#btnChangeVisualize').html('<?= translate('visulize_by_invoice_lang') ?>');
             } else {
                 change = 0;
                 $('#mode2').show();
                 $('#mode1').hide();
+                $('#btnChangeVisualize').html('<?= translate('visulize_by_box_lang') ?>');
             }
             Swal.close();
         }, 1500);
@@ -1953,6 +2020,7 @@
     }
 
     const showModalInvoiceClients = () => {
+        completPacking = true;
         $('#btnInvoice').attr('onclick', 'updateInvoice()');
         $('#btnInvoice').text('Adicionar items');
         $('#bodySearchAwb').show();
@@ -2135,14 +2203,27 @@
     }
 
     const validBtnCancel = () => {
-        $('#btnCancel').show();
+        if (arraySelectedInvoice.length > 0) {
+            if (!completPacking) {
+                $('#btnInvoiceClient').show();
+                $('#btnLoadInvoice').hide();
+            } else {
+                $('#btnInvoiceClient').hide();
+                $('#btnLoadInvoice').show();
+            }
+            $('#btnCancel').show()
+        } else {
+            $('#btnInvoiceClient').show();
+            $('#btnLoadInvoice').show();
+            $('#btnCancel').hide();
+        }
+
     }
 
     const validSelectedItems = () => {
         let markingS = $('select[id=markings] option').filter(':selected').attr('itemId');
         let marking = $('select[id=markingsInvoice] option').filter(':selected').attr('itemId');
         let bodySearchAwb = $('#bodySearchAwb').css('display');
-        console.log(bodySearchAwb)
         if (bodySearchAwb === 'flex') {
             if (arrayInvoiceUpdate > 0) {
                 $('#modalLoadInvoice').modal('hide');

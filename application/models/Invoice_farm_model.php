@@ -73,7 +73,7 @@ class Invoice_farm_model extends CI_Model
         $result = $this->mongo_db->where('details.id', $id)->update('invoice_farm');
         return $result;
     }
-    function get_all_details_status($id = 0, $status = '0')
+    function get_all_details_status($id = 0, $status = 0)
     {
         $fields = [
             'details' => ['$filter'  => ['input' => '$details', 'as' => 'detail', 'cond' => ['$eq' => ['$$detail.status', $status]]]],
@@ -141,6 +141,19 @@ class Invoice_farm_model extends CI_Model
             ['arrayFilters' => [
                 ['d.id' => ['$eq' => $box_id]],
                 ['v.id' => ['$eq' => $variety_id]]
+            ]]
+        );
+        return $query;
+    }
+    function update_status_box($invoice_id, $box_id, $data)
+    {
+        $query = $this->mongodb->luxus->invoice_farm->updateOne(
+            ['invoice_farm' => ['$eq' => $invoice_id]],
+            ['$set' => [
+                'details.$[d].status' => $data,
+            ]],
+            ['arrayFilters' => [
+                ['d.id' => ['$eq' => $box_id]],
             ]]
         );
         return $query;
