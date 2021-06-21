@@ -257,6 +257,11 @@
                                                                         <?php foreach ($item->markings as $marking) { ?>
                                                                             <?php $marking->name_commercial = $item->name_commercial;
                                                                             $marking->name_company = $item->name_company;
+                                                                            if (property_exists($item, 'comision')) {
+                                                                                $marking->comision = $item->comision;
+                                                                            } else {
+                                                                                $marking->comision = 8;
+                                                                            }
                                                                             ?>
                                                                             <option itemId="<?= base64_encode(json_encode($marking)) ?>" value="<?= $marking->marking_id ?>"><?= $marking->name_marking . ' | ' . $item->name_commercial ?></option>
                                                                         <?php } ?>

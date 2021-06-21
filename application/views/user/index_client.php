@@ -75,6 +75,12 @@
                                                 <p><b><?= translate('director_lang') ?>:</b> <?= $item->name_commercial ?></p>
                                                 <p><b><?= translate('email_lang') ?>:</b> <?= $item->email ?></p>
                                                 <p><b><?= translate('phone_lang') ?>:</b> <?= $item->phone ?></p>
+                                                <?php if (property_exists($item, 'comision')) {
+                                                    echo ' <p><b>' . translate('comision_lang') . ': </b>' . number_format($item->comision, 2) . '%</p>';
+                                                } else {
+                                                    echo ' <p><b>' . translate('comision_lang') . ': </b>8.00%</p>';
+                                                } ?>
+
                                             </td>
                                             <td>
                                                 <?= $item->observations ?>

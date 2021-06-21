@@ -191,7 +191,7 @@
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="updateAwb('<?= base64_encode(json_encode($item)) ?>')"><?= translate("edit_awb_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)"><?= translate("send_invoice_lang"); ?></a>
                                                         <a class="dropdown-item" href="<?= site_url('invoice_farm/export_invoice/' . $item->invoice) ?>"><?= translate("export_invoice_lang"); ?></a>
-                                                        <a class="dropdown-item" href="javascript:void(0)"><?= translate("cancel_invoice_lang"); ?></a>
+                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><?= translate("cancel_invoice_lang"); ?></a>
                                                     </div>
                                                 </div>
                                             </td>
@@ -291,6 +291,22 @@
         return decodeURIComponent(escape(atob(str)));
     }
 
+    const cancelInvoice = (id) => {
+        swal({
+            title: '¿ Estás seguro de realizar esta operación ?',
+            text: "Usted no podrá revertir este cambio !!!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Cancelar invoice',
+            padding: '2em'
+        }).then(function(result) {
+            if (result.value) {
+                let urlCancel = '<?= site_url("invoice_farm/cancel_invoice/"); ?>' + id;
+                window.location.href = urlCancel;
+            }
+        })
+    }
+
     let arrayDetails = [];
     let idInvoice = null;
 
@@ -322,6 +338,7 @@
         let acumHb = 0;
         let acumQb = 0;
         let acumEb = 0;
+        let acumComision = 0;
         if (details.length > 0) {
             let texto_tabla = '';
             texto_tabla +=
@@ -417,6 +434,7 @@
                     let acumBoxBunches = 0;
                     let acumTotalBox = 0;
                     let acumBoxTotalStems = 0;
+                    let acumTotalBoxClient = 0;
                     $('#bodyTableDetails').append(textBox);
                     if (box.varieties.length > 0) {
                         box.varieties.forEach(element => {
@@ -505,6 +523,7 @@
                                 spanTotalCliente = '<span>' + totalPriceCliente.toFixed(2) + '</span>';
 
                             }
+                            acumTotalBoxClient += totalPriceCliente;
                             acumTotalCliente += totalPriceCliente;
 
                             textVariety += '</td>';
@@ -555,14 +574,24 @@
                     textFooterBox += '</td>';
 
                     textFooterBox += '<td bgcolor= "#b9e0f1">';
-
-                    textFooterBox += '</td>';
-
-                    textFooterBox += '<td bgcolor= "#b9e0f1">';
-                    textFooterBox += '</td>';
-
-                    textFooterBox += '<td bgcolor= "#b9e0f1">';
                     textFooterBox += acumTotalBox.toFixed(2);
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+                    let comisionFarm = 0;
+                    if (item.marking.comision !== undefined) {
+                        comisionFarm = item.marking.comision;
+                    } else {
+                        if (item.farm.farm_id !== 'farm_60256e217cb10') {
+                            comisionFarm = 8;
+                        }
+                    }
+                    let porcentaje = (100 - comisionFarm) / 100;
+                    acumComision += acumTotalBoxClient - (acumTotalBoxClient * porcentaje);
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += acumTotalBoxClient.toFixed(2);
                     textFooterBox += '</td>';
                     if (status !== '2') {
                         textFooterBox += '<td bgcolor= "#b9e0f1">';
@@ -661,8 +690,8 @@
             textResumen += '<tr>';
             textResumen += '<td></td>';
             textResumen += '<td></td>';
-            textResumen += '<td class="text-right">Comision</td>';
-            textResumen += '<td class="text-right"></td>';
+            textResumen += '<td class="text-right">Comisión</td>';
+            textResumen += '<td class="text-right">' + acumComision.toFixed(2) + '</td>';
             textResumen += '</tr>';
             textResumen += '</tbody>';
             textResumen += '</table>';

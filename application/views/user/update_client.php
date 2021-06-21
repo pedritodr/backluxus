@@ -16,7 +16,7 @@
                     <?= get_message_from_operation(); ?>
                     <?= form_open_multipart("user/update_client"); ?>
                     <div class="row">
-                        <div class="col-lg-5">
+                        <div class="col-lg-3">
                             <label><?= translate("name_company_lang"); ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
@@ -24,7 +24,7 @@
                                 <input type="hidden" name="user_id" value="<?= $user_object->user_id ?>">
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <label><?= translate('name_commercial_lang') ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
@@ -36,6 +36,13 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
                                 <input autocomplete="off" type="text" class="form-control input-sm" name="phone" required placeholder="<?= translate('phone_lang') ?>" value="<?= $user_object->phone ?>">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label><?= translate('comision_lang') ?></label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                                <input autocomplete="new-comision" type="number" step=any class="form-control input-sm" name="comision" value="<?= property_exists($user_object, 'comision') ? $user_object->comision : 8 ?>" required placeholder="<?= translate('comision_lang') ?>">
                             </div>
                         </div>
                         <div class="col-lg-12">

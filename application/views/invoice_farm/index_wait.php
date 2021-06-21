@@ -42,6 +42,16 @@
         padding-bottom: 0.5em;
     }
 
+
+    #table-example-1>thead>tr>th {
+        color: #000;
+        font-weight: 700;
+        font-size: 13px;
+        border: solid 1px #000;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
     #table-example-1 th,
     #table-example-1 td {
         border: solid thin;
@@ -236,7 +246,7 @@
                                                 <td><?= number_format($total, 2) ?></td>
                                                 <td class="text-center" style="width:10%">
                                                     <div class="n-chk" style="display:none">
-                                                        <label id="<?= $detail->id ?>" onclick="addItemBox((this),'<?= base64_encode(json_encode($item->markings)) ?>','<?= base64_encode(json_encode($item->farms)) ?>','<?= base64_encode(json_encode($detail)) ?>','<?= base64_encode(json_encode($item)) ?>')" class="new-control new-checkbox new-checkbox-rounded checkbox-primary">
+                                                        <label id="<?= $detail->id ?>" for="input_<?= $detail->id ?>" onclick="addItemBox((this),'<?= base64_encode(json_encode($item->markings)) ?>','<?= base64_encode(json_encode($item->farms)) ?>','<?= base64_encode(json_encode($detail)) ?>','<?= base64_encode(json_encode($item)) ?>')" class="new-control new-checkbox new-checkbox-rounded checkbox-primary">
                                                             <input id="input_<?= $detail->id ?>" type="checkbox" class="new-control-input">
                                                             <span class="new-control-indicator"></span><?= translate('add_box_lang') ?>
                                                         </label>
@@ -459,16 +469,32 @@
                                 Ann. A.S.T.M. A27-16, Class B;* P max. 0.06; S max. 0.05.</caption> -->
                             <thead>
                                 <tr>
-                                    <th rowspan="2">Export Name</th>
-                                    <th rowspan="2">FULL BXS</th>
-                                    <th colspan="5">Piezas Confirmadas</th>
+                                    <th class="text-left" colspan="1">
+                                        AWB 123-1234-4567
+                                    </th>
+                                    <th class="text-right" colspan="4">
+                                        LUXUS BLUMEN
+                                    </th>
+
+                                </tr>
+                                <tr>
+                                    <th class="text-left" colspan="1">
+                                        Dia de vuelo: 01.01.21
+                                    </th>
+                                    <th class="text-right" colspan="4">
+                                        LUXUS BAL
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2">Finca (Razon social)</th>
+                                    <th rowspan="1">Cajas</th>
+                                    <th colspan="3">Piezas por tipo</th>
                                 </tr>
                                 <tr>
                                     <th>Full</th>
-                                    <th>1/2</th>
-                                    <th>1/4</th>
-                                    <th>1/8</th>
-                                    <th>1/16</th>
+                                    <th>HB</th>
+                                    <th>QB</th>
+                                    <th>EB</th>
                                 </tr>
                             </thead>
                             <tbody id="bodyTableLoadInvoice">
@@ -478,19 +504,15 @@
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td></td>
-                                    <td></td>
                                 </tr>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <th style="border:none"></th>
-                                    <th id="fulles">0</th>
-                                    <th id="full">0</th>
-                                    <th id="hb">0</th>
-                                    <th id="qb">0</th>
-                                    <th id="eb">0</th>
-                                    <th id="ebb">0</th>
+                                    <th id="full" style="background:yellow !important">0</th>
+                                    <th id="hb" style="background:yellow !important">0</th>
+                                    <th id="qb" style="background:yellow !important">0</th>
+                                    <th id="eb" style="background:yellow !important">0</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -1174,74 +1196,65 @@
     const printSelectedInvoice = () => {
         $('#bodyTableLoadInvoice').empty();
         if (arraySelectedInvoice.length > 0) {
-            if (arrayInvoiceUpdate > 0) {
-                // $('#btnInvoiceClient').hide();
-                //  $('#btnLoadInvoice').show();
-            } else {
-                //  $('#btnInvoiceClient').show();
-                //$('#btnLoadInvoice').hide();
-            }
             let acumHb = 0;
             let acumQb = 0;
             let acumEb = 0;
             let stringSelected = '';
             arraySelectedInvoice.forEach((item, index, array) => {
+                let hb = 0;
+                let qb = 0;
+                let eb = 0;
                 item.boxs.forEach((box) => {
-                    let hb = 0;
-                    let qb = 0;
-                    let eb = 0;
+
                     if (box.typeBoxs.name.toUpperCase().trim() === "HB") {
-                        hb = parseInt(box.boxNumber);
+                        hb += parseInt(box.boxNumber);
                         acumHb += parseInt(box.boxNumber);
                     } else if (box.typeBoxs.name.toUpperCase().trim() === "QB") {
-                        qb = parseInt(box.boxNumber);
+                        qb += parseInt(box.boxNumber);
                         acumQb += parseInt(box.boxNumber);
                     } else {
-                        eb = parseInt(box.boxNumber);
+                        eb += parseInt(box.boxNumber);
                         acumEb += parseInt(box.boxNumber);
                     }
-                    stringSelected += '<tr>';
-                    stringSelected += '<td>';
-                    stringSelected += item.farm.name_commercial + ' (' + item.farm.name_legal + ')';
-                    stringSelected += '</td>';
-                    stringSelected += '<td class="text-center">';
-                    if (hb > 0) {
-                        stringSelected += (0.50 * hb).toFixed(3);
-                    } else if (qb > 0) {
-                        stringSelected += (0.25 * qb).toFixed(3);
-                    } else {
-                        stringSelected += (0.125 * eb).toFixed(3);
-                    }
-
-                    stringSelected += '</td>';
-                    stringSelected += '<td>';
-
-                    stringSelected += '</td>';
-                    stringSelected += '<td class="text-center">';
-                    stringSelected += hb > 0 ? hb : '';
-                    stringSelected += '</td>';
-                    stringSelected += '<td class="text-center">';
-                    stringSelected += qb > 0 ? qb : '';
-                    stringSelected += '</td>';
-                    stringSelected += '<td class="text-center">';
-                    stringSelected += eb > 0 ? eb : '';
-                    stringSelected += '</td>';
-                    stringSelected += '<td class="text-center">';
-
-                    stringSelected += '</td>';
-                    stringSelected += '</tr>';
                 })
+                stringSelected += '<tr>';
+                stringSelected += '<td>';
+                stringSelected += item.farm.name_commercial + ' (' + item.farm.name_legal + ')';
+                stringSelected += '</td>';
+                stringSelected += '<td class="text-center">';
+                if (hb > 0) {
+                    stringSelected += (0.50 * hb).toFixed(3);
+                } else if (qb > 0) {
+                    stringSelected += (0.25 * qb).toFixed(3);
+                } else {
+                    stringSelected += (0.125 * eb).toFixed(3);
+                }
+
+                stringSelected += '</td>';
+                stringSelected += '<td class="text-center">';
+                stringSelected += hb > 0 ? hb : '|';
+                stringSelected += '</td>';
+                stringSelected += '<td class="text-center">';
+                stringSelected += qb > 0 ? qb : '|';
+                stringSelected += '</td>';
+                stringSelected += '<td class="text-center">';
+                stringSelected += eb > 0 ? eb : '|';
+                stringSelected += '</td>';
+
+                stringSelected += '</tr>';
+
             });
             $('#bodyTableLoadInvoice').html(stringSelected);
+
             let fulles = (acumHb * 0.50) + (acumQb * 0.25) + (acumEb * 0.125);
-            $('#fulles').text(fulles.toFixed(3));
-            $('#full').text(0);
+
+            $('#full').text(fulles.toFixed(3));
             $('#hb').text(acumHb);
             $('#qb').text(acumQb);
             $('#eb').text(acumEb);
             $('#ebb').text(0);
         } else {
-            let stringDefault = '<tr><td>Vacio</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+            let stringDefault = '<tr><td>Vacio</td><td></td><td></td><td></td><td></td></tr>';
             $('#bodyTableLoadInvoice').html(stringDefault);
             $('#ebb').text(0);
             $('#full').text(0);
@@ -1343,7 +1356,7 @@
                 if (arraySelectedInvoice[0].marking.name_marking === markingS.name_marking) {
                     let encontro = false;
                     arraySelectedInvoice.forEach(item => {
-                        if (item.invoice.invoice_farm == object.invoice_farm) {
+                        if (item.invoice == object.invoice_farm) {
                             encontro = true;
                             item.boxs.push(box);
                             if (item.boxs.length == object.details.length) {
@@ -1445,7 +1458,7 @@
                 }
             }
         } else {
-            arraySelectedInvoice.forEach((element, indice, array) => {
+            arraySelectedInvoice.map((element, indice, array) => {
                 const index = element.boxs.findIndex(x => x.id === box.id);
                 if (index > -1) {
                     element.boxs.splice(index, 1);
@@ -1483,7 +1496,7 @@
                         invoiceFarm.details.forEach(box => {
                             let encontro = false;
                             arraySelectedInvoice.forEach(item => {
-                                if (item.invoice.invoice_farm == invoiceFarm.invoice_farm) {
+                                if (item.invoice == invoiceFarm.invoice_farm) {
                                     encontro = true;
                                     item.boxs.push(box);
                                 }

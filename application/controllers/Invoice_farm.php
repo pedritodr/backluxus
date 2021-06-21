@@ -614,6 +614,25 @@ class Invoice_farm extends CI_Controller
             show_404();
         }
     }
+
+
+    public function cancel_invoice($id = 0)
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $this->load->model('User_model', 'user');
+        $invoice = $this->invoice_farm->get_by_id_invoice_client($id);
+
+        if ($invoice) {
+            $this->invoice_farm->update_invoice_client($id, ['status' => 0]);
+            $this->response->set_message(translate("invoice_send_client_lang"), ResponseMessage::SUCCESS);
+            redirect("invoice_farm/index_invoice_client_send");
+        } else {
+            show_404();
+        }
+    }
     public function arraysDift($arrayOLd, $arrayEdit)
     {
         $arrayBoxsDelete = [];
@@ -2109,5 +2128,26 @@ class Invoice_farm extends CI_Controller
                 }
             }
         }
+    }
+
+    public function update_comision()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
+            exit();
+        }
+        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+            echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
+            exit();
+        }
+        $comision = (float)$this->input->post('comision');
+        $invoice = $this->input->post('invoice');
+        $resquest =  $this->invoice_farm->update($invoice, ['markings.comision' => $comision]);
+        if ($resquest) {
+            echo json_encode(['status' => 200, 'msj' => 'correcto']);
+        } else {
+            echo json_encode(['status' => 404, 'msj' => 'No se actualizo el precio del cliente']);
+        }
+        exit();
     }
 }

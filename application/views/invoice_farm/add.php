@@ -257,6 +257,11 @@
                                                                         <?php foreach ($item->markings as $marking) { ?>
                                                                             <?php $marking->name_commercial = $item->name_commercial;
                                                                             $marking->name_company = $item->name_company;
+                                                                            if (property_exists($item, 'comision')) {
+                                                                                $marking->comision = $item->comision;
+                                                                            } else {
+                                                                                $marking->comision = 8;
+                                                                            }
                                                                             ?>
                                                                             <option value="<?= base64_encode(json_encode($marking)) ?>"><?= $marking->name_marking . ' | ' . $item->name_commercial ?></option>
                                                                         <?php } ?>
@@ -637,6 +642,7 @@
                 validNext = false;
                 let farms = $('select[name=farms] option').filter(':selected').val();
                 let markings = $('select[name=markings] option').filter(':selected').val();
+                console.log(JSON.parse(decodeB64Utf8(markings)))
                 if (farms == 0) {
                     const toast = swal.mixin({
                         toast: true,

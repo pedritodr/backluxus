@@ -14,6 +14,10 @@
     #modalDetailsFixedOrder {
         background-color: rgba(0, 0, 0, 0.5) !important;
     }
+
+    #modalComision {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
 </style>
 <link rel="stylesheet" type="text/css" href="<?= base_url() ?>admin_template/assets/css/forms/theme-checkbox-radio.css">
 <link href="<?= base_url('admin_template/assets/css/components/tabs-accordian/custom-tabs.css'); ?>" rel="stylesheet" type="text/css" />
@@ -101,6 +105,16 @@
                                                 <p><?= $item->markings->name_company . ' | ' . $item->markings->name_commercial ?></p>
                                                 <p><b><?= translate("marking_lang"); ?>: <?= $item->markings->name_marking ?></b></p>
                                                 <?php
+
+                                                if (property_exists($item->markings, 'comision')) {
+                                                    echo '<p><b>' . translate("comision_lang") . ': ' . number_format($item->markings->comision, 2) . '%</b></p>';
+                                                } else {
+                                                    if ($item->farms->farm_id === 'farm_60256e217cb10') {
+                                                        echo '<p><b>' . translate("comision_lang") . ':0.00%</b></p>';
+                                                    } else {
+                                                        echo '<p><b>' . translate("comision_lang") . ':8.00%</b></p>';
+                                                    }
+                                                }
                                                 if (property_exists($item, 'packing')) {
                                                     echo '<b>' . translate("packing_lang") . ':</b> ';
                                                     printf('%02d', $item->packing);
@@ -134,6 +148,7 @@
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
+                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="handleComision('<?= base64_encode(json_encode($item))  ?>')"><i class="fa fa-edit"></i> <?= translate("comision_lang"); ?></a>
                                                         <?php
                                                         $separado = explode(' ', $item->date_create);
                                                         $dateCreate = $separado[0];
@@ -293,6 +308,27 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalComision" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><?= translate('comision_lang') ?></h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                    <input autocomplete="new-comision" type="number" step=any class="form-control input-sm" id="comision" required placeholder="<?= translate('comision_lang') ?>">
+                    <input type="hidden" id="invoiceFarmComision">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                <button class="btn btn-primary" onclick="handleSubmitUpdateComision()">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(function() {
 
@@ -309,6 +345,93 @@
         });
 
     });
+    const handleComision = (object) => {
+        object = JSON.parse(decodeB64Utf8(object));
+
+        if (object.markings.comision !== undefined) {
+            $('#comision').val(object.markings.comision);
+        } else {
+            if (object.farms.farm_id === 'farm_60256e217cb10') {
+                $('#comision').val(0);
+            } else {
+                $('#comision').val(8);
+            }
+        }
+        $('#invoiceFarmComision').val(object.invoice_farm);
+        $('#modalComision').modal('show');
+    }
+
+    const handleSubmitUpdateComision = () => {
+        const comision = $('#comision').val();
+        const invoice = $('#invoiceFarmComision').val();
+        if (comision === '') {
+            const toast = swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                padding: '2em'
+            });
+
+            toast({
+                type: 'success',
+                title: 'La comisión no puede estar en vacía',
+                padding: '2em',
+            })
+        } else {
+            $('#modalComision').modal('hide');
+            Swal.fire({
+                title: 'Completando operación',
+                text: 'Actualizando la comisión...',
+                imageUrl: '<?= base_url("assets/img/cargando.gif") ?>',
+                imageAlt: 'No realice acciones sobre la página',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                footer: '<a href>No realice acciones sobre la página</a>',
+            });
+
+            let data = {
+                comision,
+                invoice
+            }
+            setTimeout(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?= site_url('invoice_farm/update_comision') ?>",
+                    data: data,
+                    success: function(result) {
+                        result = JSON.parse(result);
+                        if (result.status == 200) {
+                            const toast = swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                padding: '2em'
+                            });
+                            toast({
+                                type: 'success',
+                                title: '¡Correcto!',
+                                padding: '2em',
+                            })
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            Swal.close();
+                            swal({
+                                title: '¡Error!',
+                                text: result.msj,
+                                padding: '2em'
+                            });
+                        }
+                    }
+                });
+            }, 1500)
+
+        }
+    }
+
     const encodeB64Utf8 = (str) => {
         return btoa(unescape(encodeURIComponent(str)));
     }
@@ -554,7 +677,6 @@
     const verDetailsFixedOrder = (details) => {
         details = decodeB64Utf8(details);
         details = JSON.parse(details);
-        console.log(details)
         $("#modalDetailsFixedOrder").modal('show');
         $("#bodyModalDetailsFixedOrder").empty();
         let qtyBox = 0;

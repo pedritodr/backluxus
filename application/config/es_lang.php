@@ -54,6 +54,7 @@ $config['hectare_lang'] = "Hectareaje";
 $config['days_credit_lang'] = "Días de crédito con nuestra empresa";
 $config['name_legal_lang'] = "Nombre jurídico";
 $config['name_company_lang'] = "Nombre empresa";
+$config['comision_lang'] = "Comisión";
 $config['name_commercial_lang'] = "Nombre comercial";
 $config['director_lang'] = "Director";
 $config['address_farm_lang'] = "Dirección finca";

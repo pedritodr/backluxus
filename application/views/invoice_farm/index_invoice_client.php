@@ -380,6 +380,7 @@
         let acumHb = 0;
         let acumQb = 0;
         let acumEb = 0;
+        let acumComision = 0;
         if (details.length > 0) {
             let texto_tabla = '';
             texto_tabla +=
@@ -474,6 +475,7 @@
                     let acumBoxStems = 0;
                     let acumBoxBunches = 0;
                     let acumTotalBox = 0;
+                    let acumTotalBoxClient = 0;
                     let acumBoxTotalStems = 0;
                     $('#bodyTableDetails').append(textBox);
                     if (box.varieties.length > 0) {
@@ -534,7 +536,7 @@
                             let totalTable = parseFloat(element.price) * (parseInt(element.stems) *
                                 parseInt(box.boxNumber) * parseInt(element.bunches));
                             acumTotal += totalTable;
-                            acumTotalBox += totalTable
+                            acumTotalBox += totalTable;
                             let totalPriceFarm = parseFloat(element.price) * (parseInt(element.stems) * parseInt(element.bunches));
                             textVariety += totalPriceFarm.toFixed(2);
                             textVariety += '</td>';
@@ -563,6 +565,7 @@
                                 spanTotalCliente = '<span>' + totalPriceCliente.toFixed(2) + '</span>';
 
                             }
+                            acumTotalBoxClient += totalPriceCliente;
                             acumTotalCliente += totalPriceCliente;
 
                             textVariety += '</td>';
@@ -613,14 +616,25 @@
                     textFooterBox += '</td>';
 
                     textFooterBox += '<td bgcolor= "#b9e0f1">';
-
-                    textFooterBox += '</td>';
-
-                    textFooterBox += '<td bgcolor= "#b9e0f1">';
-                    textFooterBox += '</td>';
-
-                    textFooterBox += '<td bgcolor= "#b9e0f1">';
                     textFooterBox += acumTotalBox.toFixed(2);
+                    let comisionFarm = 0;
+                    if (item.marking.comision !== undefined) {
+                        comisionFarm = item.marking.comision;
+                    } else {
+                        if (item.farm.farm_id !== 'farm_60256e217cb10') {
+                            comisionFarm = 8;
+                        }
+                    }
+                    let porcentaje = (100 - comisionFarm) / 100;
+                    acumComision += acumTotalBoxClient - (acumTotalBoxClient * porcentaje);
+
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += '</td>';
+
+                    textFooterBox += '<td bgcolor= "#b9e0f1">';
+                    textFooterBox += acumTotalBoxClient.toFixed(2);
                     textFooterBox += '</td>';
                     if (status !== '2') {
                         textFooterBox += '<td bgcolor= "#b9e0f1">';
@@ -720,7 +734,7 @@
             textResumen += '<td></td>';
             textResumen += '<td></td>';
             textResumen += '<td class="text-right">Comision</td>';
-            textResumen += '<td class="text-right"></td>';
+            textResumen += '<td class="text-right">' + acumComision.toFixed(2) + '</td>';
             textResumen += '</tr>';
             textResumen += '</tbody>';
             textResumen += '</table>';

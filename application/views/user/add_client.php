@@ -30,21 +30,28 @@
                                 <input autocomplete="off" type="text" class="form-control input-sm" name="name_commercial" required placeholder="<?= translate('name_commercial_lang') ?>">
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
+                            <label><?= translate('comision_lang') ?></label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
+                                <input autocomplete="new-comision" type="number" step=any class="form-control input-sm" name="comision" required placeholder="<?= translate('comision_lang') ?>">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
                             <label><?= translate('phone_lang') ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
                                 <input autocomplete="new-phone" type="text" class="form-control input-sm" name="phone" required placeholder="<?= translate('phone_lang') ?>">
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <label><?= translate('email_lang') ?></label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-text-height"></i></span>
                                 <input autocomplete="new-email" type="text" class="form-control input-sm" name="email" required placeholder="<?= translate('email_lang') ?>">
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <label><?= translate("password_lang"); ?></label>
                             <div class="input-group">
                                 <input autocomplete="new-password" type="password" class="form-control input-sm" id="password" name="password" required placeholder="<?= translate('password_lang'); ?>">

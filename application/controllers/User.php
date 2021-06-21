@@ -96,7 +96,6 @@ class User extends CI_Controller
         $this->form_validation->set_rules('address', "Dirección", 'required');
         $this->form_validation->set_rules('phone', "Teléfono", 'required');
         $this->form_validation->set_rules('role', "Seleccione un rol", 'required');
-
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
             redirect("user/add_index");
@@ -132,6 +131,7 @@ class User extends CI_Controller
         $password = $this->input->post('password');
         $desc = $this->input->post('desc');
         $phone = $this->input->post('phone');
+        $comision = (float)$this->input->post('comision');
         $validaEmail = $this->user->get_by_email($email);
         if ($validaEmail) {
             $this->response->set_message(translate('email_already_exist_lang'), ResponseMessage::ERROR);
@@ -157,6 +157,7 @@ class User extends CI_Controller
                 'is_delete' => 0,
                 'observations' => $desc,
                 'phone' => $phone,
+                'comision' => $comision
             ];
             $this->user->create($data_user);
             $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
@@ -230,7 +231,6 @@ class User extends CI_Controller
         $this->form_validation->set_rules('address', "Dirección", 'required');
         $this->form_validation->set_rules('phone', "Teléfono", 'required');
         $this->form_validation->set_rules('role', "Seleccione un rol", 'required');
-
         if ($this->form_validation->run() == FALSE) { //si alguna de las reglas de validacion fallaron
             $this->response->set_message(validation_errors(), ResponseMessage::ERROR);
             redirect("user/update_index/" . $user_id);
@@ -266,6 +266,7 @@ class User extends CI_Controller
         $desc = $this->input->post('desc');
         $user_id = $this->input->post('user_id');
         $phone = $this->input->post('phone');
+        $comision = (float)$this->input->post('comision');
         //establecer reglas de validacion
         $this->form_validation->set_rules('name_company', translate('name_company_lang'), 'required');
 
@@ -278,6 +279,7 @@ class User extends CI_Controller
                 'name_commercial' => $name_commercial,
                 'observations' =>  $desc,
                 'phone' => $phone,
+                'comision' => $comision
             ];
             $this->user->update($user_id, $data_user);
             $this->response->set_message(translate('data_saved_ok'), ResponseMessage::SUCCESS);
