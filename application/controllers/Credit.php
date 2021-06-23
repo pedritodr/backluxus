@@ -28,7 +28,7 @@ class Credit extends CI_Controller
     public function index()
     {
 
-        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -40,7 +40,7 @@ class Credit extends CI_Controller
 
     public function add_index()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -58,7 +58,7 @@ class Credit extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }

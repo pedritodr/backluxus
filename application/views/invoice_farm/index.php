@@ -156,7 +156,7 @@
                                                         $dateCreate = $separado[0];
                                                         $dateDays =  date("Y-m-d", strtotime($dateCreate . "+ 2 week"));
                                                         if (strtotime(date('Y-m-d')) <= strtotime($dateDays)) {
-                                                            if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6])) {
+                                                            if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5])) {
                                                                 if (property_exists($item, 'packing')) {
                                                                     if (in_array($this->session->userdata('role_id'), [1, 2])) {
                                                                         echo '<a class="dropdown-item" href="' . site_url('invoice_farm/update_invoice_farm_index/' . $item->invoice_farm) . '"><i class="fa fa-edit"></i>' . translate("update_invoice_farm_lang") . '</a>';
