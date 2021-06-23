@@ -209,9 +209,15 @@
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" id="<?= 'btneyeDetails_' . $item->invoice ?>" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>','<?= $item->status ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="updateAwb('<?= base64_encode(json_encode($item)) ?>')"><?= translate("edit_awb_lang"); ?></a>
-                                                        <?php if (!$item->status == 2) { ?>
-                                                            <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><?= translate("cancel_packing_lang"); ?></a>
-                                                            <a class="dropdown-item" href="javascript:void(0)" onclick="handleSendClient('<?= $item->invoice ?>')"> <?= translate("create_invoice_lang"); ?></a>
+                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 6])) { ?>
+                                                            <?php if (!$item->status == 2) { ?>
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><?= translate("cancel_packing_lang"); ?></a>
+                                                            <?php } ?>
+                                                        <?php } ?>
+                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                                                            <?php if (!$item->status == 2) { ?>
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="handleSendClient('<?= $item->invoice ?>')"> <?= translate("create_invoice_lang"); ?></a>
+                                                            <?php } ?>
                                                         <?php } ?>
                                                         <a class="dropdown-item" href="<?= site_url('invoice_farm/export_invoice/' . $item->invoice) ?>"><?= translate("export_packing_lang"); ?></a>
                                                     </div>

@@ -340,9 +340,26 @@
                                 <img src="<?= base_url('assets/img/juice.png') ?>" class="img-fluid mr-2" alt="avatar">
                                 <div class="media-body">
                                     <h5><?= $this->session->userdata('name') ?></h5>
-                                    <?php if ($this->session->userdata('role_id') == 1) { ?>
-                                        <p>Administrador</p>
-                                    <?php } ?>
+                                    <?php if ($this->session->userdata('role_id') == 1) {
+                                        echo   '<p>Super Administrador</p>';
+                                    } else if ($this->session->userdata('role_id') == 2) {
+                                        echo   '<p>Administrador</p>';
+                                    } else if ($this->session->userdata('role_id') == 3) {
+                                        echo   '<p>Ejecutivo de ventas 2</p>';
+                                    } else if ($this->session->userdata('role_id') == 4) {
+                                        echo   '<p>Ejecutivo de ventas 1</p>';
+                                    } else if ($this->session->userdata('role_id') == 5) {
+                                        echo   '<p>Ejecutivo de compras 2</p>';
+                                    } else if ($this->session->userdata('role_id') == 6) {
+                                        echo   '<p>Ejecutivo de compras 1</p>';
+                                    } else if ($this->session->userdata('role_id') == 7) {
+                                        echo   '<p>Comprador</p>';
+                                    } else if ($this->session->userdata('role_id') == 8) {
+                                        echo   '<p>Contador</p>';
+                                    } else {
+                                        echo   '<p>Cliente</p>';
+                                    }
+                                    ?>
                                 </div>
                             </div>
                         </div>
