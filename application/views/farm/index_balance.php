@@ -216,7 +216,7 @@
 						stringTable += '<td>';
 						stringTable += '<button type="button" class="btn btn-outline-primary" onclick=watchDetails("' + encodeB64Uft8(JSON.stringify(item.details)) + '")>Ver detalle</button>';
 						if (item.viewed === undefined) {
-							const validRol = [1, 2, 7, 6, 5].includes(Number('<?= $this->session->userdata('role_id') ?>'));
+							const validRol = [1, 2, 7, 6, 5, 4].includes(Number('<?= $this->session->userdata('role_id') ?>'));
 							if (validRol) {
 								stringTable += '<button type="button" class="btn btn-outline-success" id="btnCheck' + item.invoice_farm + '" onclick=handleViewed("' + item.invoice_farm + '")>Marcar</button>';
 							}

@@ -209,12 +209,12 @@
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" id="<?= 'btneyeDetails_' . $item->invoice ?>" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>','<?= $item->status ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="updateAwb('<?= base64_encode(json_encode($item)) ?>')"><?= translate("edit_awb_lang"); ?></a>
-                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 6, 5])) { ?>
+                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 6, 5, 4])) { ?>
                                                             <?php if (!$item->status == 2) { ?>
                                                                 <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><?= translate("cancel_packing_lang"); ?></a>
                                                             <?php } ?>
                                                         <?php } ?>
-                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 5])) { ?>
+                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 5, 4])) { ?>
                                                             <?php if (!$item->status == 2) { ?>
                                                                 <a class="dropdown-item" href="javascript:void(0)" onclick="handleSendClient('<?= $item->invoice ?>')"> <?= translate("create_invoice_lang"); ?></a>
                                                             <?php } ?>
@@ -568,7 +568,7 @@
                             } else {
                                 priceCliente = element.price;
                                 if (status !== '2') {
-                                    const validRol = [1, 2, 5].includes(Number('<?= $this->session->userdata('role_id') ?>'));
+                                    const validRol = [1, 2, 5, 4].includes(Number('<?= $this->session->userdata('role_id') ?>'));
                                     if (validRol) {
                                         textVariety += '<span id="priceCliente' + element + '">' + parseFloat(priceCliente).toFixed(2) + '</span> <span><button type="button" class="close" onclick=handleEditPrice("' + encodeB64Utf8(JSON.stringify(element)) + '")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></span>';
                                     } else {
