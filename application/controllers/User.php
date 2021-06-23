@@ -37,8 +37,8 @@ class User extends CI_Controller
         $this->load->model('role_model', 'rol');
         $this->load->model('Carguera_model', 'carguera');
         $roles = $this->rol->get_all(['is_active' => 1]);
-        $all_users = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
-        $users_luxus = $this->user->get_all(['role_id' => 2, 'is_delete' => 0]);
+        $all_users = $this->user->get_all(['role_id' => 9, 'is_delete' => 0]);
+        $users_luxus = $this->user->get_all_users();
         $cargueras = $this->carguera->get_all(['is_active' => 1]);
         $data['cargueras'] = $cargueras;
         $data['countrys'] = $this->country->get_all_countrys();
@@ -53,7 +53,9 @@ class User extends CI_Controller
             $this->log_out();
             redirect('login/index');
         }
-        $this->load_view_admin_g('user/add');
+        $this->load->model('role_model', 'rol');
+        $roles =  $this->rol->get_all_roles();
+        $this->load_view_admin_g('user/add', ['roles' => $roles]);
     }
     public function add_index_client()
     {
@@ -151,7 +153,7 @@ class User extends CI_Controller
                 'name_commercial' => $name_commercial,
                 'email' => $email,
                 'password' => md5($password),
-                'role_id' => 3,
+                'role_id' => 9,
                 'is_active' => 1,
                 'date_create' => $fecha_create,
                 'is_delete' => 0,
@@ -174,6 +176,8 @@ class User extends CI_Controller
         $user_object = $this->user->get_by_id($user_id);
 
         if ($user_object) {
+            $this->load->model('role_model', 'rol');
+            $data['roles'] =  $this->rol->get_all_roles();
             $data['user_object'] = $user_object;
             $this->load_view_admin_g('user/update', $data);
         } else {

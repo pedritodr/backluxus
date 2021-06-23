@@ -67,10 +67,13 @@
                                                 <p><b><?= translate("name_legal_lang") . ":</b> " . $item->name_legal; ?></p>
                                             </td>
                                             <td>
-                                                <?php if (isset($item->person_luxus)) { ?>
-                                                    <?= $item->person_luxus->name . ' ' . $item->person_luxus->surname ?>
-                                                <?php } ?>
-
+                                                <?php if (isset($item->person_luxus)) {
+                                                    echo '<ul>';
+                                                    foreach ($item->person_luxus as $person) {
+                                                        echo '<li>' . $person->name . ' ' . $person->surname . '</li>';
+                                                    }
+                                                    echo '</ul>';
+                                                } ?>
                                             </td>
                                             <td style="width:40%">
                                                 <?php if ($item->farm_father) { ?>
@@ -184,19 +187,19 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="modalPersonLuxus" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal fade" id="modalPersonLuxus" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel"><?= translate('person_luxus_commercial_lang') ?></h5>
+                <h5 class="modal-title"><?= translate('person_luxus_commercial_lang') ?></h5>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-lg-12">
                         <label><?= translate("users_luxus_lang"); ?></label>
                         <div class="input-group">
-                            <select id="userLuxus" name="userLuxus" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                <option value="0"><?= translate('select_opction_lang') ?></option>
+                            <select id="userLuxus" name="userLuxus" class="form-control tagging" multiple="multiple" data-placeholder="Seleccione una opción" style="width: 100%">
+                                <option disabled itemId="0" value="0"><?= translate('select_opction_lang') ?>...</option>
                                 <?php if ($users_luxus) { ?>
                                     <?php foreach ($users_luxus as $item) { ?>
                                         <option value="<?= $item->user_id ?>" itemId="<?= base64_encode(json_encode($item)) ?>"><?= $item->name . ' ' . $item->surname ?></option>
@@ -360,11 +363,11 @@
         </div>
     </div>
 </div>
-<div class="modal  fade" id="modalMarkets" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal  fade" id="modalMarkets" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel"><?= translate('markets_lang') ?></h5>
+                <h5 class="modal-title"><?= translate('markets_lang') ?></h5>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -513,7 +516,12 @@
             placeholder: '<?= translate('select_opction_lang') ?>',
             allowClear: true,
         });
-
+        $("#userLuxus").select2({
+            tags: true,
+            dropdownParent: $("#modalPersonLuxus"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: true,
+        });
         $("#example1").DataTable({
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
@@ -532,21 +540,45 @@
     const loadPersonLuxus = (farmId, object) => {
         $('#farmId').val(farmId);
         if (object) {
-            object = decodeB64Utf8(object);
-            object = JSON.parse(object);
-            $('#userLuxus').val(object.user_id);
+            object = JSON.parse(decodeB64Utf8(object));
+            let selecteds = [];
+            if (object.length > 0) {
+                object.forEach(item => {
+                    selecteds.push(item.user_id);
+                });
+                $("#userLuxus").select2().val(selecteds).trigger("change");
+            } else {
+                $('#userLuxus').val(null).trigger('change');
+            }
         }
         $('#modalPersonLuxus').modal({
             backdrop: false
         })
-
+        $("#userLuxus").select2({
+            tags: true,
+            dropdownParent: $("#modalPersonLuxus"),
+            placeholder: '<?= translate('select_opction_lang') ?>',
+            allowClear: true,
+        });
     }
 
     const submitPersonLuxus = () => {
         $('#btnCancelModalPersonLuxus').prop('disabled', true);
-        let personLuxus = $('select[name=userLuxus] option').filter(':selected').attr('itemId');
+        let userLuxus = $('#userLuxus').val();
+        const personLuxus = <?= json_encode($users_luxus) ?>;
+        let listPersonLuxus = [];
+        userLuxus.forEach((item) => {
+            let results = personLuxus.filter((element) => {
+                return element.user_id == item;
+            });
+            let objectPersonLuxus = (results.length > 0) ? results[0] : null;
+
+            if (objectPersonLuxus) {
+                listPersonLuxus.push(objectPersonLuxus);
+            }
+        });
         let farmId = $('#farmId').val();
-        if (personLuxus == 0) {
+        if (listPersonLuxus.length == 0) {
             const toast = swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -563,7 +595,7 @@
 
             $('#spinnerPersonLuxus').show();
             $('#spanPersonLuxus').text('<?= translate('processing_lang') ?>' + '...');
-            personLuxus = JSON.parse(decodeB64Utf8(personLuxus));
+            let personLuxus = JSON.stringify(listPersonLuxus);
             setTimeout(function() {
                 $.ajax({
                     type: 'POST',

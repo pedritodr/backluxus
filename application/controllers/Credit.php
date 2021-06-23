@@ -28,7 +28,7 @@ class Credit extends CI_Controller
     public function index()
     {
 
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -40,7 +40,7 @@ class Credit extends CI_Controller
 
     public function add_index()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -48,7 +48,7 @@ class Credit extends CI_Controller
         $this->load->model('User_model', 'user');
         $reason_credits = $this->reason_credit->get_all(['is_active' => 1]);
         $data['reason_credits'] = $reason_credits;
-        $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
+        $data['clients'] = $this->user->get_all(['role_id' => 9, 'is_delete' => 0]);
         $this->load_view_admin_g('credit/add', $data);
     }
 
@@ -58,7 +58,7 @@ class Credit extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -252,8 +252,6 @@ class Credit extends CI_Controller
         $object = $this->credit->get_by_id($creditId);
 
         if ($object) {
-
-
 
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();

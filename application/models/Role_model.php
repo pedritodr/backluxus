@@ -75,5 +75,10 @@ class Role_model extends CI_Model
         }
         return $update;
     }
+    function get_all_roles()
+    {
+        $result = $this->mongo_db->get('role_users');
+        return $result;
+    }
     //------------------------------------------------------------------------------------------------------------------------------------------
 }

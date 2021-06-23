@@ -6,9 +6,9 @@ class Dashboard extends CI_Controller
     public function __construct()
     {
 
-     parent::__construct();
+        parent::__construct();
 
-       $this->load->library(array('session'));
+        $this->load->library(array('session'));
         $this->load->helper("mabuya");
 
         @session_start();
@@ -19,7 +19,7 @@ class Dashboard extends CI_Controller
     public function index()
     {
         //var_dump($this->session->userdata());die();
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3, 4, 5, 6, 7, 8, 9])) {
             $this->log_out();
             redirect('login');
         }

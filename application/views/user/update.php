@@ -42,13 +42,27 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-user"></i></span>
                                 <select class="form-control input-sm" name="role" id="role">
-                                    <?php if ($this->session->userdata('role_id') == 1) { ?>
-                                        <option value="1" selected>Super admin</option>
-                                        <option value="2" <?php if (2 == $user_object->role_id) { ?>selected <?php } ?>>Administrador</option>
-                                    <?php } else { ?>
-                                        <option value="2" <?php if (2 == $user_object->role_id) { ?>selected <?php } ?>>Administrador</option>
 
-                                    <?php } ?>
+                                    <?php
+                                    if ($this->session->userdata('role_id') == 1) {
+                                        echo ' <option value="1" selected>Super admin</option>';
+                                        foreach ($roles as $rol) {
+                                            if ($rol->role_user_id !== 9) {
+                                                echo '<option value="' . $rol->role_user_id . '">' . $rol->role . '</option>';
+                                            }
+                                        }
+                                    } else {
+                                        foreach ($roles as $rol) {
+                                            if ($rol->role_user_id == $user_object->role_id) {
+                                                echo '<option value="' . $rol->role_user_id . '" selected>' . $rol->role . '</option>';
+                                            } else {
+                                                if ($rol->role_user_id !== 9) {
+                                                    echo '<option value="' . $rol->role_user_id . '">' . $rol->role . '</option>';
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ?>
                                 </select>
                             </div>
                         </div>

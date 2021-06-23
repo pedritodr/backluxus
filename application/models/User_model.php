@@ -26,12 +26,12 @@ class User_model extends CI_Model
     }
     function get_all_users()
     {
-        $result = $this->mongo_db->where(['role_id' => $this->mongo_db->ne(3), 'is_active' => 1])->get('users');
+        $result = $this->mongo_db->where(['role_id' => $this->mongo_db->ne(9), 'is_active' => 1, 'is_delete' => 0])->get('users');
         return (count($result) > 0) ? $result : false;
     }
     function get_all_clients()
     {
-        $result = $this->mongo_db->where(['role_id' => 3, 'is_active' => 1, 'is_delete' => 0])->get('users');
+        $result = $this->mongo_db->where(['role_id' => 9, 'is_active' => 1, 'is_delete' => 0])->get('users');
         return (count($result) > 0) ? $result : false;
     }
     function get_all($conditions = [], $get_as_row = FALSE)

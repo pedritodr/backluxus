@@ -597,6 +597,7 @@
         $("#awb").inputmask("setvalue", objectInvoice.awb);
         $('#invoceNumber').val(objectInvoice.invoice_number);
         arrayRequest = objectInvoice.details;
+        validinvoiceNext = true;
         cargarDetails();
     }
 
@@ -679,7 +680,9 @@
                         padding: '3em',
                     })
                 } else {
-                    validNext = true;
+                    if (validinvoiceNext) {
+                        validNext = true;
+                    }
                 }
             } else if ($("fieldset").index(current_fs) == 1) {
                 $('.fulles').show();
@@ -895,7 +898,7 @@
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
-
+    let validinvoiceNext = false;
     const validInvoice = () => {
         let invoiceNumber = $('#invoceNumber').val().trim();
         if (objectInvoice.invoice_number !== invoiceNumber) {
@@ -938,6 +941,7 @@
                                     let numberInvoiceComplet = zFill(invoiceNumber, 4);
                                     $('#invoceNumber').val(numberInvoiceComplet);
                                 }
+                                validinvoiceNext = true;
                             }
                         } else {
                             swal({

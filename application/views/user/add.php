@@ -42,8 +42,11 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-user"></i></span>
                                 <select id="role" name="role" class="form-control select2 input-sm" data-placeholder="Seleccione una opción" style="width: 100%">
-                                    <option value="2">Administrador</option>
-                                    <option value="3">Cliente</option>
+                                    <?php foreach ($roles as $rol) {
+                                        if ($rol->role_user_id !== 9) {
+                                            echo '<option value="' . $rol->role_user_id . '">' . $rol->role . '</option>';
+                                        }
+                                    } ?>
                                 </select>
                             </div>
                         </div>

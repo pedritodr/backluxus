@@ -883,7 +883,6 @@
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
-
     const validInvoice = () => {
         let invoiceNumber = $('#invoceNumber').val().trim();
         if (invoiceNumber.length > 4) {

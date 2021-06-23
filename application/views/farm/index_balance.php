@@ -217,7 +217,10 @@
 						stringTable += '<td>';
 						stringTable += '<button type="button" class="btn btn-outline-primary" onclick=watchDetails("' + encodeB64Uft8(JSON.stringify(item.details)) + '")>Ver detalle</button>';
 						if (item.viewed === undefined) {
-							stringTable += '<button type="button" class="btn btn-outline-success" id="btnCheck' + item.invoice_farm + '" onclick=handleViewed("' + item.invoice_farm + '")>Marcar</button>';
+							const validRol = [1, 2, 7].includes(Number('<?= $this->session->userdata('role_id') ?>'));
+							if (validRol) {
+								stringTable += '<button type="button" class="btn btn-outline-success" id="btnCheck' + item.invoice_farm + '" onclick=handleViewed("' + item.invoice_farm + '")>Marcar</button>';
+							}
 						}
 
 						stringTable += '</td>';

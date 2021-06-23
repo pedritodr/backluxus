@@ -642,7 +642,6 @@
                 validNext = false;
                 let farms = $('select[name=farms] option').filter(':selected').val();
                 let markings = $('select[name=markings] option').filter(':selected').val();
-                console.log(JSON.parse(decodeB64Utf8(markings)))
                 if (farms == 0) {
                     const toast = swal.mixin({
                         toast: true,
@@ -743,7 +742,9 @@
                         padding: '3em',
                     })
                 } else {
-                    validNext = true;
+                    if (validinvoiceNext) {
+                        validNext = true;
+                    }
                 }
 
             } else if ($("fieldset").index(current_fs) == 2) {
@@ -898,7 +899,7 @@
     const decodeB64Utf8 = (str) => {
         return decodeURIComponent(escape(atob(str)));
     }
-
+    let validinvoiceNext = false;
     const validInvoice = () => {
         let invoiceNumber = $('#invoceNumber').val().trim();
         if (invoiceNumber.length > 4) {
@@ -940,6 +941,7 @@
                                 let numberInvoiceComplet = zFill(invoiceNumber, 4);
                                 $('#invoceNumber').val(numberInvoiceComplet);
                             }
+                            validinvoiceNext = true;
                         }
                     } else {
                         swal({

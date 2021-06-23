@@ -148,13 +148,33 @@
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
-                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="handleComision('<?= base64_encode(json_encode($item))  ?>')"><i class="fa fa-edit"></i> <?= translate("comision_lang"); ?></a>
+                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                                                            <a class="dropdown-item" href="javascript:void(0)" onclick="handleComision('<?= base64_encode(json_encode($item))  ?>')"><i class="fa fa-edit"></i> <?= translate("comision_lang"); ?></a>
+                                                        <?php } ?>
                                                         <?php
                                                         $separado = explode(' ', $item->date_create);
                                                         $dateCreate = $separado[0];
                                                         $dateDays =  date("Y-m-d", strtotime($dateCreate . "+ 2 week"));
                                                         if (strtotime(date('Y-m-d')) <= strtotime($dateDays)) {
-                                                            echo '<a class="dropdown-item" href="' . site_url('invoice_farm/update_invoice_farm_index/' . $item->invoice_farm) . '"><i class="fa fa-edit"></i>' . translate("update_invoice_farm_lang") . '</a>';
+                                                            if (in_array($this->session->userdata('role_id'), [1, 2, 7])) {
+                                                                if (property_exists($item, 'packing')) {
+                                                                    if (in_array($this->session->userdata('role_id'), [1, 2])) {
+                                                                        echo '<a class="dropdown-item" href="' . site_url('invoice_farm/update_invoice_farm_index/' . $item->invoice_farm) . '"><i class="fa fa-edit"></i>' . translate("update_invoice_farm_lang") . '</a>';
+                                                                    } else {
+                                                                        $arrValid = [];
+                                                                        if (property_exists($item->farms, 'person_luxus')) {
+                                                                            foreach ($item->farms->person_luxus as $person) {
+                                                                                $arrValid[] = $person->user_id;
+                                                                            }
+                                                                            if (in_array($this->session->userdata('user_id'), $arrValid)) {
+                                                                                echo '<a class="dropdown-item" href="' . site_url('invoice_farm/update_invoice_farm_index/' . $item->invoice_farm) . '"><i class="fa fa-edit"></i>' . translate("update_invoice_farm_lang") . '</a>';
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    echo '<a class="dropdown-item" href="' . site_url('invoice_farm/update_invoice_farm_index/' . $item->invoice_farm) . '"><i class="fa fa-edit"></i>' . translate("update_invoice_farm_lang") . '</a>';
+                                                                }
+                                                            }
                                                         }
                                                         ?>
                                                     </div>

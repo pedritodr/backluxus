@@ -24,7 +24,7 @@ class Invoice_farm extends CI_Controller
     public function index()
     {
 
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -58,7 +58,7 @@ class Invoice_farm extends CI_Controller
 
     public function add_index()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -81,7 +81,7 @@ class Invoice_farm extends CI_Controller
         $this->load->model('User_model', 'user');
         $data['request_server'] = $dataSolicitud;
         $data['categories']  = $this->categoria->get_all(['is_active' => 1]);
-        $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
+        $data['clients'] = $this->user->get_all(['role_id' => 9, 'is_delete' => 0]);
         $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);
         $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
         $data['measures'] = $this->measure->get_all(['is_active' => 1]);
@@ -94,7 +94,7 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -167,7 +167,7 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -185,7 +185,7 @@ class Invoice_farm extends CI_Controller
 
     function update_invoice_farm_index($id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -201,7 +201,7 @@ class Invoice_farm extends CI_Controller
             $this->load->model('Categoria_model', 'categoria');
             $this->load->model('User_model', 'user');
             $data['categories']  = $this->categoria->get_all(['is_active' => 1]);
-            $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
+            $data['clients'] = $this->user->get_all(['role_id' => 9, 'is_delete' => 0]);
             $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);;
             $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
             $data['measures'] = $this->measure->get_all(['is_active' => 1]);
@@ -218,7 +218,7 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -360,7 +360,7 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -810,7 +810,7 @@ class Invoice_farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }

@@ -33,7 +33,7 @@ class Farm extends CI_Controller
                 $item->farms_sons = $this->farm->get_all_farm_sons($item->farm_id);
             }
         }
-        $users_luxus = $this->user->get_all(['role_id' => 2, 'is_delete' => 0]);
+        $users_luxus = $this->user->get_all_users();
         $data['countrys'] = $this->country->get_all_countrys_farms();
         $data['users_luxus'] = $users_luxus;
         $data['all_providers'] = $all_providers;
@@ -200,7 +200,7 @@ class Farm extends CI_Controller
         }
         $this->load->model('User_model', 'user');
         $provider_object = $this->farm->get_provider_by_id($provider_id);
-        $users_luxus = $this->user->get_all(['role_id' => 1, 'is_delete' => 0]);
+        $users_luxus = $this->user->get_all_users();
         $data['users_luxus'] = $users_luxus;
         $data['provider_object'] = $provider_object;
 
@@ -402,11 +402,13 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
-        $personLuxus = (object)$this->input->post('personLuxus');
+        $personLuxus = json_decode($this->input->post('personLuxus'));
         $farm_id = $this->input->post('farmId');
-        $person_id = 'pl_' . uniqid();
-        $personLuxus->person_luxus_id = $person_id;
-        $personLuxus->person_is_active = 1;
+        foreach ($personLuxus as $item) {
+            $person_id = 'pl_' . uniqid();
+            $item->person_luxus_id = $person_id;
+            $item->person_is_active = 1;
+        }
         $response = $this->farm->update_provider($farm_id, ['person_luxus' => $personLuxus]);
         if ($response) {
             echo json_encode(['status' => 200, 'msj' => 'correcto']);
@@ -476,7 +478,7 @@ class Farm extends CI_Controller
     }
     public function index_balance()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -491,7 +493,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
