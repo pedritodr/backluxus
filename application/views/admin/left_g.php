@@ -51,7 +51,7 @@
                         <div class="tooltip"><span>Variedades</span></div>
                     </li>
                 <?php } ?>
-                <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) { ?>
+                <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3, 8])) { ?>
                     <li class="menu">
                         <a href="#farms" data-active="false" class="menu-toggle">
                             <div class="base-menu">
@@ -232,7 +232,7 @@
                                     </svg></span> <?= translate('manage_farms_lang') ?> </a>
                         </li>
                     <?php } ?>
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3, 8])) { ?>
                         <li>
                             <a href="<?= site_url('farm/index_balance') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>

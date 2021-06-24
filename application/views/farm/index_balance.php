@@ -215,10 +215,22 @@
 
 						stringTable += '<td>';
 						stringTable += '<button type="button" class="btn btn-outline-primary" onclick=watchDetails("' + encodeB64Uft8(JSON.stringify(item.details)) + '")>Ver detalle</button>';
+						const validRol = [1, 2, 7, 6, 5, 4, 3, 8].includes(Number('<?= $this->session->userdata('role_id') ?>'));
 						if (item.viewed === undefined) {
-							const validRol = [1, 2, 7, 6, 5, 4, 3].includes(Number('<?= $this->session->userdata('role_id') ?>'));
 							if (validRol) {
 								stringTable += '<button type="button" class="btn btn-outline-success" id="btnCheck' + item.invoice_farm + '" onclick=handleViewed("' + item.invoice_farm + '")>Marcar</button>';
+								stringTable += '<button style="display:none" type="button" class="btn btn-outline-success" id="btnCheck2' + item.invoice_farm + '" onclick=handleNotViewed("' + item.invoice_farm + '")>Quitar marca</button>';
+							}
+						} else {
+							if (item.viewed) {
+								const validRol2 = [3, 8].includes(Number('<?= $this->session->userdata('role_id') ?>'));
+								if (validRol2) {
+									stringTable += '<button type="button" class="btn btn-outline-success" id="btnCheck2' + item.invoice_farm + '" onclick=handleNotViewed("' + item.invoice_farm + '")>Quitar marca</button>';
+									stringTable += '<button style="display:none" type="button" class="btn btn-outline-success" id="btnCheck' + item.invoice_farm + '" onclick=handleViewed("' + item.invoice_farm + '")>Marcar</button>';
+								}
+							} else {
+								stringTable += '<button type="button" class="btn btn-outline-success" id="btnCheck' + item.invoice_farm + '" onclick=handleViewed("' + item.invoice_farm + '")>Marcar</button>';
+								stringTable += '<button style="display:none" type="button" class="btn btn-outline-success" id="btnCheck2' + item.invoice_farm + '" onclick=handleNotViewed("' + item.invoice_farm + '")>Quitar marca</button>';
 							}
 						}
 
@@ -610,9 +622,36 @@
 			if (response.status == 200) {
 				$('#check' + id).show();
 				$('#btnCheck' + id).hide();
+				$('#btnCheck2' + id).show();
 				swal({
 					title: 'Correcto!',
 					text: "Factura marcada como vista",
+					type: 'success',
+					padding: '2em'
+				});
+			} else {
+				swal({
+					title: 'Uppsss!',
+					text: response.msj,
+					type: 'error',
+					padding: '2em'
+				});
+			}
+		})
+	}
+	const handleNotViewed = (id) => {
+		let url = '<?= site_url("invoice_farm/not_viewed_check") ?>';
+		$.post(url, {
+			id
+		}, function(response) {
+			response = JSON.parse(response);
+			if (response.status == 200) {
+				$('#check' + id).hide();
+				$('#btnCheck' + id).show();
+				$('#btnCheck2' + id).hide();
+				swal({
+					title: 'Correcto!',
+					text: "Factura desmarcada como vista",
 					type: 'success',
 					padding: '2em'
 				});
