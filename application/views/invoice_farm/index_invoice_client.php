@@ -104,6 +104,15 @@
         display: inline-block;
     }
 
+
+    .dot-blue {
+        height: 15px;
+        width: 15px;
+        background-color: blue;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
     .table>tbody>tr>td {
         border: 1px solid #ebedf2;
         color: #888ea8;
@@ -165,7 +174,11 @@
                                             <td>
                                                 <?php
                                                 if ($item->status === 2) {
-                                                    echo ' <span class="dot-green"></span>';
+                                                    if ($item->viewed == 0) {
+                                                        echo ' <span class="dot-green"></span>';
+                                                    } else {
+                                                        echo ' <span class="dot-blue"></span>';
+                                                    }
                                                 } else {
                                                     $newDate = date("Y-m-d", strtotime($item->date_create));
                                                     $dateActual = date("Y-m-d");

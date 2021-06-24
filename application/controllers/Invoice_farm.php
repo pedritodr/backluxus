@@ -626,7 +626,7 @@ class Invoice_farm extends CI_Controller
         $invoice = $this->invoice_farm->get_by_id_invoice_client($id);
 
         if ($invoice) {
-            $this->invoice_farm->update_invoice_client($id, ['status' => 0]);
+            $this->invoice_farm->update_invoice_client($id, ['status' => 0, 'viewed' => 0]);
             $this->response->set_message(translate("invoice_send_client_lang"), ResponseMessage::SUCCESS);
             redirect("invoice_farm/index_invoice_client_send");
         } else {
@@ -1919,7 +1919,7 @@ class Invoice_farm extends CI_Controller
         }
         $invoice = $this->invoice_farm->get_by_id_invoice_client($id);
         if ($invoice) {
-            $this->invoice_farm->update_invoice_client($id, ['status' => 2]);
+            $this->invoice_farm->update_invoice_client($id, ['status' => 2, 'viewed' => 0]);
             $this->response->set_message(translate("invoice_send_client_lang"), ResponseMessage::SUCCESS);
             redirect("invoice_farm/index_invoice_client");
         } else {
@@ -1929,11 +1929,40 @@ class Invoice_farm extends CI_Controller
 
     public function index_invoice_client_send()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2, 4, 3])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 4, 3, 9])) {
             $this->log_out();
             redirect('login/index');
         }
         $all_invoice = $this->invoice_farm->get_all_invoice_client(['status' => 2]);
+        $all_invoice2 = $this->invoice_farm->get_all_invoice_client(['status' => 2, 'viewed' => 0]);
+        foreach ($all_invoice2 as $item) {
+            $this->invoice_farm->update($item->invoice, ['viewed' => 1]);
+        }
+        $data['all_invoice'] = $all_invoice;
+        $this->load_view_admin_g("invoice_farm/index_invoice_client_send", $data);
+    }
+
+    public function index_client()
+    {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 9])) {
+            $this->log_out();
+            redirect('login/index');
+        }
+        $this->load->model('User_model', 'user');
+        $userMarkings = $this->user->get_markings_by_user($this->session->userdata('user_id'));
+        $invoices = [];
+        $all_invoice = [];
+        if ($userMarkings) {
+            foreach ($userMarkings[0]->markings as $item) {
+                $response = $this->invoice_farm->get_all_invoice_client(['status' => 2, 'viewed' => 0, 'marking.marking_id' => $item->marking_id]);
+                $invoices = array_merge($invoices, $response);
+                $response2 = $this->invoice_farm->get_all_invoice_client(['status' => 2, 'marking.marking_id' => $item->marking_id]);
+                $all_invoice = array_merge($all_invoice, $response2);
+            }
+        }
+        foreach ($invoices as $item) {
+            $this->invoice_farm->update_invoice_client($item->invoice, ['viewed' => 1]);
+        }
         $data['all_invoice'] = $all_invoice;
         $this->load_view_admin_g("invoice_farm/index_invoice_client_send", $data);
     }

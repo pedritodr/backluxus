@@ -154,4 +154,19 @@ class User_model extends CI_Model
             return false;
         }
     }
+
+    function get_markings_by_user($id = 0)
+    {
+        $tuberia = [
+            ['$project' => ['_id' => 0, 'comision' => 0, 'carguera' => 0, 'secuencial' => 0, 'managers' => 0, 'address' => 0]],
+            ['$match' => ['user_id' => $id]]
+        ];
+
+        $query      = $this->mongo_db->aggregate('users', $tuberia);
+        if (count($query) > 0) {
+            return $query;
+        } else {
+            return false;
+        }
+    }
 }
