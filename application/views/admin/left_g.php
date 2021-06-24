@@ -16,7 +16,7 @@
             </div>
 
             <ul class="menu-categories">
-                <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                <?php if (in_array($this->session->userdata('role_id'), [1, 2, 3])) { ?>
                     <li class="menu active">
                         <a href="#dashboard" data-active="true" class="menu-toggle">
                             <div class="base-menu">
@@ -51,7 +51,7 @@
                         <div class="tooltip"><span>Variedades</span></div>
                     </li>
                 <?php } ?>
-                <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4])) { ?>
+                <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) { ?>
                     <li class="menu">
                         <a href="#farms" data-active="false" class="menu-toggle">
                             <div class="base-menu">
@@ -78,7 +78,7 @@
                         <div class="tooltip"><span><?= translate('manage_farms_lang') ?></span></div>
                     </li>
                 <?php } ?>
-                <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                <?php if (in_array($this->session->userdata('role_id'), [1, 2, 3])) { ?>
                     <li class="menu">
                         <a href="#users" data-active="false" class="menu-toggle">
                             <div class="base-menu">
@@ -96,7 +96,7 @@
                     </li>
                 <?php } ?>
 
-                <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4])) { ?>
+                <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) { ?>
                     <li class="menu">
                         <a href="#invoice_farm" data-active="false" class="menu-toggle">
                             <div class="base-menu">
@@ -128,41 +128,55 @@
                 </div>
 
                 <ul class="submenu-list" data-parent-element="#dashboard">
-                    <li>
-                        <a href="<?= site_url('empresa/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span>Empresa</a>
-                    </li>
-                    <li>
-                        <a href="<?= site_url('box/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span>Gestionar tipo cajas</a>
-                    </li>
-                    <li>
-                        <a href="<?= site_url('country/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span>Gestionar paises de entrega</a>
-                    </li>
-                    <li>
-                        <a href="<?= site_url('rol/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span><?= translate('manage_roles_lang') ?></a>
-                    </li>
-                    <li>
-                        <a href="<?= site_url('reason_credit/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span><?= translate('manage_reason_credit_lang') ?></a>
-                    </li>
-                    <li>
-                        <a href="<?= site_url('carguera/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span><?= translate('manage_carguera_lang') ?></a>
-                    </li>
-                    <li>
-                        <a href="<?= site_url('aeroline/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span><?= translate('management_areoline_lang') ?></a>
-                    </li>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                        <li>
+                            <a href="<?= site_url('empresa/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span>Empresa</a>
+                        </li>
+                    <?php } ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                        <li>
+                            <a href="<?= site_url('box/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span>Gestionar tipo cajas</a>
+                        </li>
+                    <?php } ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 3])) { ?>
+                        <li>
+                            <a href="<?= site_url('country/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span>Gestionar paises de entrega</a>
+                        </li>
+                    <?php } ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                        <li>
+                            <a href="<?= site_url('rol/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span><?= translate('manage_roles_lang') ?></a>
+                        </li>
+                    <?php } ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                        <li>
+                            <a href="<?= site_url('reason_credit/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span><?= translate('manage_reason_credit_lang') ?></a>
+                        </li>
+                    <?php } ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                        <li>
+                            <a href="<?= site_url('carguera/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span><?= translate('manage_carguera_lang') ?></a>
+                        </li>
+                    <?php } ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                        <li>
+                            <a href="<?= site_url('aeroline/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span><?= translate('management_areoline_lang') ?></a>
+                        </li>
+                    <?php } ?>
                 </ul>
             </div>
 
@@ -211,14 +225,14 @@
                     <p>Gestión para las fincas.</p>
                 </div>
                 <ul class="submenu-list" data-parent-element="#farms">
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 3])) { ?>
                         <li>
                             <a href="<?= site_url('farm/index_provider') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>
                                     </svg></span> <?= translate('manage_farms_lang') ?> </a>
                         </li>
                     <?php } ?>
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) { ?>
                         <li>
                             <a href="<?= site_url('farm/index_balance') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>
@@ -245,31 +259,20 @@
                     <p>Gestión de usuarios en la plataforma.</p>
                 </div>
                 <ul class="submenu-list" data-parent-element="#users">
-                    <li>
-                        <a href="<?= site_url('user/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span> Gestionar usuario </a>
-                    </li>
-                    <li>
-                        <a href="<?= site_url('user/index_client') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span> <?= translate('manage_clients_lang') ?> </a>
-                    </li>
-                    <!--   <li>
-                        <a href="user_account_setting.html"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span> Account Settings </a>
-                    </li>
-                    <li>
-                        <a href="fonticons.html"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span> Font Icons </a>
-                    </li>
-                    <li>
-                        <a href="widgets.html"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                </svg></span> Widgets </a>
-                    </li> -->
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2])) { ?>
+                        <li>
+                            <a href="<?= site_url('user/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span> Gestionar usuario </a>
+                        </li>
+                    <?php } ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 3])) { ?>
+                        <li>
+                            <a href="<?= site_url('user/index_client') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg></span> <?= translate('manage_clients_lang') ?> </a>
+                        </li>
+                    <?php } ?>
                 </ul>
             </div>
             <div class="submenu" id="invoice_farm">
@@ -278,42 +281,42 @@
                     <p>Gestión de facturas de fincas y clientes en la plataforma.</p>
                 </div>
                 <ul class="submenu-list" data-parent-element="#invoice_farm">
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) { ?>
                         <li>
                             <a href="<?= site_url('invoice_farm/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>
                                     </svg></span> <?= translate('manage_invoice_farms_lang') ?> </a>
                         </li>
                     <?php } ?>
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 6, 5, 4])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 6, 5, 4, 3])) { ?>
                         <li>
                             <a href="<?= site_url('invoice_farm/index_wait') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>
                                     </svg></span> <?= translate('invoice_wait_lang') ?> </a>
                         </li>
                     <?php } ?>
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 6, 5, 4])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 6, 5, 4, 3])) { ?>
                         <li>
                             <a href="<?= site_url('invoice_farm/index_invoice_client') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>
                                     </svg></span> <?= translate('packings_lang') ?> </a>
                         </li>
                     <?php } ?>
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 4])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 4, 3])) { ?>
                         <li>
                             <a href="<?= site_url('invoice_farm/index_invoice_client_send') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>
                                     </svg></span> <?= translate('List_invoice_send_client_lang') ?> </a>
                         </li>
                     <?php } ?>
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) { ?>
                         <li>
                             <a href="<?= site_url('credit/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>
                                     </svg></span> <?= translate('manage_credit_lang') ?> </a>
                         </li>
                     <?php } ?>
-                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4])) { ?>
+                    <?php if (in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) { ?>
                         <li>
                             <a href="<?= site_url('fixed_orders/index') ?>"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle">
                                         <circle cx="12" cy="12" r="10"></circle>

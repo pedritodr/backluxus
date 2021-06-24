@@ -188,12 +188,12 @@
                                                         </svg></button>
                                                     <div class="dropdown-menu" aria-labelledby="btnOutline">
                                                         <a class="dropdown-item" id="<?= 'btneyeDetails_' . $item->invoice ?>" href="javascript:void(0)" onclick="verDetails('<?= base64_encode(json_encode($item->details)) ?>','<?= $item->invoice ?>','<?= $item->status ?>')"><i class="fa fa-edit"></i> <?= translate("details_lang"); ?></a>
-                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 5, 4])) { ?>
+                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 5, 4, 3])) { ?>
                                                             <a class="dropdown-item" href="javascript:void(0)" onclick="updateAwb('<?= base64_encode(json_encode($item)) ?>')"><?= translate("edit_awb_lang"); ?></a>
                                                             <a class="dropdown-item" href="javascript:void(0)"><?= translate("send_invoice_lang"); ?></a>
                                                         <?php } ?>
                                                         <a class="dropdown-item" href="<?= site_url('invoice_farm/export_invoice/' . $item->invoice) ?>"><?= translate("export_invoice_lang"); ?></a>
-                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 5, 4])) { ?>
+                                                        <?php if (in_array($this->session->userdata('role_id'), [1, 2, 5, 4, 3])) { ?>
                                                             <a class="dropdown-item" href="javascript:void(0)" onclick="cancelInvoice('<?= $item->invoice ?>')"><?= translate("cancel_invoice_lang"); ?></a>
                                                         <?php } ?>
                                                     </div>

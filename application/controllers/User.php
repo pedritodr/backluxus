@@ -29,7 +29,7 @@ class User extends CI_Controller
     }
     public function index_client()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -59,7 +59,7 @@ class User extends CI_Controller
     }
     public function add_index_client()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -122,7 +122,7 @@ class User extends CI_Controller
     }
     public function add_client()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -186,7 +186,7 @@ class User extends CI_Controller
     }
     public function update_index_client($user_id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -260,7 +260,7 @@ class User extends CI_Controller
     }
     public function update_client()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -310,7 +310,7 @@ class User extends CI_Controller
     }
     public function delete_cliente($user_id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -427,7 +427,7 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -448,7 +448,7 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -475,7 +475,7 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -502,7 +502,7 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -524,7 +524,7 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -553,7 +553,7 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -583,7 +583,7 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -605,7 +605,7 @@ class User extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }

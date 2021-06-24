@@ -19,7 +19,7 @@ class Farm extends CI_Controller
     public function index_provider()
     {
 
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -43,7 +43,7 @@ class Farm extends CI_Controller
 
     public function add_index_provider()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -58,7 +58,7 @@ class Farm extends CI_Controller
 
     public function add_provider()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -107,7 +107,7 @@ class Farm extends CI_Controller
     }
     function update_index_provider($provider_id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -127,7 +127,7 @@ class Farm extends CI_Controller
     }
     public function update_provider()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -179,7 +179,7 @@ class Farm extends CI_Controller
     }
     public function delete_provider($provider_id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -194,7 +194,7 @@ class Farm extends CI_Controller
     }
     public function index($provider_id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -209,7 +209,7 @@ class Farm extends CI_Controller
 
     public function add_farm_index($provider_id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -219,7 +219,7 @@ class Farm extends CI_Controller
 
     public function add_farm()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -249,7 +249,7 @@ class Farm extends CI_Controller
     }
     function update_index($farm_id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -265,7 +265,7 @@ class Farm extends CI_Controller
     }
     public function update_farm()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -294,7 +294,7 @@ class Farm extends CI_Controller
     }
     public function delete_farm($farm_id = 0)
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -315,7 +315,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -350,7 +350,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -381,7 +381,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -398,7 +398,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -424,7 +424,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -444,7 +444,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -465,7 +465,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
@@ -478,7 +478,7 @@ class Farm extends CI_Controller
     }
     public function index_balance()
     {
-        if (!in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) {
             $this->log_out();
             redirect('login/index');
         }
@@ -493,7 +493,7 @@ class Farm extends CI_Controller
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los usuarios autenticados']);
             exit();
         }
-        if (!in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4])) {
+        if (!in_array($this->session->userdata('role_id'), [1, 2, 7, 6, 5, 4, 3])) {
             echo json_encode(['status' => 500, 'msj' => 'Esta opción solo esta disponible para los administradores']);
             exit();
         }
