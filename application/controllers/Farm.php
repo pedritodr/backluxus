@@ -34,8 +34,6 @@ class Farm extends CI_Controller
             }
         }
         $users_luxus = $this->user->get_all_users();
-        var_dump($users_luxus);
-        die();
         $data['countrys'] = $this->country->get_all_countrys_farms();
         $data['users_luxus'] = $users_luxus;
         $data['all_providers'] = $all_providers;
