@@ -180,6 +180,8 @@
                                                         } else {
                                                             echo ' <span class="dot-blue"></span>';
                                                         }
+                                                    } else {
+                                                        echo ' <span class="dot-green"></span>';
                                                     }
                                                 } else {
                                                     $newDate = date("Y-m-d", strtotime($item->date_create));
