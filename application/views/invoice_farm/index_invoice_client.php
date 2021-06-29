@@ -174,10 +174,12 @@
                                             <td>
                                                 <?php
                                                 if ($item->status === 2) {
-                                                    if ($item->viewed == 0) {
-                                                        echo ' <span class="dot-green"></span>';
-                                                    } else {
-                                                        echo ' <span class="dot-blue"></span>';
+                                                    if (property_exists($item, 'viewed')) {
+                                                        if ($item->viewed == 0) {
+                                                            echo ' <span class="dot-green"></span>';
+                                                        } else {
+                                                            echo ' <span class="dot-blue"></span>';
+                                                        }
                                                     }
                                                 } else {
                                                     $newDate = date("Y-m-d", strtotime($item->date_create));
