@@ -53,7 +53,7 @@ class Fixed_orders extends CI_Controller
         $this->load->model('User_model', 'user');
         $data['request_server'] = $dataSolicitud;
         $data['categories']  = $this->categoria->get_all(['is_active' => 1]);
-        $data['clients'] = $this->user->get_all(['role_id' => 3, 'is_delete' => 0]);
+        $data['clients'] = $this->user->get_all(['role_id' => 9, 'is_delete' => 0]);
         $data['farms'] = $this->farm->get_all_providers(['is_active' => 1]);
         $data['boxs_type'] = $this->box->get_all(['is_active' => 1]);
         $data['measures'] = $this->measure->get_all(['is_active' => 1]);
